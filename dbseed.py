@@ -12,11 +12,13 @@ def make_db_seed(db):
         seed_dxcc(db)
         seed_dxcc_exceptions(db)
         seed_users(db)  # after timezones because not null relation
-                        # also seeds roles admin/user
+        # also seeds roles admin/user
         seed_modes(db)
         seed_bands(db)
     except:
         db.session.rollback()
+        raise
+
 
 def seed_users(db):
     print("++ Seeding users")
@@ -31,8 +33,8 @@ def seed_users(db):
         name='toto',
         timezone='UTC',
         roles=[role_adm],
-        callsign = 'N0C4LL',
-        locator = 'JN'
+        callsign='N0C4LL',
+        locator='JN'
     )
     db.session.commit()
     return
@@ -4060,6 +4062,7 @@ def seed_dxcc_exceptions(db):
         DxccException(prefix='ZC6C', name='PALESTINE', cqz='20', ituz='39', cont='AS', long='35.1', lat='31.4',
                       start=datetime.fromtimestamp(0), end=datetime.fromtimestamp(0)))
     db.session.commit()
+
 
 def seed_modes(db):
     print("+++ Seeding modes")
