@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: a8a7c1e2e3a
+Revision ID: 425cc4594aa1
 Revises: None
-Create Date: 2016-05-05 17:01:42.609143
+Create Date: 2016-05-05 18:29:08.542299
 
 """
 
 # revision identifiers, used by Alembic.
-revision = 'a8a7c1e2e3a'
+revision = '425cc4594aa1'
 down_revision = None
 
 from alembic import op
@@ -176,7 +176,7 @@ def upgrade():
     sa.Column('eqsl_qslsdate', sa.DateTime(), nullable=True),
     sa.Column('eqsl_qsl_rcvd', sa.String(length=2), nullable=True),
     sa.Column('eqsl_qsl_sent', sa.String(length=2), nullable=True),
-    sa.Column('esql_status', sa.String(length=255), nullable=True),
+    sa.Column('eqsl_status', sa.String(length=255), nullable=True),
     sa.Column('force_init', sa.Integer(), nullable=True),
     sa.Column('freq', sa.Integer(), nullable=True),
     sa.Column('freq_rx', sa.Integer(), nullable=True),

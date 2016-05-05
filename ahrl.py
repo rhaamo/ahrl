@@ -1,3 +1,4 @@
+# encoding: utf-8
 from pprint import pprint as pp
 
 from flask import Flask, render_template, g, send_from_directory, jsonify

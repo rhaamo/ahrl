@@ -12,9 +12,9 @@ import requests
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
-# To be managed a-part: band, klass (class), freq, freq_rx, mode, time_on, qso_date
+# To be managed a-part: band, klass (class), freq, freq_rx, mode, time_on, qso_date, comment
 ADIF_FIELDS = ['address', 'age', 'a_index', 'ant_az', 'ant_el', 'ant_path', 'arrl_sect', 'biography',
-               'band_rx', 'call', 'check', 'cnty', 'comment', 'cont', 'contacted_op', 'contest_id',
+               'band_rx', 'call', 'check', 'cnty', 'cont', 'contacted_op', 'contest_id',
                'country', 'cqz', 'distance', 'dxcc', 'email', 'eq_call', 'eqsl_qslrdate',
                'eqsl_qslsdate', 'eqsl_qsl_rcvd', 'eqsl_qsl_sent', 'eqsl_status', 'force_init',
                'gridsquare', 'heading', 'iota', 'ituz', 'k_index', 'lat', 'lon',
@@ -27,7 +27,7 @@ ADIF_FIELDS = ['address', 'age', 'a_index', 'ant_az', 'ant_el', 'ant_path', 'arr
                'qsl_rcvd', 'qsl_rcvd_via', 'qsl_sent', 'qsl_sent_via', 'qsl_via', 'qso_complete',
                'qso_random', 'qth', 'rig', 'rst_rcvd', 'rst_sent', 'rx_pwr', 'sat_mode', 'sat_name',
                'sfi', 'sig', 'sig_info', 'srx', 'srx_string', 'state', 'station_callsign', 'stx',
-               'stx_info', 'swl', 'ten_ten', 'time_off', 'time_on', 'tx_pwr', 'web', 'credit_granted',
+               'stx_info', 'swl', 'ten_ten', 'time_off', 'tx_pwr', 'web', 'credit_granted',
                'credit_submitted']
 
 

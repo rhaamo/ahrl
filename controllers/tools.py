@@ -42,7 +42,7 @@ def adif_import_file():
             dl = Log.query.filter(Log.user_id == current_user.id,
                                   Log.call == log['call'],
                                   Log.time_on == _date_wo_tz)
-            if dl:
+            if dl.count() > 0:
                 duplicates += 1
                 continue  # duplicate found, skip record
 
@@ -63,7 +63,9 @@ def adif_import_file():
                     band = Mode.query.filter(Band.name == 'SSB',
                                              Band.start.is_(None),
                                              Band.modes.is_(None)).first()
-                    l.comment += "\r\nBand automatically set to 40m because not found in ADIF"
+                    if not l.notes:
+                        l.notes = ""
+                    l.notes += "\r\nBand automatically set to 40m because not found in ADIF"
                 l.band_id = band.id
             if 'freq' in log:
                 l.freq = int(float(log['freq']) * 1000000)  # ADIF stores in MHz, we store in Hertz
@@ -73,20 +75,27 @@ def adif_import_file():
                 mode = Mode.query.filter(Mode.mode == log['mode']).first()
                 if not mode:
                     mode = Mode.query.filter(Mode.mode == 'SSB').first()
-                    l.comment += "\r\nMode automatically set to SSB because not found in ADIF"
+                    if not l.notes:
+                        l.notes = ""
+                    l.notes += "\r\nMode automatically set to SSB because not found in ADIF"
                 l.mode_id = mode.id
             # Reminder : ADIF is in UTC, we store in UTC, no TZ conversion necessary
             if 'qso_date' in log and 'time_on':
                 date = "{0} {1}".format(log['qso_date'], log['time_on'])
                 date_wo_tz = datetime.datetime.strptime(date, "%Y%m%d %H%M%S")
-                date_w_tz = pytz.timezone(current_user.timezone).localize(date_wo_tz)
-                l.time_on = date_w_tz.astimezone(pytz.timezone('UTC'))
-                l.time_off = date_w_tz.astimezone(pytz.timezone('UTC'))
+                l.time_on = date_wo_tz
+                l.time_off = date_wo_tz
             else:
                 date_w_tz = datetime.datetime.utcnow()
                 l.time_on = date_w_tz.astimezone(pytz.timezone('UTC'))
                 l.time_off = date_w_tz.astimezone(pytz.timezone('UTC'))
-                l.comment += "\r\nDate set to the import date because not found in ADIF"
+                if not l.notes:
+                    l.notes = ""
+                l.notes = "\r\nDate set to the import date because not found in ADIF"
+            if 'comment' in log:
+                l.comment = log['comment'].decode('UTF-8')
+            if 'comment_intl' in log:
+                l.comment = log['comment_intl'].decode('UTF-8')
             l.user = current_user  # oops dont miss it
 
             db.session.add(l)
@@ -114,7 +123,8 @@ def adif_export_dl():
     logs = current_user.logs
 
     def a(k, v):
-        return "<{0}:{1}>{2} ".format(str(k), len(str(v)), str(v))
+        v = unicode(v)
+        return u"<{0}:{1}>{2} ".format(k, len(v), v)
 
     def generate():
         yield 'ADIF Export by AHRL\r\n'
@@ -129,13 +139,13 @@ def adif_export_dl():
         for log in logs:
             counter = 0
             for key in ADIF_FIELDS:
-                if counter == 3:
+                if counter == 4:
                     counter = 0
                     yield '\r\n'
 
                 value = getattr(log, key)
                 if value:
-                    a(key, value)
+                    yield a(key, value)
                     counter += 1
 
             yield '\r\n'
@@ -145,14 +155,16 @@ def adif_export_dl():
             if log.freq_rx:
                 yield a('freq', log.freq_rx / 1000000.0)
             if log.mode:
-                a('mode', log.mode.mode)
+                yield a('mode', log.mode.mode)
             if log.time_on:
-                a('qso_date', log.time_on.strftime('%Y%m%d'))
-                a('time_on', log.time_on.strftime('%H%M%S'))
+                yield a('qso_date', log.time_on.strftime('%Y%m%d'))
+                yield a('time_on', log.time_on.strftime('%H%M%S'))
             if log.klass:
-                a('class', log.klass)
+                yield a('class', log.klass)
             if log.band:
-                a('band', log.band.name)
+                yield a('band', log.band.name)
+            if log.comment:
+                yield a('comment_intl', log.comment)
             yield '\r\n<eor>\r\n\r\n'
 
     return Response(stream_with_context(generate()), mimetype="text/plain",
