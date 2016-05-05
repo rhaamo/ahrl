@@ -147,7 +147,7 @@ class Dxcc(db.Model):
     __tablename__ = "dxcc"
 
     id = db.Column(db.Integer, primary_key=True)
-    prefix = db.Column(db.String(10), nullable=False, index=True)
+    prefix = db.Column(db.String(20), nullable=False, index=True)
     name = db.Column(db.String(150), default=None)
     cqz = db.Column(db.Float, nullable=False)
     ituz = db.Column(db.Float, nullable=False)
