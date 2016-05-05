@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: 193f5c779640
+Revision ID: 33200cef9060
 Revises: None
-Create Date: 2016-05-05 20:50:28.654966
+Create Date: 2016-05-05 21:12:22.134639
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '193f5c779640'
+revision = '33200cef9060'
 down_revision = None
 
 from alembic import op
@@ -20,9 +20,9 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('modes', sa.String(length=255), nullable=True),
     sa.Column('name', sa.String(length=255), nullable=False),
-    sa.Column('lower', sa.Integer(), nullable=True),
-    sa.Column('upper', sa.Integer(), nullable=True),
-    sa.Column('start', sa.Integer(), nullable=True),
+    sa.Column('lower', sa.BigInteger(), nullable=True),
+    sa.Column('upper', sa.BigInteger(), nullable=True),
+    sa.Column('start', sa.BigInteger(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('cat',

@@ -387,8 +387,8 @@ class Band(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     modes = db.Column(db.String(255), nullable=True)
     name = db.Column(db.String(255), nullable=False)
-    lower = db.Column(db.BigInteger, nullable=True)
-    upper = db.Column(db.BigInteger, nullable=True)
-    start = db.Column(db.BigInteger, nullable=True)
+    lower = db.Column(db.BigInteger(), nullable=True)
+    upper = db.Column(db.BigInteger(), nullable=True)
+    start = db.Column(db.BigInteger(), nullable=True)
 
     logs = db.relationship('Log', backref='band', lazy='dynamic')
