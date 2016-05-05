@@ -8,15 +8,15 @@
         <table class="table table-borderless">
             <tr>
                 <td>Band</td>
-                <td>{{ qso.band }}</td>
+                <td>{{ qso.band.name }}</td>
             </tr>
             <tr>
                 <td>Freq.</td>
-                <td>{{ qso.freq }} Hz</td>
+                <td>{{ qso.freq }}Hz - {{ qso.freq / 1000000.0 }}MHz</td>
             </tr>
             <tr>
                 <td>Mode</td>
-                <td>{{ qso.mode }}</td>
+                <td>{{ qso.mode.mode }}</td>
             </tr>
             <tr>
                 <td>RST Sent</td>
@@ -34,6 +34,20 @@
                 <td>Distance</td>
                 <td>{{ qso_bearing | round }}&deg; {{ qso_bearing_star }} - {{ qso_distance | round }} {{ qso_distance_unit }}</td>
             </tr>
+            <tr>
+                <td>Comment</td>
+                <td>{{ qso.comment or "No comment" }}</td>
+            </tr>
+            <tr>
+                <td>Notes</td>
+                <td>{{ qso.notes or "No notes" }}</td>
+            </tr>
+            {% if qso.web %}
+            <tr>
+                <td>Web</td>
+                <td><a href="{{ qso.web }}">{{ qso.web }}</a></td>
+            </tr>
+            {% endif %}
         </table>
     </div>
     <div class="col-lg-6"><div id="map-single-qso" style="width: 400px; height: 250px"></div></div>
@@ -54,8 +68,29 @@
                 string += "<br />Mode: " + f.properties['mode'];
                 l.bindPopup("<div class='popupMap'>" + string + '</div>');
             }
+
+            if (f.properties['icon'] == 'home') {
+                l.setIcon(homeIcon);
+            } else if (f.properties['icon'] == 'qso') {
+                l.setIcon(qsoIcon);
+            } else {
+                l.setIcon(defaultIcon);
+            }
         }
     }
+
+    var defaultIcon = L.AwesomeMarkers.icon({
+        icon: 'star',
+        markerColor: 'blue'
+    });
+    var qsoIcon = L.AwesomeMarkers.icon({
+        icon: 'user',
+        markerColor: 'blue'
+    });
+    var homeIcon = L.AwesomeMarkers.icon({
+        icon: 'home',
+        markerColor: 'green'
+    });
 
     var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_qso_geojson', qso_id=qso.id) }}"],{onEachFeature:popUp}).addTo(map_single_qso);
 </script>
