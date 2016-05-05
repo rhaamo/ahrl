@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: 425cc4594aa1
+Revision ID: 313b9f2a4947
 Revises: None
-Create Date: 2016-05-05 18:29:08.542299
+Create Date: 2016-05-05 20:21:15.392177
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '425cc4594aa1'
+revision = '313b9f2a4947'
 down_revision = None
 
 from alembic import op
@@ -30,7 +30,7 @@ def upgrade():
     sa.Column('radio', sa.String(length=250), nullable=False),
     sa.Column('frequency', sa.Integer(), nullable=False),
     sa.Column('mode', sa.String(length=10), nullable=False),
-    sa.Column('timestamp', sa.DateTime(), server_default=sa.text(u'CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('timestamp', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('config',
@@ -162,7 +162,7 @@ def upgrade():
     sa.Column('check', sa.String(length=8), nullable=True),
     sa.Column('klass', sa.String(length=8), nullable=True),
     sa.Column('cnty', sa.String(length=32), nullable=True),
-    sa.Column('comment', sa.Text(), nullable=True),
+    sa.Column('comment', sa.UnicodeText(), nullable=True),
     sa.Column('cont', sa.String(length=6), nullable=True),
     sa.Column('contacted_op', sa.String(length=32), nullable=True),
     sa.Column('contest_id', sa.String(length=32), nullable=True),
