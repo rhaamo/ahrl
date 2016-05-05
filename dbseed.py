@@ -6,14 +6,17 @@ import parsedatetime as pdt
 
 def make_db_seed(db):
     print("== Seeding database")
-    seed_config(db)
-    seed_dxcc(db)
-    seed_dxcc_exceptions(db)
-    seed_users(db)  # after timezones because not null relation
-                    # also seeds roles admin/user
-    seed_modes(db)
-    seed_bands(db)
-
+    db.session.begin(subtransactions=True)
+    try:
+        seed_config(db)
+        seed_dxcc(db)
+        seed_dxcc_exceptions(db)
+        seed_users(db)  # after timezones because not null relation
+                        # also seeds roles admin/user
+        seed_modes(db)
+        seed_bands(db)
+    except:
+        db.session.rollback()
 
 def seed_users(db):
     print("++ Seeding users")
