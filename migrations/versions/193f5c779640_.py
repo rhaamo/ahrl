@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: 1f2ea117a61e
+Revision ID: 193f5c779640
 Revises: None
-Create Date: 2016-05-05 20:30:30.145306
+Create Date: 2016-05-05 20:50:28.654966
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '1f2ea117a61e'
+revision = '193f5c779640'
 down_revision = None
 
 from alembic import op
@@ -78,7 +78,7 @@ def upgrade():
     )
     op.create_table('dxcc',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('prefix', sa.String(length=10), nullable=False),
+    sa.Column('prefix', sa.String(length=30), nullable=False),
     sa.Column('name', sa.String(length=150), nullable=True),
     sa.Column('cqz', sa.Float(), nullable=False),
     sa.Column('ituz', sa.Float(), nullable=False),
@@ -90,7 +90,7 @@ def upgrade():
     op.create_index(op.f('ix_dxcc_prefix'), 'dxcc', ['prefix'], unique=False)
     op.create_table('dxccexceptions',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('prefix', sa.String(length=10), nullable=False),
+    sa.Column('prefix', sa.String(length=30), nullable=False),
     sa.Column('name', sa.String(length=150), nullable=True),
     sa.Column('cqz', sa.Float(), nullable=False),
     sa.Column('ituz', sa.Float(), nullable=False),
