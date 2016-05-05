@@ -91,7 +91,7 @@ class Cat(db.Model):
     radio = db.Column(db.String(250), nullable=False)
     frequency = db.Column(db.Integer(), nullable=False)
     mode = db.Column(db.String(10), nullable=False)
-    timestamp = db.Column(db.DateTime(timezone=False), nullable=False, default=func.now(), onupdate=func.now())
+    timestamp = db.Column(db.DateTime(timezone=False), nullable=False)
 
 
 class Config(db.Model):
