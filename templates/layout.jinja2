@@ -78,8 +78,10 @@
               </ul>
             </li>
             {% else %}
-                <li class="{% if request.endpoint == 'bp_qsos.logbook' %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook', username=user.name) }}">Logbook</a></li>
-                <li class="{% if request.endpoint.startswith('bp_qsos.logbook_stats') %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook_stats', username=user.name) }}">Statistics</a></li>
+                {% if user %}
+                    <li class="{% if request.endpoint == 'bp_qsos.logbook' %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook', username=user.name) }}">Logbook</a></li>
+                    <li class="{% if request.endpoint.startswith('bp_qsos.logbook_stats') %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook_stats', username=user.name) }}">Statistics</a></li>
+                {% endif %}
             {% endif %}
 
           </ul>
