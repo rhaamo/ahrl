@@ -60,7 +60,7 @@ def adif_import_file():
                                          Band.start.is_(None),
                                          Band.modes.is_(None)).first()
                 if not band:
-                    band = Mode.query.filter(Band.name == 'SSB',
+                    band = Band.query.filter(Band.name == 'SSB',
                                              Band.start.is_(None),
                                              Band.modes.is_(None)).first()
                     if not l.notes:
