@@ -3,7 +3,12 @@
 {% block content %}
 <div class="row">
     <div class="col-lg-12">
-        home page
+        <h4>You can view the following logbooks:</h4>
+        <ul>
+            {% for i in logbooks %}
+            <li><a href="{{ url_for('bp_qsos.logbook', username=i.name) }}">{{ i.name }} - {{ i.callsign }}</a></li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 {% endblock %}

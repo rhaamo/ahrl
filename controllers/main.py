@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+from models import User
 
 bp_main = Blueprint('bp_main', __name__)
 
@@ -7,7 +8,8 @@ bp_main = Blueprint('bp_main', __name__)
 @bp_main.route('/')
 def home():
     pcfg = {"title": "AHRL - Another Ham Radio Log"}
-    return render_template('home.jinja2', pcfg=pcfg)
+    users = User.query.all()
+    return render_template('home.jinja2', pcfg=pcfg, logbooks=users)
 
 
 @bp_main.route('/about')
