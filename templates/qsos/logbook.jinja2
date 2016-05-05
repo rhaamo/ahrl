@@ -31,7 +31,7 @@
             <tr><td colspan="2"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> User</td></tr>
             <tr><td width="60%">Callsign</td><td>{{ user.callsign }}</td></tr>
             {% if user.swl %}
-                <tr><td width="60%">SWL</td><td><span class="glyphicon glyphicon-{{ 'ok' if current_user.swl else 'remove' }}"></span></td></tr>
+                <tr><td width="60%">SWL</td><td><span class="glyphicon glyphicon-{{ 'ok' if user.swl else 'remove' }}"></span></td></tr>
             {% endif %}
         </table>
 
