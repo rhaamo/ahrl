@@ -198,7 +198,6 @@ def lib_clublog_dxcc():
 
 
 @bp_qsos.route('/logbook/<string:username>/geojson', methods=['GET'])
-@login_required
 def logbook_geojson(username):
     if not username:
         raise InvalidUsage('Missing username', status_code=400)
@@ -258,7 +257,6 @@ def logbook_geojson(username):
 
 
 @bp_qsos.route('/logbook/qso/<int:qso_id>/geojson', methods=['GET'])
-@login_required
 def logbook_qso_geojson(qso_id):
     if not qso_id:
         raise InvalidUsage('Missing qso_id', status_code=400)
@@ -378,4 +376,4 @@ def logbook_stats(username):
             })
         stats_months.append(stats_y)
 
-    return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_months=json.dumps(stats_months))
+    return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_months=json.dumps(stats_months), user=user)
