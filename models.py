@@ -1,0 +1,394 @@
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
+
+from sqlalchemy.sql import func
+from sqlalchemy_searchable import make_searchable
+
+from libqth import is_valid_qth, qth_to_coords, coords_to_qth
+from geohelper import distance
+
+import datetime
+
+db = SQLAlchemy()
+make_searchable()
+
+
+roles_users = db.Table('roles_users',
+                       db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+                       db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
+
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False, info={'label': 'Name'})
+    description = db.Column(db.String(255), info={'label': 'Description'})
+
+    __mapper_args__ = {"order_by": name}
+
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False, info={'label': 'Email'})
+    name = db.Column(db.String(255), unique=True, nullable=False, info={'label': 'Name'})
+    password = db.Column(db.String(255), nullable=False, info={'label': 'Password'})
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+
+    callsign = db.Column(db.String(32))
+    locator = db.Column(db.String(16))
+    firstname = db.Column(db.String(32))
+    lastname = db.Column(db.String(32))
+    lotw_name = db.Column(db.String(32))
+    lotw_password = db.Column(db.String(255))
+    eqsl_name = db.Column(db.String(32))
+    eqsl_password = db.Column(db.String(255))
+    timezone = db.Column(db.String(255), nullable=False)  # Managed and fed by pytz
+    swl = db.Column(db.Boolean(), nullable=False, default=False)
+
+    roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+    logs = db.relationship('Log', backref='user', lazy='dynamic')
+    notes = db.relationship('Note', backref='user', lazy='dynamic')
+    apitokens = db.relationship('Apitoken', backref='user', lazy='dynamic')
+
+    __mapper_args__ = {"order_by": name}
+
+    def join_roles(self, string):
+        return string.join([i.description for i in self.roles])
+
+    def qth_to_coords(self):
+        qth = is_valid_qth(self.locator, 6)
+        if not qth:
+            return None
+        qth = qth_to_coords(self.locator, 6)
+        if not qth:
+            return None
+        return qth
+
+    # Give a cute name <3 More like "name - callsign" or "callsign"
+    def cutename(self):
+        cute = ""
+        if self.name:
+            cute += self.name
+            cute += " - "
+        cute += self.callsign
+        return cute
+
+
+class Apitoken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+    token = db.Column(db.String(), unique=True, nullable=False, info={'label': 'Token'})
+    secret = db.Column(db.String(), unique=True, nullable=False, info={'label': 'Secret'})
+
+
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+
+
+class Cat(db.Model):
+    __tablename__ = "cat"
+
+    id = db.Column(db.Integer, primary_key=True)
+    radio = db.Column(db.String(250), nullable=False)
+    frequency = db.Column(db.Integer(), nullable=False)
+    mode = db.Column(db.String(10), nullable=False)
+    timestamp = db.Column(db.DateTime(timezone=False), nullable=False, server_default=func.now(), onupdate=func.now())
+
+
+class Config(db.Model):
+    __tablename__ = "config"
+
+    id = db.Column(db.Integer, primary_key=True)
+    lotw_download_url = db.Column(db.String(255), default=None)
+    lotw_upload_url = db.Column(db.String(255), default=None)
+    lotw_rcvd_mark = db.Column(db.String(255), default=None)
+    lotw_login_url = db.Column(db.String(255), default=None)
+    eqsl_download_url = db.Column(db.String(255), default=None)
+    eqsl_rcvd_mark = db.Column(db.String(255), default=None)
+
+
+class ContestTemplate(db.Model):
+    __tablename__ = "contest_template"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False, index=True)
+    band_160 = db.Column(db.String(20), nullable=False)
+    band_80 = db.Column(db.String(20), nullable=False)
+    band_40 = db.Column(db.String(20), nullable=False)
+    band_20 = db.Column(db.String(20), nullable=False)
+    band_15 = db.Column(db.String(20), nullable=False)
+    band_10 = db.Column(db.String(20), nullable=False)
+    band_6m = db.Column(db.String(20), nullable=False)
+    band_4m = db.Column(db.String(20), nullable=False)
+    band_2m = db.Column(db.String(20), nullable=False)
+    band_70cm = db.Column(db.String(20), nullable=False)
+    band_23cm = db.Column(db.String(20), nullable=False)
+    mode_ssb = db.Column(db.String(20), nullable=False)
+    mode_cw = db.Column(db.String(20), nullable=False)
+    serial = db.Column(db.String(20), nullable=False)
+    point_per_km = db.Column(db.String(20), nullable=False)
+    qra = db.Column(db.String(20), nullable=False)
+    other_exch = db.Column(db.String(255), nullable=False)
+    scoring = db.Column(db.String(255), nullable=False)
+
+
+class Contest(db.Model):
+    __tablename__ = "contests"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    start = db.Column(db.DateTime(timezone=False), nullable=False)
+    end = db.Column(db.DateTime(timezone=False), nullable=False)
+    template = db.Column(db.Integer(), nullable=False)
+    serial_num = db.Column(db.Integer(), nullable=False)
+    # possible FK template->contest_template
+
+
+class Dxcc(db.Model):
+    __tablename__ = "dxcc"
+
+    id = db.Column(db.Integer, primary_key=True)
+    prefix = db.Column(db.String(10), nullable=False, index=True)
+    name = db.Column(db.String(150), default=None)
+    cqz = db.Column(db.Float, nullable=False)
+    ituz = db.Column(db.Float, nullable=False)
+    cont = db.Column(db.String(5), nullable=False)
+    long = db.Column(db.Float, nullable=False)
+    lat = db.Column(db.Float, nullable=False)
+
+
+class DxccException(db.Model):
+    __tablename__ = "dxccexceptions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    prefix = db.Column(db.String(10), nullable=False, index=True)
+    name = db.Column(db.String(150), default=None)
+    cqz = db.Column(db.Float, nullable=False)
+    ituz = db.Column(db.Float, nullable=False)
+    cont = db.Column(db.String(5), nullable=False)
+    long = db.Column(db.Float, nullable=False)
+    lat = db.Column(db.Float, nullable=False)
+
+    # 0000-00-00 00:00:00 date is invalid for DateTime
+    # So instead we EPOCH them
+    start = db.Column(db.DateTime(timezone=False), nullable=False)
+    end = db.Column(db.DateTime(timezone=False), nullable=False)
+
+
+class Log(db.Model):
+    __tablename__ = "log"
+
+    id = db.Column(db.Integer, primary_key=True)
+    address = db.Column(db.String(255), default=None)
+    age = db.Column(db.Integer, default=None)
+    a_index = db.Column(db.Float, default=None)
+    ant_az = db.Column(db.Float, default=None)
+    ant_el = db.Column(db.Float, default=None)
+    ant_path = db.Column(db.String(2), default=None)
+    arrl_sect = db.Column(db.String(10), default=None)
+
+    band_id = db.Column(db.Integer(), db.ForeignKey('bands.id'), nullable=False)
+
+    band_rx = db.Column(db.String(10), default=None)
+    biography = db.Column(db.Text)
+    call = db.Column(db.String(32), default=None, index=True)
+    check = db.Column(db.String(8), default=None)
+    klass = db.Column(db.String(8), default=None)
+    cnty = db.Column(db.String(32), default=None)
+    comment = db.Column(db.Text)
+    cont = db.Column(db.String(6), default=None, index=True)
+    contacted_op = db.Column(db.String(32), default=None)
+    contest_id = db.Column(db.String(32), default=None)
+    country = db.Column(db.String(64), default=None)
+    cqz = db.Column(db.Integer, default=None)
+    distance = db.Column(db.Float, default=None)
+    dxcc = db.Column(db.String(6), default=None, index=True)
+    email = db.Column(db.String(255), default=None)
+    eq_call = db.Column(db.String(32), default=None)
+    eqsl_qslrdate = db.Column(db.DateTime(timezone=False), default=None)
+    eqsl_qslsdate = db.Column(db.DateTime(timezone=False), default=None)
+    eqsl_qsl_rcvd = db.Column(db.String(2), default=None)
+    eqsl_qsl_sent = db.Column(db.String(2), default=None)
+    esql_status = db.Column(db.String(255), default=None)
+    force_init = db.Column(db.Integer, default=None)
+    freq = db.Column(db.Integer, default=None)
+    freq_rx = db.Column(db.Integer, default=None)
+    gridsquare = db.Column(db.String(12), default=None)
+    heading = db.Column(db.Float, default=None)
+    iota = db.Column(db.String(10), default=None, index=True)
+    ituz = db.Column(db.Integer, default=None)
+    k_index = db.Column(db.Float, default=None)
+    lat = db.Column(db.Float, default=None)
+    lon = db.Column(db.Float, default=None)
+    lotw_qslrdate = db.Column(db.DateTime(timezone=False), default=None)
+    lotw_qslsdate = db.Column(db.DateTime(timezone=False), default=None)
+    lotw_qsl_rcvd = db.Column(db.String(2), default=None)
+    lotw_qsl_sent = db.Column(db.String(2), default=None)
+    lotw_status = db.Column(db.String(255), default=None)
+    max_bursts = db.Column(db.Integer, default=None)
+
+    mode_id = db.Column(db.Integer(), db.ForeignKey('modes.id'), nullable=False)
+
+    ms_shower = db.Column(db.String(32), default=None)
+    my_city = db.Column(db.String(32), default=None)
+    my_cnty = db.Column(db.String(32), default=None)
+    my_country = db.Column(db.String(64), default=None)
+    my_cq_zone = db.Column(db.Integer, default=None)
+    my_gridsquare = db.Column(db.String(12), default=None)
+    my_iota = db.Column(db.String(10), default=None)
+    my_itu_zone = db.Column(db.String(11), default=None)
+    my_lat = db.Column(db.Float, default=None)
+    my_lon = db.Column(db.Float, default=None)
+    my_name = db.Column(db.String(255), default=None)
+    my_postal_code = db.Column(db.String(24), default=None)
+    my_rig = db.Column(db.String(255), default=None)
+    my_sig = db.Column(db.String(32), default=None)
+    my_sig_info = db.Column(db.String(64), default=None)
+    my_state = db.Column(db.String(32), default=None)
+    my_street = db.Column(db.String(64), default=None)
+    name = db.Column(db.String(128), default=None)
+    notes = db.Column(db.Text, default=None)
+    nr_bursts = db.Column(db.Integer, default=None)
+    nr_pings = db.Column(db.Integer, default=None)
+    operator = db.Column(db.String(32), default=None)
+    owner_callsign = db.Column(db.String(32), default=None)
+    pfx = db.Column(db.String(32), default=None, index=True)
+    precedence = db.Column(db.String(32), default=None)
+    prop_mode = db.Column(db.String(8), default=None)
+    public_key = db.Column(db.String(255), default=None)
+    qslmsg = db.Column(db.String(255), default=None)
+    qslrdate = db.Column(db.DateTime(timezone=False), default=None)
+    qslsdate = db.Column(db.DateTime(timezone=False), default=None)
+    qsl_rcvd = db.Column(db.String(2), default=None)
+    qsl_rcvd_via = db.Column(db.String(2), default=None)
+    qsl_sent = db.Column(db.String(2), default=None)
+    qsl_sent_via = db.Column(db.String(2), default=None)
+    qsl_via = db.Column(db.String(64), default=None)
+    qso_complete = db.Column(db.String(6), default=None)
+    qso_random = db.Column(db.String(11), default=None)
+    qth = db.Column(db.String(64), default=None)
+    rig = db.Column(db.String(255), default=None)
+    rst_rcvd = db.Column(db.String(32), default=None)
+    rst_sent = db.Column(db.String(32), default=None)
+    rx_pwr = db.Column(db.Float, default=None)
+    sat_mode = db.Column(db.String(32), default=None, index=True)
+    sat_name = db.Column(db.String(32), default=None, index=True)
+    sfi = db.Column(db.Float, default=None)
+    sig = db.Column(db.String(32), default=None)
+    sig_info = db.Column(db.String(64), default=None)
+    srx = db.Column(db.String(11), default=None)
+    srx_string = db.Column(db.String(32), default=None)
+    state = db.Column(db.String(32), default=None)
+    station_callsign = db.Column(db.String(32), default=None)
+    stx = db.Column(db.String(11), default=None)
+    stx_info = db.Column(db.String(32), default=None)
+    swl = db.Column(db.Integer, default=None)
+    ten_ten = db.Column(db.Integer, default=None)
+    time_off = db.Column(db.DateTime(timezone=False), default=None)
+    time_on = db.Column(db.DateTime(timezone=False), default=None, index=True)
+    tx_pwr = db.Column(db.Float, default=None)
+    web = db.Column(db.String(255), default=None)
+    user_defined_0 = db.Column(db.String(64), default=None)
+    user_defined_1 = db.Column(db.String(64), default=None)
+    user_defined_2 = db.Column(db.String(64), default=None)
+    user_defined_3 = db.Column(db.String(64), default=None)
+    user_defined_4 = db.Column(db.String(64), default=None)
+    user_defined_5 = db.Column(db.String(64), default=None)
+    user_defined_6 = db.Column(db.String(64), default=None)
+    user_defined_7 = db.Column(db.String(64), default=None)
+    user_defined_8 = db.Column(db.String(64), default=None)
+    user_defined_9 = db.Column(db.String(64), default=None)
+    credit_granted = db.Column(db.String(64), default=None)
+    credit_submitted = db.Column(db.String(64), default=None)
+
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+
+    __mapper_args__ = {"order_by": time_on.desc()}
+
+    # Give a cute name <3 More like "name - callsign" or "callsign"
+    def cutename(self):
+        cute = ""
+        if self.name:
+            cute += self.name
+            cute += " - "
+        cute += self.call
+        return cute
+
+    def country_grid_coords(self):
+        if 'sqlite' in db.engine.driver:
+            q = Dxcc.query.filter(Dxcc.prefix == func.substr(self.call, 1, func.LENGTH(Dxcc.prefix))).order_by(
+                func.length(Dxcc.prefix).desc()).limit(1)
+        else:
+            q = Dxcc.query.filter(Dxcc.prefix == func.substring(self.call, 1, func.LENGTH(Dxcc.prefix))).order_by(
+                func.length(Dxcc.prefix).desc()).limit(1)
+        if q.count() <= 0:
+            return None
+        else:
+            return {'latitude': q[0].lat, 'longitude': q[0].long}
+
+    def country_grid(self):
+        q = self.country_grid_coords()
+        return coords_to_qth(q['latitude'], q['longitude'], 6)['qth']
+
+    def distance_from_user(self):
+        if not self.gridsquare:
+            qso_gs = self.country_grid()
+        else:
+            qso_gs = self.gridsquare
+
+        if not qso_gs or not self.user.locator:
+            return None
+
+        if not is_valid_qth(self.user.locator, 6) or not is_valid_qth(qso_gs, 6):
+            return None
+
+        _f = qth_to_coords(self.user.locator, 6)  # precision, latitude, longitude
+        _t = qth_to_coords(qso_gs, 6)  # precision, latitude, longitude
+
+        return distance.haversine_km(_f['latitude'],
+                                     _f['longitude'],
+                                     _t['latitude'],
+                                     _t['longitude'])
+
+
+class Note(db.Model):
+    __tablename__ = "notes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    cat = db.Column(db.String(255), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
+    note = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime(timezone=False), server_default=func.now(), onupdate=func.now())
+
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+
+    __mapper_args__ = {"order_by": id.desc()}
+
+    def timestamp_tz(self):
+        t = self.timestamp
+        if self.user.timezone.offset < 0:
+            return t - datetime.timedelta(hours=self.user.timezone.offset)
+        else:
+            return t + datetime.timedelta(hours=self.user.timezone.offset)
+
+
+class Mode(db.Model):
+    __tablename__ = "modes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    mode = db.Column(db.String(255), nullable=False)
+    submode = db.Column(db.String(255), nullable=True)  # Unused as now
+
+    logs = db.relationship('Log', backref='mode', lazy='dynamic')
+
+
+class Band(db.Model):
+    __tablename__ = "bands"
+
+    id = db.Column(db.Integer, primary_key=True)
+    modes = db.Column(db.String(255), nullable=True)
+    name = db.Column(db.String(255), nullable=False)
+    lower = db.Column(db.Integer, nullable=True)
+    upper = db.Column(db.Integer, nullable=True)
+    start = db.Column(db.Integer, nullable=True)
+
+    logs = db.relationship('Log', backref='band', lazy='dynamic')

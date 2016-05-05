@@ -1,0 +1,114 @@
+{% extends "layout.jinja2" %}
+
+{% block content %}
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="ModalQsoSingle">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="col-lg-12">
+        <div id="map" style="width: 1024px; height: 300px"></div>
+    </div>
+    <div class="row">
+    <div class="col-lg-9">
+        {% with logbook=logbook %}
+            {% include 'qsos/_logbook_table_full.jinja2' %}
+        {% endwith %}
+    </div>
+    <div class="col-lg-3">
+        <table class="table table-condensed table-stripped">
+            <tr><td colspan="2"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> QSOs</td></tr>
+            <tr><td width="60%">Total</td><td>{{ stats['qsos']['total'] }}</td></tr>
+            <tr><td width="60%">Month</td><td>{{ stats['qsos']['month'] }}</td></tr>
+            <tr><td width="60%">Year</td><td>{{ stats['qsos']['year'] }}</td></tr>
+        </table>
+
+        <table class="table table-condensed table-stripped">
+            <tr><td colspan="2"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Countries</td></tr>
+            <tr><td width="60%">Worked</td><td>{{ stats['countries']['worked'] }}</td></tr>
+            <tr><td width="60%">Needed</td><td>{{ stats['countries']['needed'] }}</td></tr>
+        </table>
+
+        <table class="table table-condensed table-stripped">
+            <tr><td colspan="2"><span class="glyphicon glyphicon-picture" aria-hidden="true"></span> QSL Cards</td></tr>
+            <tr><td width="60%">Sent</td><td>{{ stats['qsl']['sent'] }}</td></tr>
+            <tr><td width="60%">Received</td><td>{{ stats['qsl']['received'] }}</td></tr>
+            <tr><td width="60%">Requested</td><td>{{ stats['qsl']['requested'] }}</td></tr>
+        </table>
+    </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.ajax.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.awesome-markers.js') }}"></script>
+
+    <script>
+        {% if uqth %}
+            var map = L.map('map').setView([52, 4], 3);
+            map.addLayer(L.tileLayer.provider('OpenStreetMap.Mapnik'));
+
+            function popUp(f,l){
+                var out = [];
+                if (f.properties) {
+                    if (f.properties['own']) {
+                        l.bindPopup("<div class='popupMap'>This user: " + f.properties['callsign'] + "</div>")
+                    } else {
+                        var string = "Callsign: " + f.properties['callsign'];
+                        string += "<br />Date: " + f.properties['date'];
+                        string += "<br />Band: " + f.properties['band'];
+                        string += "<br />Mode: " + f.properties['mode'];
+                        l.bindPopup("<div class='popupMap'>" + string + '</div>');
+                    }
+
+                    if (f.properties['icon'] == 'home') {
+                        l.setIcon(homeIcon);
+                    } else if (f.properties['icon'] == 'qso') {
+                        l.setIcon(qsoIcon);
+                    } else {
+                        l.setIcon(defaultIcon);
+                    }
+                }
+            }
+
+            var defaultIcon = L.AwesomeMarkers.icon({
+                icon: 'star',
+                markerColor: 'blue'
+            });
+            var qsoIcon = L.AwesomeMarkers.icon({
+                icon: 'user',
+                markerColor: 'blue'
+            });
+            var homeIcon = L.AwesomeMarkers.icon({
+                icon: 'home',
+                markerColor: 'green'
+            });
+
+            var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_geojson', username=user.name) }}"],{onEachFeature:popUp}).addTo(map);
+        {% endif %}
+
+        $('#ModalQsoSingle').on('shown.bs.modal', function(ev) {
+            var btn = $(ev.relatedTarget);
+            var qso_id = btn.data('qso-id');
+            var url = "/logbook/qso/" + qso_id + "/modal";
+            $('div.modal-body').load(url);
+        });
+    </script>
+{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.awesome-markers.css') }}" />
+{% endblock %}

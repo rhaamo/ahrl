@@ -1,0 +1,6 @@
+[submodule "texttable"]
+	path = texttable
+	url = https://github.com/bufordtaylor/python-texttable.git
+[submodule "dxcc"]
+	path = dxcc
+	url = https://github.com/rhaamo/dxcc.git

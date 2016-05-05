@@ -1,0 +1,10 @@
+{% extends "layout.jinja2" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-6">
+            <h4>ADIF Export</h4>
+            Click <a href="{{ url_for('bp_tools.adif_export_dl') }}">here</a> to get an ADIF export of your QSOs
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,31 @@
+from flask import Blueprint, redirect, url_for, abort
+from flask.ext.security import login_required, current_user
+from models import db, Apitoken
+from utils import generate_uniques_apitoken
+
+bp_api = Blueprint('bp_api', __name__)
+
+
+@bp_api.route('/apitoken/new')
+@login_required
+def apitoken_new():
+    apitoken = generate_uniques_apitoken()
+    if not apitoken:
+        return abort(500)
+
+    a = Apitoken()
+    a.user_id = current_user.id
+    a.token = apitoken["token"]
+    a.secret = apitoken["secret"]
+    db.session.add(a)
+    db.session.commit()
+    return redirect(url_for('bp_users.user_profile'))
+
+
+@bp_api.route('/apitoken/<string:apit>/del')
+@login_required
+def apitoken_del(apit):
+    apitoken = Apitoken.query.get_or_404(apit)
+    db.session.delete(apitoken)
+    db.session.commit()
+    return redirect(url_for('bp_users.user_profile'))

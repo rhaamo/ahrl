@@ -1,0 +1,20 @@
+<table class="table table-condensed">
+    <tr>
+        <th>Date</th>
+        <th>Call</th>
+        <th>Mode</th>
+        <th>Sent</th>
+        <th>Recv</th>
+        <th>Band</th>
+    </tr>
+    {% for log in logbook %}
+        <tr>
+        <td>{{ log.time_on | localize | show_date_no_offset }}</td>
+        <td>{{ log.call }}</td>
+        <td>{{ log.mode.mode }}</td>
+        <td>{{ log.rst_sent }}</td>
+        <td>{{ log.rst_rcvd }}</td>
+        <td>{{ log.band.name }}</td>
+        </tr>
+    {% endfor %}
+</table>

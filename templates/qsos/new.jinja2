@@ -1,0 +1,168 @@
+{% extends "layout.jinja2" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<div class="row">
+    <div class="row">
+        <div class="col-lg-5">
+            <h3>New QSO <small class="freq_mhz"></small><small>TZ: {{ current_user.timezone }}</small></h3>
+
+            <form action="{{ url_for('bp_qsos.new', method=method) }}" method="POST" class="form-horizontal new-qso">
+                {{ form.hidden_tag() }}
+                {{ wtf.form_errors(form, hiddens="only") }}
+
+                <div class="row">
+                    <div class="col-lg-6">{{ wtf.form_field(form.date, 'inline', placeholder='DD-MM-YYYY') }}</div>
+                    <div class="col-lg-6">{{ wtf.form_field(form.time, 'inline', placeholder='HH:MM:SS', autocomplete=off) }}</div>
+                </div>
+                {{ wtf.form_field(form.callsign, 'inline', placeholder='Callsign') }}
+                <div class="row">
+                    <div class="col-lg-6">{{ wtf.form_field(form.mode, 'inline') }}</div>
+                    <div class="col-lg-6">{{ wtf.form_field(form.band, 'inline') }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">{{ wtf.form_field(form.rst_s, 'vertical', placeholder='59') }}</div>
+                    <div class="col-lg-6">{{ wtf.form_field(form.rst_r, 'vertical', placeholder='59') }}</div>
+                </div>
+                {{ wtf.form_field(form.name, 'inline', placeholder='Name') }}
+                <div class="row">
+                    <div class="col-lg-6">{{ wtf.form_field(form.location, 'inline', placeholder='Location') }}</div>
+                    <div class="col-lg-6">{{ wtf.form_field(form.country, 'inline', placeholder='Country') }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">{{ wtf.form_field(form.locator, 'inline', placeholder='Locator') }}</div>
+                    <div class="col-lg-6"><div id="bearing_info"></div></div>
+                </div>
+                {{ wtf.form_field(form.comment, 'inline', placeholder='Comment') }}
+
+                <div>
+
+                  <!-- Nav tabs -->
+                  <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+                    <li role="presentation"><a href="#station" aria-controls="station" role="tab" data-toggle="tab">Station</a></li>
+                    <li role="presentation"><a href="#satellite" aria-controls="satellite" role="tab" data-toggle="tab">Satellite</a></li>
+                    <li role="presentation"><a href="#qsl" aria-controls="qsl" role="tab" data-toggle="tab">QSL</a></li>
+                  </ul>
+
+                  <!-- Tab panes -->
+                  <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="home">
+                        {{ wtf.form_field(form.propagation, 'vertical') }}
+                        {{ wtf.form_field(form.iota, 'vertical', placeholder='eg. EU-005') }}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="station">
+                        {{ wtf.form_field(form.radio, 'vertical') }}
+                        {{ wtf.form_field(form.frequency, 'vertical') }}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="satellite">
+                        {{ wtf.form_field(form.sat_name, 'vertical') }}
+                        {{ wtf.form_field(form.sat_mode, 'vertical') }}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="qsl">
+                        {{ wtf.form_field(form.qsl_sent, 'vertical') }}
+                        {{ wtf.form_field(form.qsl_method, 'vertical') }}
+                        {{ wtf.form_field(form.qsl_via, 'vertical') }}
+                    </div>
+                  </div>
+
+                </div>
+
+                {{ wtf.form_field(form.submit, button_map={'submit': 'success'}) }}
+
+            </form>
+        </div>
+        <div class="col-lg-6 col-lg-offset-1">
+            <h3>Last 16 QSO</h3>
+            {% with logbook=logbook %}
+                {% include 'qsos/_logbook_table.jinja2' %}
+            {% endwith %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {% if method == 'live' %}
+    <script src="{{ url_for('static', filename='js/jquery.jclock.js') }}"></script>
+    <script>
+        $(function($){
+            var options = { };
+            $('#time').jclock(options);
+        });
+    </script>
+    {% endif %}
+    <script>
+        function reload_frequency() {
+            $.ajax({
+                url: '/qsos/lib/jambon/band_to_freq',
+                data: 'mode=' + $('select#mode').val() + '&band=' + $('select#band').val(),
+                dataType: 'json',
+                success: function (result) {
+                    $('input#frequency').val(result.frequency).trigger('keyup');
+                }
+            })
+        }
+
+        function get_bearing() {
+            $.ajax({
+                url: '/qsos/lib/geo/bearing',
+                data: 'locator_qso=' + $('input#locator').val() + '&locator_user={{ current_user.locator }}',
+                dataType: 'json',
+                success: function (result) {
+                    var b = Math.round(result.bearing) + "&deg; " + result.bearing_star + " " + result.distance.toFixed(2) + result.unit;
+                    console.log(b);
+                    $('div#bearing_info').html(b);
+                },
+                error: function (result) {
+                    $('div#bearing_info').html("Invalid locator or error");
+                }
+            })
+        }
+
+        $('select#band').change(function() { reload_frequency(); });
+        $('input#locator').keyup(function() { get_bearing(); });
+
+        $('select#mode').change(function() {
+            reload_frequency();
+
+            if ($(this).val() == 'JT65' || $(this).val() == 'JT65B' || $(this).val() == 'JT6C' || $(this).val() == 'JT6M' || $(this).val() == 'FSK441' || $(this).val() == 'JTMS' || $(this).val() == 'ISCAT') {
+                $('input#rst_s').val('-5');
+                $('input#rst_r').val('-5');
+            } else if ($(this).val() == 'CW') {
+                $('input#rst_s').val('599');
+                $('input#rst_r').val('599');
+            } else {
+                $('input#rst_s').val('59');
+                $('input#rst_r').val('59');
+            }
+        });
+
+        $('#callsign').focusout(function() {
+           // TODO matching logs on right
+            var callsign = $('input#callsign').val();
+            if (callsign) {
+                $.ajax({
+                    url: '/qsos/lib/clublog/dxcc',
+                    data: 'callsign=' + callsign,
+                    dataType: 'json',
+                    success: function (result) {
+                        $('input#country').val(result.Name);
+                        $('input#dxcc_id').val(result.DXCC);
+                        $('input#cqz').val(result.CQZ);
+                        return true;
+                    }
+                });
+            }
+        });
+
+        $('input#frequency').keyup(function() {
+            var freq = $('input#frequency').val();
+            $('small.freq_mhz').html("(" + freq / 1000000.0 + "MHz) ");
+        });
+
+
+        // in last, call functions to be updated on load
+        reload_frequency(); // first call on page load
+    </script>
+{% endblock %}

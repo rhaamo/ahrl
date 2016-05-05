@@ -1,0 +1,78 @@
+/*
+ * Globals
+ */
+
+body {
+}
+
+.navbar-static-top {
+  margin-bottom: 19px;
+}
+
+
+/*
+ * Footer
+ */
+
+.blog-footer {
+  padding: 40px 0;
+  color: #999;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-top: 1px solid #e5e5e5;
+  margin-top: 1em;
+}
+.blog-footer p:last-child {
+  margin-bottom: 0;
+}
+
+.well-ultra-sm {
+    padding: 2px;
+    margin-bottom: 0px;
+}
+
+.single-note {
+    margin-bottom: 2em;
+}
+
+.summary {
+    white-space: pre-wrap;
+}
+
+input#callsign {
+    text-transform: uppercase;
+}
+
+input#locator {
+    text-transform: uppercase;
+}
+
+input#sat_name {
+    text-transform: uppercase;
+}
+
+input#sat_mode {
+    text-transform: uppercase;
+}
+
+input#iota {
+    text-transform: uppercase;
+}
+
+div#map {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1em;
+}
+
+td.log-cnty {
+    font-size: 80%;
+}
+
+div#lb-stats-months-prev {
+    height: 15em;
+}
+
+div#lb-stats-months-cur {
+    height: 15em;
+}

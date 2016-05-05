@@ -1,0 +1,61 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h3>QSO with {{ qso.call }} on {{ qso.time_on | localize | show_date_no_offset }}</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        <table class="table table-borderless">
+            <tr>
+                <td>Band</td>
+                <td>{{ qso.band }}</td>
+            </tr>
+            <tr>
+                <td>Freq.</td>
+                <td>{{ qso.freq }} Hz</td>
+            </tr>
+            <tr>
+                <td>Mode</td>
+                <td>{{ qso.mode }}</td>
+            </tr>
+            <tr>
+                <td>RST Sent</td>
+                <td>{{ qso.rst_sent }}</td>
+            </tr>
+            <tr>
+                <td>RST Recv</td>
+                <td>{{ qso.rst_rcvd }}</td>
+            </tr>
+            <tr>
+                <td>Country</td>
+                <td>{{ qso.country }}</td>
+            </tr>
+            <tr>
+                <td>Distance</td>
+                <td>{{ qso_bearing | round }}&deg; {{ qso_bearing_star }} - {{ qso_distance | round }} {{ qso_distance_unit }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-lg-6"><div id="map-single-qso" style="width: 400px; height: 250px"></div></div>
+</div>
+<script>
+    var map_single_qso = L.map('map-single-qso').setView([52, 4], 3);
+    map_single_qso.addLayer(L.tileLayer.provider('OpenStreetMap.Mapnik'));
+
+    function popUp(f,l){
+        var out = [];
+        if (f.properties) {
+            if (f.properties['own']) {
+                l.bindPopup("<div class='popupMap'>This user: " + f.properties['callsign'] + "</div>")
+            } else {
+                var string = "Callsign: " + f.properties['callsign'];
+                string += "<br />Date: " + f.properties['date'];
+                string += "<br />Band: " + f.properties['band'];
+                string += "<br />Mode: " + f.properties['mode'];
+                l.bindPopup("<div class='popupMap'>" + string + '</div>');
+            }
+        }
+    }
+
+    var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_qso_geojson', qso_id=qso.id) }}"],{onEachFeature:popUp}).addTo(map_single_qso);
+</script>

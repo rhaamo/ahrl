@@ -1,0 +1,142 @@
+from flask.ext.wtf import Form
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, \
+    HiddenField, BooleanField
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+from wtforms.validators import DataRequired
+from flask_security import RegisterForm
+from models import db, User, Note, Cat, Mode, Band
+from wtforms_alchemy import model_form_factory
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.ext.dateutil.fields import DateTimeField
+from utils import dt_utc_to_user_tz
+import datetime
+import pytz
+
+BaseModelForm = model_form_factory(Form)
+
+
+class ModelForm(BaseModelForm):
+    @classmethod
+    def get_session(cls):
+        return db.session
+
+
+class ExtendedRegisterForm(RegisterForm):
+    name = StringField('Name', [DataRequired()])
+
+
+class UserProfileForm(ModelForm):
+    class Meta:
+        model = User
+
+    password = PasswordField('Password')
+    name = StringField('Name')
+    email = StringField('Email')
+
+    callsign = StringField('Callsign', [DataRequired()])
+    locator = StringField('Locator', [DataRequired()])
+    firstname = StringField('Firstname')
+    lastname = StringField('Lastname')
+    timezone = SelectField(choices=zip(pytz.all_timezones, pytz.all_timezones),
+                           label='Timezone', default='UTC')
+    lotw_name = StringField('LoTW Username')
+    lotw_password = PasswordField('LoTW Password')
+    eqsl_name = StringField('eQSL.cc Username')
+    eqsl_password = PasswordField('eQSL.cc Password')
+
+    swl = BooleanField('Are you a SWL HAM ?')
+
+    submit = SubmitField('Update profile')
+
+
+class NoteForm(ModelForm):
+    class Meta:
+        model = Note
+
+    cat = SelectField(choices=[
+        ('General', 'General'),
+        ('Antennas', 'Antennas'),
+        ('Satellites', 'Satellites')], default=['General'], label='Category')
+    title = StringField('Title', [DataRequired()])
+    note = TextAreaField('Note', [DataRequired()])
+
+    submit = SubmitField('Sauver note')
+
+
+def get_modes():
+    return Mode.query.all()
+
+
+def get_bands():
+    return Band.query.filter(Band.modes.is_(None), Band.start.is_(None)).all()
+
+
+def dflt_mode():
+    return Mode.query.filter(Mode.mode == 'SSB').first()
+
+
+def dflt_band():
+    return Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.name == '40m').first()
+
+
+list_of_props = [['', ''], ['AUR', 'Aurora'], ['AUE', 'Aurora-E'], ['BS', 'Back scatter'],
+                 ['ECH', 'EchoLink'], ['EME', 'Earth-Moon-Earth'], ['ES', 'Sporadic E'],
+                 ['FAI', 'Field Aligned Irregularities'], ['F2', 'F2 Reflection'],
+                 ['INTERNET', 'Internet-assisted'], ['ION', 'Ionoscatter'], ['IRL', 'IRLP'],
+                 ['MS', 'Meteor scatter'], ['RPT', 'Terrestrial or atmospheric repeater or transponder'],
+                 ['RS', 'Rain scatter'], ['SAT', 'Satellite'], ['TEP', 'Tras-equatorial'],
+                 ['TR', 'Tropospheric ducting']]
+
+
+def get_radios():
+    return Cat.query.all()
+
+
+def foo_bar_baz_qux():
+    return dt_utc_to_user_tz(datetime.datetime.utcnow())
+
+
+class QsoForm(Form):
+    date = DateTimeField('Date', default=datetime.datetime.utcnow, display_format='%d-%m-%Y')
+    time = DateTimeField('Time', default=foo_bar_baz_qux, display_format='%H:%M:%S')
+    callsign = StringField('Callsign', [DataRequired()])
+    mode = QuerySelectField(query_factory=get_modes, default=dflt_mode, label='Mode',
+                            validators=[DataRequired()], get_label='mode')
+    band = QuerySelectField(query_factory=get_bands, default=dflt_band, label='Band',
+                            validators=[DataRequired()], get_label='name')
+    rst_s = IntegerField('RST (S)', [DataRequired()], default=59)
+    rst_r = IntegerField('RST (R)', [DataRequired()], default=59)
+    name = StringField('Name')
+    location = StringField('Location')
+    locator = StringField('Locator')  # TODO libqth is_valid_qth
+    comment = StringField('Comment')
+    country = StringField('Country', [DataRequired()])
+
+    # Hidden
+    dxcc_id = HiddenField(validators=[DataRequired()])
+    cqz = HiddenField(validators=[DataRequired()])
+
+    # Home
+    propagation = SelectField(choices=list_of_props, default='', label='Propagation Mode')
+    iota = StringField('IOTA', )
+
+    # Station
+    radio = QuerySelectField(query_factory=get_radios, allow_blank=True, label='Radio', get_label='radio')
+    frequency = IntegerField('Frequency', [DataRequired()])
+
+    # Satellite
+    sat_name = StringField('Sat name')
+    sat_mode = StringField('Sat mode')
+
+    # QSL
+    qsl_sent = SelectField('Sent', choices=[['N', 'No'], ['Y', 'Yes'], ['R', 'Requested']])
+    qsl_method = SelectField('Method', choices=[['', 'Method'], ['D', 'Direct'], ['B', 'Bureau']])
+    qsl_via = StringField('Via')
+
+    submit = SubmitField('Save')
+
+
+class AdifParse(Form):
+    adif_file = FileField('File', [FileRequired(),
+                                   FileAllowed(['adi', 'adif'], 'Adif only !')])
+    submit = SubmitField('Import file')
