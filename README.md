@@ -31,6 +31,21 @@ Another Ham Radio Log
  - This is majoritary a fork of https://github.com/magicbug/Cloudlog by 2E0SQL
  - Thanks to him for all his work on CloudLog which inspired me (and from which I reused some things)
 
+# How we handle DateTimes and timezones
+ - DateTimes are stored in database without timezone, so we manage to always save them in UTC:
+
+
+    time_off = db.Column(db.DateTime(timezone=False), default=None)
+    time_on = db.Column(db.DateTime(timezone=False), default=None, index=True)
+
+ - User input DateTime are first converted to a timezone-aware DateTime of 'current_user.timezone' (using pytz)
+ - Then are converted .astimezone() to UTC, still with pytz and stored in database
+
+ - The reverse, DB -> View are either:
+   - Using a function (utils: dt_utc_to_user_tz(dt, user=None)) or jinja2 helper (localize, mapped to dt_utc...) to display the correct DateTime with the user offset/timezone
+   - Converted to a timezone-aware DateTime of 'UTC' using pytz
+   - Then converted .astimezone() to current_user.timezone with pytz (like qsos:edit part)
+
 # TODO
  - eQSL integration
  - HAMQTH integration
