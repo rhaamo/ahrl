@@ -30,7 +30,8 @@
                 {% for i in stats['modes_used'] | batch(2) %}
                     <tr>
                         {% for col in i %}
-                            <td width="10%">{{ col['label'] }}</td><td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}%</td>
+                            <td width="10%">{{ col['label'] }}</td>
+                            <td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}% ({{ col['data'] }} of {{ stats['total_qsos_year'] }})</td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
@@ -41,7 +42,8 @@
                 {% for i in stats['bands_used'] | batch(2)%}
                     <tr>
                         {% for col in i %}
-                            <td width="10%">{{ col['label'] }}</td><td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}%</td>
+                            <td width="10%">{{ col['label'] }}</td>
+                            <td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}% ({{ col['data'] }} of {{ stats['total_qsos_year'] }})</td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
