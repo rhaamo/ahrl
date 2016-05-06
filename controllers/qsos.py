@@ -35,20 +35,20 @@ def logbook(username):
 
     stats = {
         'qsos': {
-            'total': Log.query.filter(Log.user_id == user.id).count(),
-            'month': Log.query.filter(Log.user_id == user.id,
-                                      Log.time_on.between(d_month_start, d_month_end)).count(),
-            'year': Log.query.filter(Log.user_id == user.id,
-                                     Log.time_on.between(d_year_start, d_year_end)).count()
+            'total': db.session.query(Log.id).filter(Log.user_id == user.id).count(),
+            'month': db.session.query(Log.id).filter(Log.user_id == user.id,
+                                                     Log.time_on.between(d_month_start, d_month_end)).count(),
+            'year': db.session.query(Log.id).filter(Log.user_id == user.id,
+                                                    Log.time_on.between(d_year_start, d_year_end)).count()
         },
         'countries': {
             'worked': cntry_worked,
             'needed': 340 - cntry_worked
         },
         'qsl': {
-            'sent': Log.query.filter(Log.user_id == user.id, Log.qsl_sent == 'Y').count(),
-            'received': Log.query.filter(Log.user_id == user.id, Log.qsl_rcvd == 'Y').count(),
-            'requested': Log.query.filter(Log.user_id == user.id, Log.qsl_sent == 'R').count()
+            'sent': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_sent == 'Y').count(),
+            'received': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_rcvd == 'Y').count(),
+            'requested': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_sent == 'R').count()
         }
     }
 
@@ -368,13 +368,14 @@ def logbook_stats(username):
             d_month_end = datetime.datetime(y, i, mr[1], 23, 59, 59, tzinfo=pytz.timezone('UTC'))
             stats_y.append([
                 i,
-                Log.query.filter(Log.user_id == user.id, Log.time_on.between(d_month_start, d_month_end)).count()
+                db.session.query(Log.id).filter(Log.user_id == user.id,
+                                                Log.time_on.between(d_month_start, d_month_end)).count()
             ])
         stats_months.append(stats_y)
 
     # Total this year
     mr = monthrange(dt.year, 12)
-    total_qso_year = Log.query.filter(Log.user_id == user.id).count()
+    total_qso_year = db.session.query(Log.id).filter(Log.user_id == user.id).count()
 
     # Pie with modes
     stats_modes = []
@@ -382,7 +383,7 @@ def logbook_stats(username):
                   Log.query.filter(Log.user_id == user.id).group_by(Log.mode_id).all()]
     for mode in modes_used:
         stats_modes.append({
-            'data': Log.query.filter(Log.user_id == user.id, Log.mode_id == mode['id']).count(),
+            'data': db.session.query(Log.id).filter(Log.user_id == user.id, Log.mode_id == mode['id']).count(),
             'label': mode['mode']
         })
 
@@ -392,7 +393,7 @@ def logbook_stats(username):
                   Log.query.filter(Log.user_id == user.id).group_by(Log.band_id).all()]
     for band in bands_used:
         stats_bands.append({
-            'data': Log.query.filter(Log.user_id == user.id, Log.band_id == band['id']).count(),
+            'data': db.session.query(Log.id).filter(Log.user_id == user.id, Log.band_id == band['id']).count(),
             'label': band['band']
         })
 
@@ -405,9 +406,9 @@ def logbook_stats(username):
             band_id = Band.query.filter(Band.name == band,
                                         Band.start.is_(None),
                                         Band.modes.is_(None)).one()
-            count = Log.query.filter(Log.user_id == user.id,
-                                     Log.band_id == band_id.id,
-                                     Log.country == country.country).count()
+            count = db.session.query(Log.id).filter(Log.user_id == user.id,
+                                                    Log.band_id == band_id.id,
+                                                    Log.country == country.country).count()
             dxcc_entry['bands'].append({'count': count})
         dxcc_worked.append(dxcc_entry)
 
