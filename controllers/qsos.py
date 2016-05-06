@@ -10,6 +10,7 @@ from geohelper import distance, bearing
 from libqth import is_valid_qth, qth_to_coords
 from calendar import monthrange
 
+
 bp_qsos = Blueprint('bp_qsos', __name__)
 
 
@@ -19,8 +20,15 @@ def logbook(username):
     user = User.query.filter(User.name == username).first()
     if not user:
         return abort(404)
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+
     pcfg = {"title": "{0}'s ({1}) logbook".format(user.name, user.callsign)}
-    qsos = Log.query.filter(User.id == user.id).all()
+
+    qsos = Log.query.filter(User.id == user.id).paginate(page=page, per_page=20)
+
     uqth = user.qth_to_coords()
 
     d = datetime.datetime.utcnow()
@@ -52,7 +60,8 @@ def logbook(username):
         }
     }
 
-    return render_template('qsos/logbook.jinja2', pcfg=pcfg, logbook=qsos, user=user, uqth=uqth, stats=stats)
+    return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user,
+                           uqth=uqth, stats=stats)
 
 
 @bp_qsos.route('/qsos/new/<string:method>', methods=['GET', 'POST'])

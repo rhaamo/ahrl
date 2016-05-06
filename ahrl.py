@@ -37,6 +37,7 @@ app = Flask(__name__)
 Bootstrap(app)
 
 app.jinja_env.add_extension('jinja2.ext.with_')
+app.jinja_env.add_extension('jinja2.ext.do')
 app.jinja_env.filters['localize'] = dt_utc_to_user_tz
 app.jinja_env.filters['show_date_no_offset'] = show_date_no_offset
 
