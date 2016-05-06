@@ -76,3 +76,11 @@ div#lb-stats-months-prev {
 div#lb-stats-months-cur {
     height: 15em;
 }
+
+div#lb-stats-modes {
+    min-height: 15em;
+}
+
+div#lb-stats-bands {
+    min-height: 15em;
+}

@@ -372,13 +372,38 @@ def logbook_stats(username):
             ])
         stats_months.append(stats_y)
 
-    # Table with worked countries and bands
+    # Total this year
+    mr = monthrange(dt.year, 12)
+    total_qso_year = Log.query.filter(Log.user_id == user.id).count()
+
+    # Pie with modes
+    stats_modes = []
+    modes_used = [{'mode': a.mode.mode, 'id': a.mode.id} for a in
+                  Log.query.filter(Log.user_id == user.id).group_by(Log.mode_id).all()]
+    for mode in modes_used:
+        stats_modes.append({
+            'data': Log.query.filter(Log.user_id == user.id, Log.mode_id == mode['id']).count(),
+            'label': mode['mode']
+        })
+
+    # Pie with bands
+    stats_bands = []
+    bands_used = [{'band': a.band.name, 'id': a.band.id} for a in
+                  Log.query.filter(Log.user_id == user.id).group_by(Log.band_id).all()]
+    for band in bands_used:
+        stats_bands.append({
+            'data': Log.query.filter(Log.user_id == user.id, Log.band_id == band['id']).count(),
+            'label': band['band']
+        })
 
     stats = {
         'current_year': stats_months[0],
         'previous_year': stats_months[1],
         'l_cy': dt.year,
-        'l_py': dt.year - 1
+        'l_py': dt.year - 1,
+        'modes_used': stats_modes,
+        'bands_used': stats_bands,
+        'total_qsos_year': total_qso_year
     }
 
-    return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_months=json.dumps(stats), user=user)
+    return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_json=json.dumps(stats), stats=stats, user=user)

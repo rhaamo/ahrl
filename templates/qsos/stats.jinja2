@@ -3,12 +3,52 @@
 {% block content %}
     <div class="row">
         <div class="col-lg-5 col-lg-offset-1">
+            <h4>QSOs in <span class="year-prev"></span></h4>
             <div id="lb-stats-months-prev"></div>
         </div>
         <div class="col-lg-5">
+            <h4>QSOs in <span class="year-cur"></span></h4>
             <div id="lb-stats-months-cur"></div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-lg-5 col-lg-offset-1">
+            <h4>Total modes logged</h4>
+            <div id="lb-stats-modes"></div>
+        </div>
+        <div class="col-lg-5">
+            <h4>Total bands logged</h4>
+            <div id="lb-stats-bands"></div>
+        </div>
+    </div>
+
+    {% if stats['total_qsos_year'] > 0 %}
+    <div class="row">
+        <div class="col-lg-5 col-lg-offset-1">
+            <table class="table table-condensed">
+                {% for i in stats['modes_used'] | batch(2) %}
+                    <tr>
+                        {% for col in i %}
+                            <td width="10%">{{ col['label'] }}</td><td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}%</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="col-lg-5">
+            <table class="table table-condensed">
+                {% for i in stats['bands_used'] | batch(2)%}
+                    <tr>
+                        {% for col in i %}
+                            <td width="10%">{{ col['label'] }}</td><td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}%</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -21,7 +61,9 @@
 
     <script>
 
-    var stats = {{ stats_months }};
+    var stats = {{ stats_json }};
+    $('span.year-prev').html(stats.l_py);
+    $('span.year-cur').html(stats.l_cy);
 
     var plotObjCur = $.plot("#lb-stats-months-cur", [
         { data: stats.current_year, label: stats.l_cy }
@@ -76,6 +118,22 @@
        } else {
            $('div#tooltip').hide()
        }
+    });
+
+    var objModes = $.plot('#lb-stats-modes', stats.modes_used, {
+        series: {
+            pie: {
+                show: true
+            }
+        }
+    });
+
+    var objBands = $.plot('#lb-stats-bands', stats.bands_used, {
+        series: {
+            pie: {
+                show: true
+            }
+        }
     });
 
     </script>
