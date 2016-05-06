@@ -35,6 +35,5 @@ Another Ham Radio Log
  - eQSL integration
  - HAMQTH integration
  - QSO edit
- - More statistics
  - Radio/CAT edit, add you own rig and link them when QSOing
 
