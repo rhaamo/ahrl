@@ -12,32 +12,73 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='js/raphael.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/morris.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/excanvas.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.flot.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.flot.pie.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.flot.resize.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.flot.time.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.flot.categories.min.js') }}"></script>
+
     <script>
-    Morris.Line({
-        element: 'lb-stats-months-prev',
-        data: {{ stats_months }}[1],
-        xkey: 'date',
-        ykeys: ['count'],
-        xLabels: 'month',
-        labels: ['QSOs'],
-        hideHover: false,
-        ymin: 'auto 10'
+
+    var stats = {{ stats_months }};
+
+    var plotObjCur = $.plot("#lb-stats-months-cur", [
+        { data: stats.current_year, label: stats.l_cy }
+    ], {
+        series: {
+            lines: { show: true },
+            points: { show: true }
+        },
+        grid: { hoverable: true },
+        yaxis: { min: 0 }
     });
 
-    Morris.Line({
-        element: 'lb-stats-months-cur',
-        data: {{ stats_months }}[0],
-        xkey: 'date',
-        ykeys: ['count'],
-        xLabels: 'month',
-        labels: ['QSOs'],
-        hideHover: 'auto',
-        ymin: 'auto 10'
+    var plotObjPrev = $.plot("#lb-stats-months-prev", [
+        { data: stats.previous_year, label: stats.l_py }
+    ], {
+        series: {
+            lines: { show: true },
+            points: { show: true }
+        },
+        grid: { hoverable: true },
+        yaxis: { min: 0 }
     });
+
+    $("<div id='tooltip'></div>").css({
+        position: "absolute",
+        display: "none",
+        border: "1px solid #fdd",
+        padding: "2px",
+        "background-color": "#fee",
+        opacity: 0.80
+    }).appendTo("body");
+
+    $("#lb-stats-months-prev").bind("plothover", function(e, p, i) {
+       if (i) {
+           var x = i.datapoint[0];
+           var y = i.datapoint[1];
+           $("div#tooltip").html(y + " QSOs")
+                   .css({top: i.pageY+5, left: i.pageX+5})
+                   .fadeIn(200);
+       } else {
+           $('div#tooltip').hide()
+       }
+    });
+
+    $("#lb-stats-months-cur").bind("plothover", function(e, p, i) {
+       if (i) {
+           var x = i.datapoint[0];
+           var y = i.datapoint[1];
+           $("div#tooltip").html(y + " QSOs")
+                   .css({top: i.pageY+5, left: i.pageX+5})
+                   .fadeIn(200);
+       } else {
+           $('div#tooltip').hide()
+       }
+    });
+
     </script>
 {% endblock %}
 {% block styles %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/morris.css') }}" />
 {% endblock %}

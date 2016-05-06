@@ -356,8 +356,8 @@ def logbook_stats(username):
         return abort(404)
     pcfg = {'title': 'Stats'}
 
+    # Bargraph by year (previous and current)
     stats_months = []
-
     dt = datetime.datetime.utcnow()
 
     for y in [dt.year, dt.year - 1]:
@@ -366,14 +366,19 @@ def logbook_stats(username):
             mr = monthrange(y, i)
             d_month_start = datetime.datetime(y, i, 0o1, 00, 00, 00, tzinfo=pytz.timezone('UTC'))
             d_month_end = datetime.datetime(y, i, mr[1], 23, 59, 59, tzinfo=pytz.timezone('UTC'))
-            stats_y.append({
-                'count': Log.query.filter(Log.user_id == user.id,
-                                          Log.time_on.between(d_month_start, d_month_end)).count(),
-                'month': i,
-                'year': y,
-                'label': 'QSOs',
-                'date': "{0}-{1}".format(y, i)
-            })
+            stats_y.append([
+                i,
+                Log.query.filter(Log.user_id == user.id, Log.time_on.between(d_month_start, d_month_end)).count()
+            ])
         stats_months.append(stats_y)
 
-    return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_months=json.dumps(stats_months), user=user)
+    # Table with worked countries and bands
+
+    stats = {
+        'current_year': stats_months[0],
+        'previous_year': stats_months[1],
+        'l_cy': dt.year,
+        'l_py': dt.year - 1
+    }
+
+    return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_months=json.dumps(stats), user=user)
