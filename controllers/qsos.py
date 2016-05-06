@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort
 from flask.ext.security import login_required, current_user
-from models import db, User, Log
+from models import db, User, Log, Band
 from forms import QsoForm
 import pytz
 import datetime
@@ -396,6 +396,21 @@ def logbook_stats(username):
             'label': band['band']
         })
 
+    # DXCC Awards worked
+    dxcc_bands = ['160m', '80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m', '4m', '2m', '70cm']
+    dxcc_worked = []
+    for country in db.session.query(Log.country).filter(Log.user_id == user.id).distinct(Log.country):
+        dxcc_entry = {'country': country.country, 'bands': []}
+        for band in dxcc_bands:
+            band_id = Band.query.filter(Band.name == band,
+                                        Band.start.is_(None),
+                                        Band.modes.is_(None)).one()
+            count = Log.query.filter(Log.user_id == user.id,
+                                     Log.band_id == band_id.id,
+                                     Log.country == country.country).count()
+            dxcc_entry['bands'].append({'count': count})
+        dxcc_worked.append(dxcc_entry)
+
     stats = {
         'current_year': stats_months[0],
         'previous_year': stats_months[1],
@@ -403,7 +418,9 @@ def logbook_stats(username):
         'l_py': dt.year - 1,
         'modes_used': stats_modes,
         'bands_used': stats_bands,
-        'total_qsos_year': total_qso_year
+        'total_qsos_year': total_qso_year,
+        'bands_list': dxcc_bands,
+        'dxcc_worked': dxcc_worked
     }
 
     return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_json=json.dumps(stats), stats=stats, user=user)

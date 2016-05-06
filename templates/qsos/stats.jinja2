@@ -1,56 +1,107 @@
 {% extends "layout.jinja2" %}
 
 {% block content %}
+
+    <div>
     <div class="row">
-        <div class="col-lg-5 col-lg-offset-1">
-            <h4>QSOs in <span class="year-prev"></span></h4>
-            <div id="lb-stats-months-prev"></div>
-        </div>
         <div class="col-lg-5">
-            <h4>QSOs in <span class="year-cur"></span></h4>
-            <div id="lb-stats-months-cur"></div>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#home" aria-controls="stats" role="tab" data-toggle="tab">Stats</a></li>
+                <li role="presentation"><a href="#sat" aria-controls="profile" role="tab" data-toggle="tab">Satellites</a></li>
+                <li role="presentation"><a href="#dxcc" aria-controls="messages" role="tab" data-toggle="tab">DXCC</a></li>
+            </ul>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-5 col-lg-offset-1">
-            <h4>Total modes logged</h4>
-            <div id="lb-stats-modes"></div>
-        </div>
-        <div class="col-lg-5">
-            <h4>Total bands logged</h4>
-            <div id="lb-stats-bands"></div>
-        </div>
-    </div>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="home">
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1">
+                    <h4>QSOs in <span class="year-prev"></span></h4>
+                    <div id="lb-stats-months-prev"></div>
+                </div>
+                <div class="col-lg-5">
+                    <h4>QSOs in <span class="year-cur"></span></h4>
+                    <div id="lb-stats-months-cur"></div>
+                </div>
+            </div>
 
-    {% if stats['total_qsos_year'] > 0 %}
-    <div class="row">
-        <div class="col-lg-5 col-lg-offset-1">
-            <table class="table table-condensed">
-                {% for i in stats['modes_used'] | batch(2) %}
-                    <tr>
-                        {% for col in i %}
-                            <td width="10%">{{ col['label'] }}</td>
-                            <td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}% ({{ col['data'] }} of {{ stats['total_qsos_year'] }})</td>
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1">
+                    <h4>Total modes logged</h4>
+                    <div id="lb-stats-modes"></div>
+                </div>
+                <div class="col-lg-5">
+                    <h4>Total bands logged</h4>
+                    <div id="lb-stats-bands"></div>
+                </div>
+            </div>
+
+            {% if stats['total_qsos_year'] > 0 %}
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1">
+                    <table class="table table-condensed">
+                        {% for i in stats['modes_used'] | batch(2) %}
+                            <tr>
+                                {% for col in i %}
+                                    <td width="10%">{{ col['label'] }}</td>
+                                    <td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}% ({{ col['data'] }} of {{ stats['total_qsos_year'] }})</td>
+                                {% endfor %}
+                            </tr>
                         {% endfor %}
-                    </tr>
-                {% endfor %}
-            </table>
+                    </table>
+                </div>
+                <div class="col-lg-5">
+                    <table class="table table-condensed">
+                        {% for i in stats['bands_used'] | batch(2)%}
+                            <tr>
+                                {% for col in i %}
+                                    <td width="10%">{{ col['label'] }}</td>
+                                    <td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}% ({{ col['data'] }} of {{ stats['total_qsos_year'] }})</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
         </div>
-        <div class="col-lg-5">
-            <table class="table table-condensed">
-                {% for i in stats['bands_used'] | batch(2)%}
-                    <tr>
-                        {% for col in i %}
-                            <td width="10%">{{ col['label'] }}</td>
-                            <td>{{ ((col['data'] * 100) / stats['total_qsos_year']) | round(2) }}% ({{ col['data'] }} of {{ stats['total_qsos_year'] }})</td>
+
+        <div role="tabpanel" class="tab-pane" id="sat">
+            <div class="row">
+                <div class="col-lg-5">
+                    No available stats now.
+                </div>
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="dxcc">
+            <div class="row">
+                <div class="col-lg-10">
+                    <h4>Worked DXCC</h4>
+
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>Country</th>
+                            {% for i in stats['bands_list'] %}
+                            <th>{{ i }}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for row in stats['dxcc_worked'] %}
+                            <tr>
+                                <td>{{ row['country'] }}</td>
+                                {% for band in row['bands'] %}
+                                    <td>{% if band['count'] > 0 %}{{ band['count'] }}{% endif %}</td>
+                                {% endfor %}
+                            </tr>
                         {% endfor %}
-                    </tr>
-                {% endfor %}
-            </table>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-    {% endif %}
+    </div>
 {% endblock %}
 
 {% block scripts %}
