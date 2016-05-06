@@ -49,6 +49,5 @@ Another Ham Radio Log
 # TODO
  - eQSL integration
  - HAMQTH integration
- - QSO edit
  - Radio/CAT edit, add you own rig and link them when QSOing
 

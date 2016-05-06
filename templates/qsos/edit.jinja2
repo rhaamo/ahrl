@@ -1,0 +1,160 @@
+{% extends "layout.jinja2" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+    <div class="row">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>Edit QSO
+                    <small class="freq_mhz"></small>
+                    <small>TZ: {{ current_user.timezone }}</small>
+                </h3>
+
+                <form action="{{ url_for('bp_qsos.edit', qso_id=log.id) }}" method="POST"
+                      class="form-horizontal new-qso">
+                    {{ form.hidden_tag() }}
+                    {{ wtf.form_errors(form, hiddens="only") }}
+
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="row">
+                                <div class="col-lg-6">{{ wtf.form_field(form.time_on, 'inline', placeholder='YYYY-MM-DD HH:MM:SS') }}</div>
+                                <div class="col-lg-6">{{ wtf.form_field(form.time_off, 'inline', placeholder='YYYY-MM-DD HH:MM:SS', autocomplete=off) }}</div>
+                            </div>
+                            {{ wtf.form_field(form.call, 'inline', placeholder='Callsign') }}
+                            <div class="row">
+                                <div class="col-lg-6">{{ wtf.form_field(form.mode, 'inline') }}</div>
+                                <div class="col-lg-6">{{ wtf.form_field(form.band, 'inline') }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">{{ wtf.form_field(form.rst_s, 'vertical', placeholder='59') }}</div>
+                                <div class="col-lg-6">{{ wtf.form_field(form.rst_r, 'vertical', placeholder='59') }}</div>
+                            </div>
+                            {{ wtf.form_field(form.name, 'inline', placeholder='Name') }}
+                            <div class="row">
+                                <div class="col-lg-6">{{ wtf.form_field(form.location, 'inline', placeholder='Location') }}</div>
+                                <div class="col-lg-6">{{ wtf.form_field(form.country, 'inline', placeholder='Country') }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">{{ wtf.form_field(form.locator, 'inline', placeholder='Locator') }}</div>
+                                <div class="col-lg-6">
+                                    <div id="bearing_info"></div>
+                                </div>
+                            </div>
+                            {{ wtf.form_field(form.comment, 'inline', placeholder='Comment') }}
+                            {{ wtf.form_field(form.notes, 'inline', placeholder='Notes') }}
+                            {{ wtf.form_field(form.submit, button_map={'submit': 'success'}) }}
+                        </div>
+
+                        <div class="col-lg-5 col-lg-offset-1">
+
+                            <div class="row">
+                                <div class="col-lg-6">{{ wtf.form_field(form.prop_mode, 'vertical') }}</div>
+                                <div class="col-lg-6">{{ wtf.form_field(form.iota, 'vertical', placeholder='eg. EU-005') }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6">{{ wtf.form_field(form.radio, 'vertical') }}</div>
+                                <div class="col-lg-6">{{ wtf.form_field(form.freq, 'vertical') }}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6">{{ wtf.form_field(form.sat_name, 'vertical') }}</div>
+                                <div class="col-lg-6">{{ wtf.form_field(form.sat_mode, 'vertical') }}</div>
+                            </div>
+
+                            <div class="row">
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li role="presentation" class="active"><a href="#qsl" aria-controls="qsl"
+                                                                              role="tab" data-toggle="tab">QSL</a></li>
+                                    <li role="presentation"><a href="#eqsl" aria-controls="eqsl" role="tab"
+                                                               data-toggle="tab">eQSL</a></li>
+                                    <li role="presentation"><a href="#lotw" aria-controls="lotw" role="tab"
+                                                               data-toggle="tab">LOTW QSL</a></li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane active" id="qsl">
+                                        <div class="row">
+                                            <div class="col-lg-6">{{ wtf.form_field(form.qsl_sent, 'vertical') }}</div>
+                                            <div class="col-lg-6">{{ wtf.form_field(form.qsl_rcvd, 'vertical') }}</div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-6">{{ wtf.form_field(form.qsl_sent_method, 'vertical') }}</div>
+                                            <div class="col-lg-6">{{ wtf.form_field(form.qsl_rcvd_method, 'vertical') }}</div>
+                                        </div>
+                                    </div>
+
+                                    <div role="tabpanel" class="tab-pane" id="eqsl">
+                                        <div class="row">
+                                            <div class="col-lg-6">{{ wtf.form_field(form.eqsl_qsl_sent, 'vertical') }}</div>
+                                            <div class="col-lg-6">{{ wtf.form_field(form.eqsl_qsl_rcvd, 'vertical') }}</div>
+                                        </div>
+                                    </div>
+
+                                    <div role="tabpanel" class="tab-pane" id="lotw">
+                                        <div class="row">
+                                            <div class="col-lg-6">{{ wtf.form_field(form.lotw_qsl_sent, 'vertical') }}</div>
+                                            <div class="col-lg-6">{{ wtf.form_field(form.lotw_qsl_rcvd, 'vertical') }}</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function get_bearing() {
+            $.ajax({
+                url: '/qsos/lib/geo/bearing',
+                data: 'locator_qso=' + $('input#locator').val() + '&locator_user={{ current_user.locator }}',
+                dataType: 'json',
+                success: function (result) {
+                    var b = Math.round(result.bearing) + "&deg; " + result.bearing_star + " " + result.distance.toFixed(2) + result.unit;
+                    console.log(b);
+                    $('div#bearing_info').html(b);
+                },
+                error: function (result) {
+                    $('div#bearing_info').html("Invalid locator or error");
+                }
+            })
+        }
+
+        $('input#locator').keyup(function () {
+            get_bearing();
+        });
+
+        $('#callsign').focusout(function () {
+            // TODO matching logs on right
+            var callsign = $('input#callsign').val();
+            if (callsign) {
+                $.ajax({
+                    url: '/qsos/lib/clublog/dxcc',
+                    data: 'callsign=' + callsign,
+                    dataType: 'json',
+                    success: function (result) {
+                        $('input#country').val(result.Name);
+                        $('input#dxcc').val(result.DXCC);
+                        $('input#cqz').val(result.CQZ);
+                        return true;
+                    }
+                });
+            }
+        });
+
+        $('input#freq').keyup(function () {
+            var freq = $('input#freq').val();
+            $('small.freq_mhz').html("(" + freq / 1000000.0 + "MHz) ");
+        });
+
+    </script>
+{% endblock %}

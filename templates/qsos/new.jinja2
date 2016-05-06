@@ -15,7 +15,7 @@
                     <div class="col-lg-6">{{ wtf.form_field(form.date, 'inline', placeholder='DD-MM-YYYY') }}</div>
                     <div class="col-lg-6">{{ wtf.form_field(form.time, 'inline', placeholder='HH:MM:SS', autocomplete=off) }}</div>
                 </div>
-                {{ wtf.form_field(form.callsign, 'inline', placeholder='Callsign') }}
+                {{ wtf.form_field(form.call, 'inline', placeholder='Callsign') }}
                 <div class="row">
                     <div class="col-lg-6">{{ wtf.form_field(form.mode, 'inline') }}</div>
                     <div class="col-lg-6">{{ wtf.form_field(form.band, 'inline') }}</div>
@@ -48,12 +48,12 @@
                   <!-- Tab panes -->
                   <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="home">
-                        {{ wtf.form_field(form.propagation, 'vertical') }}
+                        {{ wtf.form_field(form.prop_mode, 'vertical') }}
                         {{ wtf.form_field(form.iota, 'vertical', placeholder='eg. EU-005') }}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="station">
                         {{ wtf.form_field(form.radio, 'vertical') }}
-                        {{ wtf.form_field(form.frequency, 'vertical') }}
+                        {{ wtf.form_field(form.freq, 'vertical') }}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="satellite">
                         {{ wtf.form_field(form.sat_name, 'vertical') }}
@@ -99,7 +99,7 @@
                 data: 'mode=' + $('select#mode').val() + '&band=' + $('select#band').val(),
                 dataType: 'json',
                 success: function (result) {
-                    $('input#frequency').val(result.frequency).trigger('keyup');
+                    $('input#freq').val(result.frequency).trigger('keyup');
                 }
             })
         }
@@ -148,7 +148,7 @@
                     dataType: 'json',
                     success: function (result) {
                         $('input#country').val(result.Name);
-                        $('input#dxcc_id').val(result.DXCC);
+                        $('input#dxcc').val(result.DXCC);
                         $('input#cqz').val(result.CQZ);
                         return true;
                     }
@@ -156,8 +156,8 @@
             }
         });
 
-        $('input#frequency').keyup(function() {
-            var freq = $('input#frequency').val();
+        $('input#freq').keyup(function() {
+            var freq = $('input#freq').val();
             $('small.freq_mhz').html("(" + freq / 1000000.0 + "MHz) ");
         });
 

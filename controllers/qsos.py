@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort
 from flask.ext.security import login_required, current_user
 from models import db, User, Log, Band
-from forms import QsoForm
+from forms import QsoForm, EditQsoForm
 import pytz
 import datetime
 from libjambon import band_to_frequency, geo_bearing_star
@@ -88,8 +88,8 @@ def new(method):
 
         a.time_on = date_w_tz.astimezone(pytz.timezone('UTC'))
         a.time_off = date_w_tz.astimezone(pytz.timezone('UTC'))
-        a.call = form.callsign.data
-        a.freq = form.frequency.data
+        a.call = form.call.data
+        a.freq = form.freq.data
         a.rst_rcvd = form.rst_r.data
         a.rst_sent = form.rst_s.data
         a.name = form.name.data
@@ -99,16 +99,16 @@ def new(method):
         a.gridsquare = form.locator.data
         a.country = form.country.data
         a.qsl_sent = form.qsl_sent.raw_data[0]
-        a.qsl_sent_via = form.qsl_method.raw_data[0]
+        a.qsl_sent_via = form.qsl_sent_method.raw_data[0]
         a.qsl_via = form.qsl_via.data
         a.operator = current_user.callsign
         a.owner_callsign = current_user.callsign
         a.station_callsign = current_user.callsign
         a.qth = form.location.data
-        a.prop_mode = form.propagation.raw_data[0]
+        a.prop_mode = form.prop_mode.raw_data[0]
         a.iota = form.iota.data
         a.my_gridsquare = current_user.locator
-        a.dxcc = form.dxcc_id.data
+        a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
 
         if current_user.swl:
@@ -122,7 +122,7 @@ def new(method):
         a.user_id = current_user.id
         a.my_rig = form.radio.raw_data[0]  # TODO relation in model
         a.band_id = form.band.raw_data[0]
-        a.mode_id = form.band.raw_data[0]
+        a.mode_id = form.mode.raw_data[0]
 
         db.session.add(a)
         db.session.commit()
@@ -131,6 +131,75 @@ def new(method):
     qsos = Log.query.filter(User.id == current_user.id).limit(16).all()
 
     return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, logbook=qsos, method=method)
+
+
+@bp_qsos.route('/qsos/<int:qso_id>/edit', methods=['GET', 'POST'])
+@login_required
+@check_default_profile
+def edit(qso_id):
+    pcfg = {"title": "Edit QSO"}
+
+    a = Log.query.get_or_404(qso_id)
+
+    form = EditQsoForm(request.form, a)
+
+    if form.validate_on_submit():
+        a.call = form.call.data
+        a.freq = form.freq.data
+        a.rst_rcvd = form.rst_r.data
+        a.rst_sent = form.rst_s.data
+        a.name = form.name.data
+        a.comment = form.comment.data
+        a.sat_name = form.sat_name.data
+        a.sat_mode = form.sat_mode.data
+        a.gridsquare = form.locator.data
+        a.country = form.country.data
+        a.qsl_sent = form.qsl_sent.raw_data[0]
+        a.qsl_sent_via = form.qsl_sent_method.raw_data[0]
+        a.qsl_via = form.qsl_via.data
+        a.operator = current_user.callsign
+        a.owner_callsign = current_user.callsign
+        a.station_callsign = current_user.callsign
+        a.qth = form.location.data
+        a.prop_mode = form.prop_mode.raw_data[0]
+        a.iota = form.iota.data
+        a.my_gridsquare = current_user.locator
+        a.dxcc = form.dxcc.data
+        a.cqz = form.cqz.data
+
+        if current_user.swl:
+            a.swl = 'Y'
+        else:
+            a.swl = 'N'
+
+        a.distance = 0  # ??
+        a.freq_rx = 0  # ??
+
+        a.user_id = current_user.id
+        a.my_rig = form.radio.raw_data[0]  # TODO relation in model
+        a.band_id = form.band.raw_data[0]
+        a.mode_id = form.mode.raw_data[0]
+
+        a.notes = form.notes.data
+        a.qsl_rcvd = form.qsl_rcvd.data
+        a.qsl_rcvd_method = form.qsl_rcvd_method.data
+        a.eqsl_qsl_rcvd = form.eqsl_qsl_rcvd.data
+        a.eqsl_qsl_sent = form.eqsl_qsl_sent.data
+        a.lotw_qsl_rcvd = form.lotw_qsl_rcvd.data
+        a.lotw_qsl_sent = form.lotw_qsl_sent.data
+
+        db.session.commit()
+        return redirect(url_for('bp_qsos.logbook', username=current_user.name))
+
+    # DateTimes in database are stored in UTC format
+    # Before displaying them, we convert them to a timezone-aware of UTC
+    # Then convert to the current user timezone
+    ton_wo_tz = pytz.timezone('UTC').localize(form.time_on.data)
+    toff_wo_tz = pytz.timezone('UTC').localize(form.time_off.data)
+    form.time_on.data = ton_wo_tz.astimezone(pytz.timezone(current_user.timezone))
+    form.time_off.data = toff_wo_tz.astimezone(pytz.timezone(current_user.timezone))
+
+    return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a)
 
 
 @bp_qsos.route('/qsos/<int:qso_id>/delete', methods=['GET', 'DELETE', 'PUT'])

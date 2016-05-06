@@ -49,6 +49,7 @@
                 <td class="log-cnty">{{ log.country }}</td>
                 {% if current_user.is_authenticated() %}
                     <td>
+                        <a href="{{ url_for('bp_qsos.edit', qso_id=log.id) }}" class="btn btn-primary btn-xs">edit</a>
                         <a href="{{ url_for('bp_qsos.delete', qso_id=log.id) }}" class="btn btn-danger btn-xs delete_link">delete</a>
                     </td>
                 {% endif %}

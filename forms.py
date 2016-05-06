@@ -84,7 +84,7 @@ list_of_props = [['', ''], ['AUR', 'Aurora'], ['AUE', 'Aurora-E'], ['BS', 'Back 
                  ['FAI', 'Field Aligned Irregularities'], ['F2', 'F2 Reflection'],
                  ['INTERNET', 'Internet-assisted'], ['ION', 'Ionoscatter'], ['IRL', 'IRLP'],
                  ['MS', 'Meteor scatter'], ['RPT', 'Terrestrial or atmospheric repeater or transponder'],
-                 ['RS', 'Rain scatter'], ['SAT', 'Satellite'], ['TEP', 'Tras-equatorial'],
+                 ['RS', 'Rain scatter'], ['SAT', 'Satellite'], ['TEP', 'Trans-equatorial'],
                  ['TR', 'Tropospheric ducting']]
 
 
@@ -96,10 +96,8 @@ def foo_bar_baz_qux():
     return dt_utc_to_user_tz(datetime.datetime.utcnow())
 
 
-class QsoForm(Form):
-    date = DateTimeField('Date', default=datetime.datetime.utcnow, display_format='%d-%m-%Y')
-    time = DateTimeField('Time', default=foo_bar_baz_qux, display_format='%H:%M:%S')
-    callsign = StringField('Callsign', [DataRequired()])
+class BaseQsoForm(Form):
+    call = StringField('Callsign', [DataRequired()])
     mode = QuerySelectField(query_factory=get_modes, default=dflt_mode, label='Mode',
                             validators=[DataRequired()], get_label='mode')
     band = QuerySelectField(query_factory=get_bands, default=dflt_band, label='Band',
@@ -113,27 +111,82 @@ class QsoForm(Form):
     country = StringField('Country', [DataRequired()])
 
     # Hidden
-    dxcc_id = HiddenField(validators=[DataRequired()])
+    dxcc = HiddenField(validators=[DataRequired()])
     cqz = HiddenField(validators=[DataRequired()])
 
     # Home
-    propagation = SelectField(choices=list_of_props, default='', label='Propagation Mode')
+    prop_mode = SelectField(choices=list_of_props, default='', label='Propagation Mode')
     iota = StringField('IOTA', )
 
     # Station
     radio = QuerySelectField(query_factory=get_radios, allow_blank=True, label='Radio', get_label='radio')
-    frequency = IntegerField('Frequency', [DataRequired()])
+    freq = IntegerField('Frequency', [DataRequired()])
 
     # Satellite
     sat_name = StringField('Sat name')
     sat_mode = StringField('Sat mode')
 
     # QSL
-    qsl_sent = SelectField('Sent', choices=[['N', 'No'], ['Y', 'Yes'], ['R', 'Requested']])
-    qsl_method = SelectField('Method', choices=[['', 'Method'], ['D', 'Direct'], ['B', 'Bureau']])
+    qsl_sent = SelectField('QSL Sent', choices=[['N', 'No'],
+                                            ['Y', 'Yes'],
+                                            ['R', 'Requested'],
+                                            ['Q', 'Queued'],
+                                            ['I', 'Invalid (Ignore)']])
+    qsl_sent_method = SelectField('Method', choices=[['', 'Method'],
+                                                     ['D', 'Direct'],
+                                                     ['B', 'Bureau'],
+                                                     ['E', 'Electronic'],
+                                                     ['M', 'Manager']])
     qsl_via = StringField('Via')
 
     submit = SubmitField('Save')
+
+
+class QsoForm(BaseQsoForm):
+    date = DateTimeField('Date', default=datetime.datetime.utcnow, display_format='%d-%m-%Y')
+    time = DateTimeField('Time', default=foo_bar_baz_qux, display_format='%H:%M:%S')
+
+
+class EditQsoForm(BaseQsoForm):
+    time_on = DateTimeField('Start date', display_format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    time_off = DateTimeField('End date', display_format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
+    notes = TextAreaField('Notes')
+
+    qsl_rcvd = SelectField('QSL Received', choices=[['N', 'No'],
+                                                ['Y', 'Yes'],
+                                                ['R', 'Requested'],
+                                                ['I', 'Invalid (Ignore)'],
+                                                ['V', 'Verified (Match)']])
+
+    qsl_rcvd_method = SelectField('Method', choices=[['', 'Method'],
+                                                     ['D', 'Direct'],
+                                                     ['B', 'Bureau'],
+                                                     ['E', 'Electronic'],
+                                                     ['M', 'Manager']])
+
+    eqsl_qsl_rcvd = SelectField('eQSL Received', choices=[['N', 'No'],
+                                                     ['Y', 'Yes'],
+                                                     ['R', 'Requested'],
+                                                     ['I', 'Invalid (Ignore)'],
+                                                     ['V', 'Verified (Match)']])
+
+    eqsl_qsl_sent = SelectField('eQSL Sent', choices=[['N', 'No'],
+                                            ['Y', 'Yes'],
+                                            ['R', 'Requested'],
+                                            ['Q', 'Queued'],
+                                            ['I', 'Invalid (Ignore)']])
+
+    lotw_qsl_rcvd = SelectField('LOTW QSL Received', choices=[['N', 'No'],
+                                                     ['Y', 'Yes'],
+                                                     ['R', 'Requested'],
+                                                     ['I', 'Invalid (Ignore)'],
+                                                     ['V', 'Verified (Match)']])
+
+    lotw_qsl_sent = SelectField('LOTW QSL Sent', choices=[['N', 'No'],
+                                            ['Y', 'Yes'],
+                                            ['R', 'Requested'],
+                                            ['Q', 'Queued'],
+                                            ['I', 'Invalid (Ignore)']])
 
 
 class AdifParse(Form):
