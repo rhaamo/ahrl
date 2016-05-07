@@ -457,7 +457,6 @@ def logbook_stats(username):
         stats_months.append(stats_y)
 
     # Total this year
-    mr = monthrange(dt.year, 12)
     total_qso_year = db.session.query(Log.id).filter(Log.user_id == user.id).count()
 
     # Pie with modes
