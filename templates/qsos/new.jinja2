@@ -21,16 +21,16 @@
                     <div class="col-lg-6">{{ wtf.form_field(form.band, 'inline') }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6">{{ wtf.form_field(form.rst_s, 'vertical', placeholder='59') }}</div>
-                    <div class="col-lg-6">{{ wtf.form_field(form.rst_r, 'vertical', placeholder='59') }}</div>
+                    <div class="col-lg-6">{{ wtf.form_field(form.rst_sent, 'vertical', placeholder='59') }}</div>
+                    <div class="col-lg-6">{{ wtf.form_field(form.rst_rcvd, 'vertical', placeholder='59') }}</div>
                 </div>
                 {{ wtf.form_field(form.name, 'inline', placeholder='Name') }}
                 <div class="row">
-                    <div class="col-lg-6">{{ wtf.form_field(form.location, 'inline', placeholder='Location') }}</div>
+                    <div class="col-lg-6">{{ wtf.form_field(form.qth, 'inline', placeholder='Location') }}</div>
                     <div class="col-lg-6">{{ wtf.form_field(form.country, 'inline', placeholder='Country') }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6">{{ wtf.form_field(form.locator, 'inline', placeholder='Locator') }}</div>
+                    <div class="col-lg-6">{{ wtf.form_field(form.gridsquare, 'inline', placeholder='Locator') }}</div>
                     <div class="col-lg-6"><div id="bearing_info"></div></div>
                 </div>
                 {{ wtf.form_field(form.comment, 'inline', placeholder='Comment') }}
@@ -61,7 +61,7 @@
                     </div>
                     <div role="tabpanel" class="tab-pane" id="qsl">
                         {{ wtf.form_field(form.qsl_sent, 'vertical') }}
-                        {{ wtf.form_field(form.qsl_sent_method, 'vertical') }}
+                        {{ wtf.form_field(form.qsl_sent_via, 'vertical') }}
                         {{ wtf.form_field(form.qsl_via, 'vertical') }}
                     </div>
                   </div>
@@ -138,9 +138,9 @@
             }
         });
 
-        $('#callsign').focusout(function() {
+        $('#call').focusout(function() {
            // TODO matching logs on right
-            var callsign = $('input#callsign').val();
+            var callsign = $('input#call').val();
             if (callsign) {
                 $.ajax({
                     url: '/qsos/lib/clublog/dxcc',

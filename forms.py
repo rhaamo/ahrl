@@ -102,11 +102,11 @@ class BaseQsoForm(Form):
                             validators=[DataRequired()], get_label='mode')
     band = QuerySelectField(query_factory=get_bands, default=dflt_band, label='Band',
                             validators=[DataRequired()], get_label='name')
-    rst_s = IntegerField('RST (S)', [DataRequired()], default=59)
-    rst_r = IntegerField('RST (R)', [DataRequired()], default=59)
+    rst_sent = IntegerField('RST (S)', [DataRequired()], default=59)
+    rst_rcvd = IntegerField('RST (R)', [DataRequired()], default=59)
     name = StringField('Name')
-    location = StringField('Location')
-    locator = StringField('Locator')  # TODO libqth is_valid_qth
+    qth = StringField('Location')
+    gridsquare = StringField('Locator')  # TODO libqth is_valid_qth
     comment = StringField('Comment')
     country = StringField('Country', [DataRequired()])
 
@@ -128,15 +128,15 @@ class BaseQsoForm(Form):
 
     # QSL
     qsl_sent = SelectField('QSL Sent', choices=[['N', 'No'],
-                                            ['Y', 'Yes'],
-                                            ['R', 'Requested'],
-                                            ['Q', 'Queued'],
-                                            ['I', 'Invalid (Ignore)']])
-    qsl_sent_method = SelectField('Method', choices=[['', 'Method'],
-                                                     ['D', 'Direct'],
-                                                     ['B', 'Bureau'],
-                                                     ['E', 'Electronic'],
-                                                     ['M', 'Manager']])
+                                                ['Y', 'Yes'],
+                                                ['R', 'Requested'],
+                                                ['Q', 'Queued'],
+                                                ['I', 'Invalid (Ignore)']])
+    qsl_sent_via = SelectField('Sent via', choices=[['', 'Method'],
+                                                    ['D', 'Direct'],
+                                                    ['B', 'Bureau'],
+                                                    ['E', 'Electronic'],
+                                                    ['M', 'Manager']])
     qsl_via = StringField('Via')
 
     submit = SubmitField('Save')
@@ -153,40 +153,40 @@ class EditQsoForm(BaseQsoForm):
     notes = TextAreaField('Notes')
 
     qsl_rcvd = SelectField('QSL Received', choices=[['N', 'No'],
-                                                ['Y', 'Yes'],
-                                                ['R', 'Requested'],
-                                                ['I', 'Invalid (Ignore)'],
-                                                ['V', 'Verified (Match)']])
+                                                    ['Y', 'Yes'],
+                                                    ['R', 'Requested'],
+                                                    ['I', 'Invalid (Ignore)'],
+                                                    ['V', 'Verified (Match)']])
 
-    qsl_rcvd_method = SelectField('Method', choices=[['', 'Method'],
-                                                     ['D', 'Direct'],
-                                                     ['B', 'Bureau'],
-                                                     ['E', 'Electronic'],
-                                                     ['M', 'Manager']])
+    qsl_rcvd_via = SelectField('Received via', choices=[['', 'Method'],
+                                                        ['D', 'Direct'],
+                                                        ['B', 'Bureau'],
+                                                        ['E', 'Electronic'],
+                                                        ['M', 'Manager']])
 
     eqsl_qsl_rcvd = SelectField('eQSL Received', choices=[['N', 'No'],
-                                                     ['Y', 'Yes'],
-                                                     ['R', 'Requested'],
-                                                     ['I', 'Invalid (Ignore)'],
-                                                     ['V', 'Verified (Match)']])
+                                                          ['Y', 'Yes'],
+                                                          ['R', 'Requested'],
+                                                          ['I', 'Invalid (Ignore)'],
+                                                          ['V', 'Verified (Match)']])
 
     eqsl_qsl_sent = SelectField('eQSL Sent', choices=[['N', 'No'],
-                                            ['Y', 'Yes'],
-                                            ['R', 'Requested'],
-                                            ['Q', 'Queued'],
-                                            ['I', 'Invalid (Ignore)']])
+                                                      ['Y', 'Yes'],
+                                                      ['R', 'Requested'],
+                                                      ['Q', 'Queued'],
+                                                      ['I', 'Invalid (Ignore)']])
 
     lotw_qsl_rcvd = SelectField('LOTW QSL Received', choices=[['N', 'No'],
-                                                     ['Y', 'Yes'],
-                                                     ['R', 'Requested'],
-                                                     ['I', 'Invalid (Ignore)'],
-                                                     ['V', 'Verified (Match)']])
+                                                              ['Y', 'Yes'],
+                                                              ['R', 'Requested'],
+                                                              ['I', 'Invalid (Ignore)'],
+                                                              ['V', 'Verified (Match)']])
 
     lotw_qsl_sent = SelectField('LOTW QSL Sent', choices=[['N', 'No'],
-                                            ['Y', 'Yes'],
-                                            ['R', 'Requested'],
-                                            ['Q', 'Queued'],
-                                            ['I', 'Invalid (Ignore)']])
+                                                          ['Y', 'Yes'],
+                                                          ['R', 'Requested'],
+                                                          ['Q', 'Queued'],
+                                                          ['I', 'Invalid (Ignore)']])
 
 
 class AdifParse(Form):
