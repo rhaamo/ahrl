@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask.ext.security import login_required, current_user
 from models import db, Note
 from forms import NoteForm
@@ -31,6 +31,7 @@ def edit(note_id):
         a.note = form.note.data
 
         db.session.commit()
+        flash("Success saving note: {0}".format(a.title), 'success')
         return redirect(url_for('bp_notes.notes'))
 
     return render_template('notes/edit.jinja2', pcfg=pcfg, form=form, note=a, note_id=note_id)
@@ -53,6 +54,7 @@ def new():
 
         db.session.add(a)
         db.session.commit()
+        flash("Success updating note: {0}".format(a.title), 'success')
         return redirect(url_for('bp_notes.notes'))
 
     return render_template('notes/new.jinja2', pcfg=pcfg, form=form)
