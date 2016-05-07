@@ -2,13 +2,14 @@ from flask.ext.wtf import Form
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, \
     HiddenField, BooleanField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 from flask_security import RegisterForm
 from models import db, User, Note, Cat, Mode, Band
 from wtforms_alchemy import model_form_factory
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.ext.dateutil.fields import DateTimeField
 from utils import dt_utc_to_user_tz
+from libqth import is_valid_qth
 import datetime
 import pytz
 
@@ -106,7 +107,15 @@ class BaseQsoForm(Form):
     rst_rcvd = IntegerField('RST (R)', [DataRequired()], default=59)
     name = StringField('Name')
     qth = StringField('Location')
-    gridsquare = StringField('Locator')  # TODO libqth is_valid_qth
+
+    gridsquare = StringField('Locator')
+
+    def validate_gridsquare(form, field):
+        if len(field.data) <= 2:
+            raise ValidationError("QTH is too broad, please input valid QTH")
+        if not is_valid_qth(field.data, 6):
+            raise ValidationError("QTH is invalid, validation failed")
+
     comment = StringField('Comment')
     country = StringField('Country', [DataRequired()])
 
