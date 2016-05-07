@@ -45,7 +45,7 @@
                 <td>{{ log.rst_sent }}</td>
                 <td>{{ log.rst_rcvd }}</td>
                 <td>{{ log.band.name }}</td>
-                <td>{{ log.distance_from_user() | round }} Km</td>
+                <td>{% if log.distance_from_user() %}{{ log.distance_from_user() | round }} Km{% endif %}</td>
                 <td class="log-cnty">{{ log.country }}</td>
                 {% if current_user.is_authenticated() %}
                     <td>
