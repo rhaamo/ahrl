@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort
+from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort, flash
 from flask.ext.security import login_required, current_user
 from models import db, User, Log, Band
 from forms import QsoForm, EditQsoForm
@@ -9,7 +9,6 @@ from utils import InvalidUsage, dt_utc_to_user_tz, check_default_profile, get_dx
 from geohelper import distance, bearing
 from libqth import is_valid_qth, qth_to_coords
 from calendar import monthrange
-
 
 bp_qsos = Blueprint('bp_qsos', __name__)
 
@@ -126,6 +125,9 @@ def new(method):
 
         db.session.add(a)
         db.session.commit()
+        flash("Success saving QSO with {0} on {1} using {2}".format(
+            a.call, a.band.name, a.mode.mode
+        ), 'success')
         return redirect(url_for('bp_qsos.new', method=method))
 
     qsos = Log.query.filter(User.id == current_user.id).limit(16).all()
@@ -189,6 +191,9 @@ def edit(qso_id):
         a.lotw_qsl_sent = form.lotw_qsl_sent.data
 
         db.session.commit()
+        flash("Success updating QSO with {0} on {1} using {2}".format(
+            a.call, a.band.name, a.mode.mode
+        ), 'success')
         return redirect(url_for('bp_qsos.logbook', username=current_user.name))
 
     # DateTimes in database are stored in UTC format
