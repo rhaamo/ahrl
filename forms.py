@@ -35,7 +35,15 @@ class UserProfileForm(ModelForm):
     email = StringField('Email')
 
     callsign = StringField('Callsign', [DataRequired()])
+
     locator = StringField('Locator', [DataRequired()])
+    
+    def validate_locator(form, field):
+        if len(field.data) <= 2:
+            raise ValidationError("QTH is too broad, please input valid QTH")
+        if not is_valid_qth(field.data, 6):
+            raise ValidationError("QTH is invalid, validation failed")
+
     firstname = StringField('Firstname')
     lastname = StringField('Lastname')
     timezone = SelectField(choices=zip(pytz.all_timezones, pytz.all_timezones),
