@@ -85,8 +85,8 @@ def new(method):
                                                 "%d-%m-%Y %H:%M:%S")
         date_w_tz = pytz.timezone(current_user.timezone).localize(date_wo_tz)
 
-        a.time_on = date_w_tz.astimezone(pytz.timezone('UTC'))
-        a.time_off = date_w_tz.astimezone(pytz.timezone('UTC'))
+        a.time_on = date_w_tz.astimezone(pytz.timezone('UTC')).replace(tzinfo=None)
+        a.time_off = date_w_tz.astimezone(pytz.timezone('UTC')).replace(tzinfo=None)
         a.call = form.call.data
         a.freq = form.freq.data
         a.rst_rcvd = form.rst_rcvd.data
@@ -193,8 +193,8 @@ def edit(qso_id):
     # Then convert to the current user timezone
     ton_wo_tz = pytz.timezone('UTC').localize(form.time_on.data)
     toff_wo_tz = pytz.timezone('UTC').localize(form.time_off.data)
-    form.time_on.data = ton_wo_tz.astimezone(pytz.timezone(current_user.timezone))
-    form.time_off.data = toff_wo_tz.astimezone(pytz.timezone(current_user.timezone))
+    form.time_on.data = ton_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
+    form.time_off.data = toff_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
 
     return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a)
 
