@@ -357,7 +357,7 @@ def logbook_qso_geojson(qso_id):
             "date": dt_utc_to_user_tz(qso.time_on, user=qso.user),
             "band": qso.band.name,
             "mode": qso.mode.mode,
-            "icon": 'home'
+            "icon": 'qso'
         },
         "geometry": {
             "type": "Point",
@@ -374,7 +374,7 @@ def logbook_qso_geojson(qso_id):
             "name": qso.user.cutename(),
             "callsign": qso.user.callsign,
             "own": True,
-            "icon": 'qso'
+            "icon": 'home'
         },
         "geometry": {
             "type": "Point",
