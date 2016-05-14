@@ -119,6 +119,9 @@ class BaseQsoForm(Form):
     gridsquare = StringField('Locator')
 
     def validate_gridsquare(form, field):
+        if len(field.data) <= 0:
+            return  # ignore if no QTH entered
+        
         if len(field.data) <= 2:
             raise ValidationError("QTH is too broad, please input valid QTH")
         if not is_valid_qth(field.data, 6):
