@@ -109,11 +109,7 @@ def new(method):
         a.my_gridsquare = current_user.locator
         a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
-
-        if current_user.swl:
-            a.swl = 'Y'
-        else:
-            a.swl = 'N'
+        a.swl = current_user.swl
 
         a.distance = 0  # ??
         a.freq_rx = 0  # ??
@@ -168,11 +164,7 @@ def edit(qso_id):
         a.my_gridsquare = current_user.locator
         a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
-
-        if current_user.swl:
-            a.swl = 'Y'
-        else:
-            a.swl = 'N'
+        a.swl = current_user.swl
 
         a.distance = 0  # ??
         a.freq_rx = 0  # ??
