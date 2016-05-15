@@ -130,13 +130,15 @@ class BaseQsoForm(Form):
     comment = StringField('Comment')
     country = StringField('Country', [DataRequired()])
 
+    web = StringField('URL')
+
     # Hidden
     dxcc = HiddenField(validators=[DataRequired()])
     cqz = HiddenField(validators=[DataRequired()])
 
     # Home
     prop_mode = SelectField(choices=list_of_props, default='', label='Propagation Mode')
-    iota = StringField('IOTA', )
+    iota = StringField('IOTA')
 
     # Station
     radio = QuerySelectField(query_factory=get_radios, allow_blank=True, label='Radio', get_label='radio')

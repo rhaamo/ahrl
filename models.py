@@ -327,7 +327,10 @@ class Log(db.Model):
 
     def country_grid(self):
         q = self.country_grid_coords()
-        return coords_to_qth(q['latitude'], q['longitude'], 6)['qth']
+        if q:
+            return coords_to_qth(q['latitude'], q['longitude'], 6)['qth']
+        else:
+            return None
 
     def distance_from_user(self):
         if not self.gridsquare:

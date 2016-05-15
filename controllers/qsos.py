@@ -129,15 +129,15 @@ def new(method):
 
         a.time_on = date_w_tz.astimezone(pytz.timezone('UTC')).replace(tzinfo=None)
         a.time_off = date_w_tz.astimezone(pytz.timezone('UTC')).replace(tzinfo=None)
-        a.call = form.call.data
+        a.call = form.call.data.upper()
         a.freq = form.freq.data
         a.rst_rcvd = form.rst_rcvd.data
         a.rst_sent = form.rst_sent.data
         a.name = form.name.data
         a.comment = form.comment.data
-        a.sat_name = form.sat_name.data
-        a.sat_mode = form.sat_mode.data
-        a.gridsquare = form.gridsquare.data
+        a.sat_name = form.sat_name.data.upper()
+        a.sat_mode = form.sat_mode.data.upper()
+        a.gridsquare = form.gridsquare.data.upper()
         a.country = form.country.data
         a.qsl_sent = form.qsl_sent.raw_data[0]
         a.qsl_sent_via = form.qsl_sent_via.raw_data[0]
@@ -147,11 +147,12 @@ def new(method):
         a.station_callsign = current_user.callsign
         a.qth = form.qth.data
         a.prop_mode = form.prop_mode.raw_data[0]
-        a.iota = form.iota.data
-        a.my_gridsquare = current_user.locator
+        a.iota = form.iota.data.upper()
+        a.my_gridsquare = current_user.locator.upper()
         a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
         a.swl = current_user.swl
+        a.web = form.web.data
 
         a.distance = 0  # ??
         a.freq_rx = 0  # ??
@@ -184,15 +185,15 @@ def edit(qso_id):
     form = EditQsoForm(request.form, a)
 
     if form.validate_on_submit():
-        a.call = form.call.data
+        a.call = form.call.data.upper()
         a.freq = form.freq.data
         a.rst_rcvd = form.rst_rcvd.data
         a.rst_sent = form.rst_sent.data
         a.name = form.name.data
         a.comment = form.comment.data
-        a.sat_name = form.sat_name.data
-        a.sat_mode = form.sat_mode.data
-        a.gridsquare = form.gridsquare.data
+        a.sat_name = form.sat_name.data.upper()
+        a.sat_mode = form.sat_mode.data.upper()
+        a.gridsquare = form.gridsquare.data.upper()
         a.country = form.country.data
         a.qsl_sent = form.qsl_sent.raw_data[0]
         a.qsl_sent_via = form.qsl_sent_via.raw_data[0]
@@ -202,11 +203,12 @@ def edit(qso_id):
         a.station_callsign = current_user.callsign
         a.qth = form.qth.data
         a.prop_mode = form.prop_mode.raw_data[0]
-        a.iota = form.iota.data
-        a.my_gridsquare = current_user.locator
+        a.iota = form.iota.data.upper()
+        a.my_gridsquare = current_user.locator.upper()
         a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
         a.swl = current_user.swl
+        a.web = form.web.data
 
         a.distance = 0  # ??
         a.freq_rx = 0  # ??
