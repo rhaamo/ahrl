@@ -39,11 +39,11 @@ body {
     white-space: pre-wrap;
 }
 
-input#callsign {
+input#call {
     text-transform: uppercase;
 }
 
-input#locator {
+input#gridsquare {
     text-transform: uppercase;
 }
 
