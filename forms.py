@@ -213,3 +213,9 @@ class AdifParse(Form):
     adif_file = FileField('File', [FileRequired(),
                                    FileAllowed(['adi', 'adif'], 'Adif only !')])
     submit = SubmitField('Import file')
+
+
+class FilterLogbookBandMode(Form):
+    mode = SelectField(label='Mode', validators=[DataRequired()])
+    band = SelectField(label='Band', validators=[DataRequired()])
+    submit = SubmitField('Filter')

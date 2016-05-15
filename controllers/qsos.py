@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort, flash
 from flask.ext.security import login_required, current_user
-from models import db, User, Log, Band
-from forms import QsoForm, EditQsoForm
+from models import db, User, Log, Band, Mode
+from forms import QsoForm, EditQsoForm, FilterLogbookBandMode
 import pytz
 import datetime
 from libjambon import band_to_frequency, geo_bearing_star
@@ -26,8 +26,6 @@ def logbook(username):
 
     pcfg = {"title": "{0}'s ({1}) logbook".format(user.name, user.callsign)}
 
-    qsos = Log.query.filter(User.id == user.id).paginate(page=page, per_page=20)
-
     uqth = user.qth_to_coords()
 
     d = datetime.datetime.utcnow()
@@ -40,6 +38,50 @@ def logbook(username):
     d_year_end = datetime.datetime(d.year, 12, mr_y[1], 23, 59, 59, tzinfo=pytz.timezone('UTC'))
     cntry_worked = db.session.query(Log.country).filter(Log.user_id == user.id).distinct(Log.country).count()
 
+    # Form filter display thing and QSOs filtering
+    filter_form = FilterLogbookBandMode()
+    q_mode = None
+    q_band = None
+    rq_mode = request.args.get('mode', None)
+    rq_band = request.args.get('band', None)
+
+    if rq_mode or rq_mode != 'all':
+        q_mode = Mode.query.filter(Mode.mode == rq_mode)
+        if q_mode.count() == 1:
+            q_mode = q_mode.first()
+        else:
+            q_mode = None
+    if rq_band or rq_band != 'all':
+        q_band = Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.name == rq_band)
+        if q_band.count() == 1:
+            q_band = q_band.first()
+        else:
+            q_band = None
+
+    # Form choices building
+    _modes = [[a.mode.mode, a.mode.mode] for a in Log.query.filter(Log.user_id == user.id).group_by(Log.mode_id).all()]
+    _bands = [[a.band.name, a.band.name] for a in Log.query.filter(Log.user_id == user.id).group_by(Log.band_id).all()]
+    _modes.insert(0, ['all', 'All modes'])
+    _bands.insert(0, ['all', 'All bands'])
+    filter_form.mode.choices = _modes
+    filter_form.mode.data = rq_mode or 'all'
+    filter_form.band.choices = _bands
+    filter_form.band.data = rq_band or 'all'
+
+    bq = Log.query.filter(User.id == user.id)
+
+    if q_mode and not q_band:
+        fquery = bq.filter(Log.mode_id == q_mode.id)
+    elif not q_mode and q_band:
+        fquery = bq.filter(Log.band_id == q_band.id)
+    elif q_mode and q_band:
+        fquery = bq.filter(Log.mode_id == q_mode.id, Log.band_id == q_band.id)
+    else:
+        fquery = bq
+
+    qsos = fquery.paginate(page=page, per_page=20)
+
+    # Column of stats
     stats = {
         'qsos': {
             'total': db.session.query(Log.id).filter(Log.user_id == user.id).count(),
@@ -60,7 +102,7 @@ def logbook(username):
     }
 
     return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user,
-                           uqth=uqth, stats=stats)
+                           uqth=uqth, stats=stats, filter_form=filter_form, band=rq_band, mode=rq_mode)
 
 
 @bp_qsos.route('/qsos/new/<string:method>', methods=['GET', 'POST'])
@@ -281,7 +323,37 @@ def logbook_geojson(username):
     if not user:
         raise InvalidUsage('User not found', status_code=404)
 
-    logs = Log.query.filter(User.id == user.id).all()
+    # QSO filter thing
+    q_mode = None
+    q_band = None
+    rq_mode = request.args.get('mode', None)
+    rq_band = request.args.get('band', None)
+
+    if rq_mode or rq_mode != 'all':
+        q_mode = Mode.query.filter(Mode.mode == rq_mode)
+        if q_mode.count() == 1:
+            q_mode = q_mode.first()
+        else:
+            q_mode = None
+    if rq_band or rq_band != 'all':
+        q_band = Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.name == rq_band)
+        if q_band.count() == 1:
+            q_band = q_band.first()
+        else:
+            q_band = None
+
+    bq = Log.query.filter(User.id == user.id)
+
+    if q_mode and not q_band:
+        fquery = bq.filter(Log.mode_id == q_mode.id)
+    elif not q_mode and q_band:
+        fquery = bq.filter(Log.band_id == q_band.id)
+    elif q_mode and q_band:
+        fquery = bq.filter(Log.mode_id == q_mode.id, Log.band_id == q_band.id)
+    else:
+        fquery = bq
+
+    logs = fquery.all()
 
     if not is_valid_qth(user.locator, 6):
         raise InvalidUsage('QTH is not valid', status_code=400)
