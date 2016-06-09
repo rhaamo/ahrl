@@ -1,6 +1,9 @@
 Another Ham Radio Log
 =====================
 
+# Versions requirement
+ - Python 3
+
 # Installation
     Install a BDD (sqlite, mysql, postgresql)
     Makes sure that encoding is/will be in UNICODE/UTF-8
