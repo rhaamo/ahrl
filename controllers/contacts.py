@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, Response, json
 from flask_security import login_required, current_user
-from models import db, Contact
+from models import db, Contact, User
 from forms import ContactsForm
-from utils import check_default_profile, InvalidUsage
+from utils import check_default_profile, InvalidUsage, dt_utc_to_user_tz
 from libqth import is_valid_qth, qth_to_coords
 from geohelper import distance, bearing
 from libjambon import geo_bearing_star
@@ -101,3 +101,67 @@ def delete(contact_id):
     db.session.commit()
     flash("Success deleting contact: {0}".format(contact.callsign), 'success')
     return redirect(url_for('bp_contacts.contacts'))
+
+
+@bp_contacts.route('/contacts/<string:username>/geojson', methods=['GET'])
+def contacts_geojson(username):
+    if not username:
+        raise InvalidUsage('Missing username', status_code=400)
+
+    user = User.query.filter(User.name == username).first()
+    if not user:
+        raise InvalidUsage('User not found', status_code=404)
+
+    # QSO filter thing
+    q_mode = None
+    q_band = None
+    rq_mode = request.args.get('mode', None)
+    rq_band = request.args.get('band', None)
+
+    contacts = Contact.query.filter(User.id == user.id).all()
+
+    if not is_valid_qth(user.locator, 6):
+        raise InvalidUsage('QTH is not valid', status_code=400)
+    _u = qth_to_coords(user.locator, 6)  # precision, latitude, longitude
+
+    j = [{
+        "type": "Feature",
+        "properties": {
+            "name": user.cutename(),
+            "callsign": user.callsign,
+            "own": True,
+            "icon": "home"
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [_u['longitude'], _u['latitude']]
+        }
+    }]
+
+    for log in contacts:
+        if log.gridsquare:
+            if not is_valid_qth(log.gridsquare, 6):
+                raise InvalidUsage('QTH is not valid', status_code=400)
+            _f = qth_to_coords(log.gridsquare, 6)  # precision, latitude, longitude
+        else:
+            _f = log.country_grid_coords()
+            if not _f:
+                continue  # No grid at all ? Skit ip
+
+        f = {
+            "type": "Feature",
+            "properties": {
+                "callsign": log.callsign,
+                "distance": log.distance,
+                "bearing": log.bearing,
+                "bearing_star": log.bearing_star,
+                "icon": "qso"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [_f['longitude'], _f['latitude']]
+            }
+        }
+        j.append(f)
+
+    return Response(json.dumps(j), mimetype='application/json')

@@ -2,11 +2,16 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-12">
         <h3>
             {{ current_user.name }}'s contacts
             <a href="{{ url_for('bp_contacts.new') }}" class="btn btn-success btn-xs">new</a>
         </h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
 
         <table class="table table-condensed">
             <tr>
@@ -37,5 +42,62 @@
         </table>
 
     </div>
+    <div class="col-lg-6">
+        <div id="map" style="height: 300px"></div>
+    </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.ajax.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.awesome-markers.js') }}"></script>
+
+    <script>
+        var map = L.map('map').setView([52, 4], 3);
+        map.addLayer(L.tileLayer.provider('OpenStreetMap.Mapnik'));
+
+        function popUp(f,l){
+            var out = [];
+            if (f.properties) {
+                if (f.properties['own']) {
+                    l.bindPopup("<div class='popupMap'>This user: " + f.properties['callsign'] + "</div>")
+                } else {
+                    var string = "Callsign: " + f.properties['callsign'];
+                    string += "<br />Distance: " + Math.round(f.properties['distance']) + " Km";
+                    string += "<br />Bearing: " + Math.round(f.properties['bearing']) + " " + f.properties['bearing_star'];
+                    l.bindPopup("<div class='popupMap'>" + string + '</div>');
+                }
+
+                if (f.properties['icon'] == 'home') {
+                    l.setIcon(homeIcon);
+                } else if (f.properties['icon'] == 'qso') {
+                    l.setIcon(qsoIcon);
+                } else {
+                    l.setIcon(defaultIcon);
+                }
+            }
+        }
+
+        var defaultIcon = L.AwesomeMarkers.icon({
+            icon: 'star',
+            markerColor: 'blue'
+        });
+        var qsoIcon = L.AwesomeMarkers.icon({
+            icon: 'user',
+            markerColor: 'blue'
+        });
+        var homeIcon = L.AwesomeMarkers.icon({
+            icon: 'home',
+            markerColor: 'green'
+        });
+
+        var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_contacts.contacts_geojson', username=current_user.name) }}"],{onEachFeature:popUp}).addTo(map);
+
+    </script>
+{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.awesome-markers.css') }}" />
 {% endblock %}

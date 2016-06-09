@@ -48,7 +48,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            {% if current_user.is_authenticated %}
+            {% if current_user.is_authenticated and request.endpoint %}
             <li class="{% if request.endpoint == 'bp_qsos.logbook' %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook', username=current_user.name) }}">Logbook</a></li>
             <li class="{% if request.endpoint.startswith('bp_contacts.') %}active{% endif %}"><a href="{{ url_for('bp_contacts.contacts') }}">Contacts</a></li>
 
