@@ -1,5 +1,5 @@
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
+from flask_sqlalchemy import SQLAlchemy
+from flask_security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
 
 from sqlalchemy.sql import func
 from sqlalchemy_searchable import make_searchable

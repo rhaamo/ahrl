@@ -2,10 +2,10 @@
 from pprint import pprint as pp
 
 from flask import Flask, render_template, g, send_from_directory, jsonify
-from flask.ext.security import Security, current_user
-from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
-from flask.ext.mail import Mail
+from flask_security import Security, current_user
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
+from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from flask_debugtoolbar import DebugToolbarExtension
 
