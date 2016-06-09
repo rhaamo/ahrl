@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, stream_with_context, Response, flash
-from flask.ext.security import login_required, current_user
+from flask_security import login_required, current_user
 from models import db, Log, Mode, Band
 from utils import check_default_profile, ADIF_FIELDS
 from adif import parse as adif_parser

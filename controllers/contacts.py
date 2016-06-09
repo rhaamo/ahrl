@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask.ext.security import login_required, current_user
+from flask_security import login_required, current_user
 from models import db, Contact
 from forms import ContactsForm
 from utils import check_default_profile, InvalidUsage

@@ -4,7 +4,7 @@ from models import Apitoken
 import random
 import string
 import os
-from flask.ext.security import current_user
+from flask_security import current_user
 import pytz
 from flask import flash, current_app, json
 from functools import wraps

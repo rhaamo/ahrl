@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort, flash
-from flask.ext.security import login_required, current_user
+from flask_security import login_required, current_user
 from models import db, User, Log, Band, Mode
 from forms import QsoForm, EditQsoForm, FilterLogbookBandMode
 import pytz

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from flask.ext.security import login_required, current_user
+from flask_security import login_required, current_user
 from models import db, User
 from forms import UserProfileForm
 from utils import check_default_profile
