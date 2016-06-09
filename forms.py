@@ -221,3 +221,16 @@ class FilterLogbookBandMode(Form):
     mode = SelectField(label='Mode', validators=[DataRequired()])
     band = SelectField(label='Band', validators=[DataRequired()])
     submit = SubmitField('Filter')
+
+
+class ContactsForm(Form):
+    callsign = StringField('Callsign', [DataRequired()])
+    gridsquare = StringField('Locator')
+
+    def validate_gridsquare(form, field):
+        if len(field.data) <= 2:
+            raise ValidationError("QTH is too broad or empty, please input valid QTH")
+        if not is_valid_qth(field.data, 6):
+            raise ValidationError("QTH is invalid, validation failed")
+
+    submit = SubmitField('Save contact')

@@ -20,7 +20,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('callsign', sa.String(length=32), nullable=False),
     sa.Column('gridsquare', sa.String(length=32), nullable=True),
-    sa.Column('distance', sa.String(length=32), nullable=True),
+    sa.Column('distance', sa.Float(), nullable=True),
     sa.Column('bearing', sa.Float(), nullable=True),
     sa.Column('bearing_star', sa.String(length=32), nullable=True),
     sa.Column('longitude', sa.Float(), nullable=True),

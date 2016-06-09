@@ -181,7 +181,7 @@ class Contact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     callsign = db.Column(db.String(32), nullable=False)
     gridsquare = db.Column(db.String(32))
-    distance = db.Column(db.String(32))
+    distance = db.Column(db.Float)
     bearing = db.Column(db.Float)
     bearing_star = db.Column(db.String(32))
     longitude = db.Column(db.Float)

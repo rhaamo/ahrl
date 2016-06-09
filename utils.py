@@ -130,7 +130,7 @@ def check_default_profile(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         errs = []
-        if current_user.is_authenticated():
+        if current_user.is_authenticated:
             if current_user.callsign == 'N0C4LL':
                 errs.append("Profile callsign not changed !")
             if current_user.locator == 'JN':

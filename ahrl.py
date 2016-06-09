@@ -16,6 +16,7 @@ from controllers.users import bp_users
 from controllers.notes import bp_notes
 from controllers.qsos import bp_qsos
 from controllers.tools import bp_tools
+from controllers.contacts import bp_contacts
 from crons import update_qsos_without_countries
 
 import texttable
@@ -91,6 +92,7 @@ app.register_blueprint(bp_users)
 app.register_blueprint(bp_notes)
 app.register_blueprint(bp_qsos)
 app.register_blueprint(bp_tools)
+app.register_blueprint(bp_contacts)
 
 
 # Used in development

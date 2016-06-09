@@ -1,0 +1,41 @@
+{% extends "layout.jinja2" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <h3>
+            {{ current_user.name }}'s contacts
+            <a href="{{ url_for('bp_contacts.new') }}" class="btn btn-success btn-xs">new</a>
+        </h3>
+
+        <table class="table table-condensed">
+            <tr>
+                <th>Callsign</th>
+                <th>Gridsquare</th>
+                <th>Distance</th>
+                <th>Bearing</th>
+                <th>Dir</th>
+                {% if current_user.is_authenticated %}
+                    <th>Actions</th>
+                {% endif %}
+            </tr>
+            {% for c in contacts %}
+                <tr>
+                    <td>{{ c.callsign }}</td>
+                    <td>{{ c.gridsquare }}</td>
+                    <td>{{ c.distance | round}} Km</td>
+                    <td>{{ c.bearing | round}}</td>
+                    <td>{{ c.bearing_star }}</td>
+                    {% if current_user.is_authenticated %}
+                        <td>
+                            <a href="{{ url_for('bp_contacts.edit', contact_id=c.id) }}" class="btn btn-primary btn-xs">edit</a>
+                            <a href="{{ url_for('bp_contacts.delete', contact_id=c.id) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+</div>
+{% endblock %}
