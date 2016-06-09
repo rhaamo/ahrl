@@ -49,6 +49,7 @@ class User(db.Model, UserMixin):
     logs = db.relationship('Log', backref='user', lazy='dynamic')
     notes = db.relationship('Note', backref='user', lazy='dynamic')
     apitokens = db.relationship('Apitoken', backref='user', lazy='dynamic')
+    contacts = db.relationship('Contact', backref='user', lazy='dynamic')
 
     __mapper_args__ = {"order_by": name}
 
@@ -173,6 +174,20 @@ class DxccException(db.Model):
     start = db.Column(db.DateTime(timezone=False), nullable=False)
     end = db.Column(db.DateTime(timezone=False), nullable=False)
 
+
+class Contact(db.Model):
+    __tablename__ = "contact"
+
+    id = db.Column(db.Integer, primary_key=True)
+    callsign = db.Column(db.String(32), nullable=False)
+    gridsquare = db.Column(db.String(32))
+    distance = db.Column(db.String(32))
+    bearing = db.Column(db.Float)
+    bearing_star = db.Column(db.String(32))
+    longitude = db.Column(db.Float)
+    latitude = db.Column(db.Float)
+
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
 
 class Log(db.Model):
     __tablename__ = "log"
