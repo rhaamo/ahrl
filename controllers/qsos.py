@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort, flash
 from flask_security import login_required, current_user
-from models import db, User, Log, Band, Mode
+from models import db, User, Log, Band, Mode, Logbook
 from forms import QsoForm, EditQsoForm, FilterLogbookBandMode
 import pytz
 import datetime
@@ -13,9 +13,9 @@ from calendar import monthrange
 bp_qsos = Blueprint('bp_qsos', __name__)
 
 
-@bp_qsos.route('/logbook/<string:username>', methods=['GET'])
+@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>', methods=['GET'])
 @check_default_profile
-def logbook(username):
+def logbook(username, logbook_id):
     user = User.query.filter(User.name == username).first()
     if not user:
         return abort(404)
@@ -28,6 +28,8 @@ def logbook(username):
 
     uqth = user.qth_to_coords()
 
+    logbook = Logbook.query.filter(Logbook.id == logbook_id).one()
+
     d = datetime.datetime.utcnow()
     mr_m = monthrange(d.year, d.month)
     mr_y = monthrange(d.year, 12)
@@ -36,7 +38,8 @@ def logbook(username):
     d_month_end = datetime.datetime(d.year, d.month, mr_m[1], 23, 59, 59, tzinfo=pytz.timezone('UTC'))
     d_year_start = datetime.datetime(d.year, 0o1, 0o1, 00, 00, 00, tzinfo=pytz.timezone('UTC'))
     d_year_end = datetime.datetime(d.year, 12, mr_y[1], 23, 59, 59, tzinfo=pytz.timezone('UTC'))
-    cntry_worked = db.session.query(Log.country).filter(Log.user_id == user.id).distinct(Log.country).count()
+    cntry_worked = db.session.query(Log.country).filter(Log.user_id == user.id,
+                                                        Log.logbook_id == logbook.id).distinct(Log.country).count()
 
     # Form filter display thing and QSOs filtering
     filter_form = FilterLogbookBandMode()
@@ -59,8 +62,12 @@ def logbook(username):
             q_band = None
 
     # Form choices building
-    _modes = [[a.mode.mode, a.mode.mode] for a in Log.query.filter(Log.user_id == user.id).group_by(Log.mode_id).all()]
-    _bands = [[a.band.name, a.band.name] for a in Log.query.filter(Log.user_id == user.id).group_by(Log.band_id).all()]
+    _modes = [[a.mode.mode, a.mode.mode] for a in Log.query.filter(Log.user_id == user.id,
+                                                                   Log.logbook_id == logbook.id
+                                                                   ).group_by(Log.mode_id).all()]
+    _bands = [[a.band.name, a.band.name] for a in Log.query.filter(Log.user_id == user.id,
+                                                                   Log.logbook_id == logbook.id
+                                                                   ).group_by(Log.band_id).all()]
     _modes.insert(0, ['all', 'All modes'])
     _bands.insert(0, ['all', 'All bands'])
     filter_form.mode.choices = _modes
@@ -68,7 +75,7 @@ def logbook(username):
     filter_form.band.choices = _bands
     filter_form.band.data = rq_band or 'all'
 
-    bq = Log.query.filter(User.id == user.id)
+    bq = Log.query.filter(User.id == user.id, Log.logbook_id == logbook.id)
 
     if q_mode and not q_band:
         fquery = bq.filter(Log.mode_id == q_mode.id)
@@ -84,24 +91,29 @@ def logbook(username):
     # Column of stats
     stats = {
         'qsos': {
-            'total': db.session.query(Log.id).filter(Log.user_id == user.id).count(),
+            'total': db.session.query(Log.id).filter(Log.user_id == user.id, Log.logbook_id == logbook.id).count(),
             'month': db.session.query(Log.id).filter(Log.user_id == user.id,
-                                                     Log.time_on.between(d_month_start, d_month_end)).count(),
+                                                     Log.time_on.between(d_month_start, d_month_end),
+                                                     Log.logbook_id == logbook.id).count(),
             'year': db.session.query(Log.id).filter(Log.user_id == user.id,
-                                                    Log.time_on.between(d_year_start, d_year_end)).count()
+                                                    Log.time_on.between(d_year_start, d_year_end),
+                                                    Log.logbook_id == logbook.id).count()
         },
         'countries': {
             'worked': cntry_worked,
             'needed': 340 - cntry_worked
         },
         'qsl': {
-            'sent': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_sent == 'Y').count(),
-            'received': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_rcvd == 'Y').count(),
-            'requested': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_sent == 'R').count()
+            'sent': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_sent == 'Y',
+                                                    Log.logbook_id == logbook.id).count(),
+            'received': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_rcvd == 'Y',
+                                                        Log.logbook_id == logbook.id).count(),
+            'requested': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_sent == 'R',
+                                                         Log.logbook_id == logbook.id).count()
         }
     }
 
-    return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user,
+    return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user, logbook=logbook,
                            uqth=uqth, stats=stats, filter_form=filter_form, band=rq_band, mode=rq_mode)
 
 
@@ -316,14 +328,18 @@ def lib_clublog_dxcc():
     return Response(json.dumps(response), mimetype='application/json')
 
 
-@bp_qsos.route('/logbook/<string:username>/geojson', methods=['GET'])
-def logbook_geojson(username):
+@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/geojson', methods=['GET'])
+def logbook_geojson(username, logbook_id):
     if not username:
         raise InvalidUsage('Missing username', status_code=400)
 
     user = User.query.filter(User.name == username).first()
     if not user:
         raise InvalidUsage('User not found', status_code=404)
+
+    logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
+    if not logbook:
+        raise InvalidUsage('Logbook not found', status_code=404)
 
     # QSO filter thing
     q_mode = None
@@ -344,7 +360,7 @@ def logbook_geojson(username):
         else:
             q_band = None
 
-    bq = Log.query.filter(User.id == user.id)
+    bq = Log.query.filter(User.id == user.id, Log.logbook_id == logbook.id)
 
     if q_mode and not q_band:
         fquery = bq.filter(Log.mode_id == q_mode.id)

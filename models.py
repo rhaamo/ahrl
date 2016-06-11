@@ -46,6 +46,7 @@ class User(db.Model, UserMixin):
     swl = db.Column(db.Boolean(), nullable=False, default=False)
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+    logbooks = db.relationship('Logbook', backref='user', lazy='dynamic')
     logs = db.relationship('Log', backref='user', lazy='dynamic')
     notes = db.relationship('Note', backref='user', lazy='dynamic')
     apitokens = db.relationship('Apitoken', backref='user', lazy='dynamic')
@@ -189,6 +190,22 @@ class Contact(db.Model):
 
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
 
+
+class Logbook(db.Model):
+    __tablename__ = "logbook"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    callsign = db.Column(db.String(32), nullable=False)
+    locator = db.Column(db.String(16), nullable=False)
+    swl = db.Column(db.Boolean, default=False)
+    default = db.Column(db.Boolean, default=False)
+    public = db.Column(db.Boolean, default=True)
+
+    logs = db.relationship('Log', backref='logbook', lazy='dynamic')
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+
+
 class Log(db.Model):
     __tablename__ = "log"
 
@@ -316,6 +333,7 @@ class Log(db.Model):
     credit_submitted = db.Column(db.String(64), default=None)
 
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+    logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=False)
 
     __mapper_args__ = {"order_by": time_on.desc()}
 

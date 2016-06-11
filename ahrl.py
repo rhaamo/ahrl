@@ -9,7 +9,7 @@ from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from flask_debugtoolbar import DebugToolbarExtension
 
-from models import db, user_datastore
+from models import db, user_datastore, Logbook
 
 from controllers.main import bp_main
 from controllers.users import bp_users
@@ -17,6 +17,7 @@ from controllers.notes import bp_notes
 from controllers.qsos import bp_qsos
 from controllers.tools import bp_tools
 from controllers.contacts import bp_contacts
+from controllers.logbooks import bp_logbooks
 from crons import update_qsos_without_countries
 
 import texttable
@@ -79,6 +80,9 @@ def before_request():
         'AHRL_VERSION': "{0} ({1})".format(__VERSION__, git_version),
     }
     g.current_user = current_user
+    g.logbooks = None
+    if current_user.is_authenticated:
+        g.logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
 
 
 @app.errorhandler(InvalidUsage)
@@ -93,6 +97,7 @@ app.register_blueprint(bp_notes)
 app.register_blueprint(bp_qsos)
 app.register_blueprint(bp_tools)
 app.register_blueprint(bp_contacts)
+app.register_blueprint(bp_logbooks)
 
 
 # Used in development

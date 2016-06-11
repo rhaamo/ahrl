@@ -23,12 +23,18 @@
     <div class="col-lg-12">
         <div class="row">
             {% if band or mode %}
-                <div class="col-lg-6"><h4>QSOs filtered: band: {{ band }} & mode: {{ mode }}</h4></div>
+                <div class="col-lg-6">
+                    <h4>QSOs filtered: band: {{ band }} & mode: {{ mode }}</h4>
+                    <h5>From logbook: {{ logbook.name }}</h5>
+                </div>
             {% else %}
-                <div class="col-lg-6"><h4>All QSOs</h4></div>
+                <div class="col-lg-6">
+                    <h4>All QSOs</h4>
+                    <h5>From logbook: {{ logbook.name }}</h5>
+                </div>
             {% endif %}
             <div class="col-lg-4 col-lg-offset-2">
-                <form action="{{ url_for('bp_qsos.logbook', username=user.name) }}" method="get">
+                <form action="{{ url_for('bp_qsos.logbook', username=user.name, logbook_id=logbook.id) }}" method="get">
                     <div class="col-lg-5">{{ wtf.form_field(filter_form.band, 'inline') }}</div>
                     <div class="col-lg-5">{{ wtf.form_field(filter_form.mode, 'inline') }}</div>
                     <div class="col-lg-1">{{ wtf.form_field(filter_form.submit, button_map={'submit': 'success'}) }}</div>
@@ -161,7 +167,7 @@
                 markerColor: 'green'
             });
 
-            var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_geojson', username=user.name, band=band, mode=mode) }}"],{onEachFeature:popUp}).addTo(map);
+            var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_geojson', username=user.name, band=band, mode=mode, logbook_id=logbook.id) }}"],{onEachFeature:popUp}).addTo(map);
         {% endif %}
 
         $('#ModalQsoSingle').on('shown.bs.modal', function(ev) {

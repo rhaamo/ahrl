@@ -9,7 +9,7 @@ bp_main = Blueprint('bp_main', __name__)
 def home():
     pcfg = {"title": "AHRL - Another Ham Radio Log"}
     users = User.query.all()
-    return render_template('home.jinja2', pcfg=pcfg, logbooks=users)
+    return render_template('home.jinja2', pcfg=pcfg, users=users)
 
 
 @bp_main.route('/about')

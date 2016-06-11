@@ -3,12 +3,19 @@
 {% block content %}
 <div class="row">
     <div class="col-lg-12">
-        <h4>You can view the following logbooks</h4>
+        <h4>You can view the following logbooks:</h4>
         <ul>
-            {% for i in logbooks %}
-                {% if i.logs.count() > 0 %}
-                    <li><a href="{{ url_for('bp_qsos.logbook', username=i.name) }}">{{ i.name }} - {{ i.callsign }}</a></li>
-                {% endif %}
+            {% for u in users %}
+                <li>
+                    <a href="{{ url_for('bp_logbooks.logbooks', user=u.name) }}">{{ u.callsign }}</a>
+                    <ul>
+                    {% for l in u.logbooks %}
+                        {% if l.public %}
+                        <li><a href="{{ url_for('bp_qsos.logbook', username=u.name, logbook_id=l.id) }}">{{ l.name }}</a> <small>({{ l.logs.count() }} qsos)</small></li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                </li>
             {% endfor %}
         </ul>
     </div>

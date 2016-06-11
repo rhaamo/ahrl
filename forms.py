@@ -234,3 +234,21 @@ class ContactsForm(Form):
             raise ValidationError("QTH is invalid, validation failed")
 
     submit = SubmitField('Save contact')
+
+
+class LogbookForm(Form):
+    name = StringField('Name', [DataRequired()])
+    callsign = StringField('Callsign', [DataRequired()])
+    locator = StringField('Locator')
+
+    def validate_gridsquare(form, field):
+        if len(field.data) <= 2:
+            raise ValidationError("QTH is too broad or empty, please input valid QTH")
+        if not is_valid_qth(field.data, 6):
+            raise ValidationError("QTH is invalid, validation failed")
+
+    swl = BooleanField('Logbook of a SWL HAM ?')
+    default = BooleanField('Do you want this logbook to be the default one ?')
+    public = BooleanField('Make this logbook public ?')
+
+    submit = SubmitField('Save logbook')

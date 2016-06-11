@@ -1,0 +1,26 @@
+{% extends "layout.jinja2" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <h4>{{ user.name }}'s logbooks {% if current_user.is_authenticated %}<a href="{{ url_for('bp_logbooks.new') }}" class="btn btn-success btn-xs">new</a> {% endif %}:</h4>
+        <ul>
+            <ul>
+            {% for l in user.logbooks %}
+                {% if l.public or current_user.is_authenticated %}
+                <li><a href="{{ url_for('bp_qsos.logbook', username=user.name, logbook_id=l.id) }}">{{ l.name }}</a>
+                <small>
+                    ({{ l.logs.count() }} qsos{% if l.default %}, default{% endif %}{% if not l.public %}, private{% endif %})
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('bp_logbooks.edit', logbook_id=l.id) }}" class="btn btn-primary btn-xs">edit</a>
+                        <a href="{{ url_for('bp_logbooks.delete', logbook_id=l.id) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                    {% endif %}
+                </small>
+                </li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        </ul>
+    </div>
+</div>
+{% endblock %}

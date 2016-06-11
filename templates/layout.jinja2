@@ -49,7 +49,7 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             {% if current_user.is_authenticated and request.endpoint %}
-            <li class="{% if request.endpoint == 'bp_qsos.logbook' %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook', username=current_user.name) }}">Logbook</a></li>
+            <li class="{% if request.endpoint == 'bp_logbooks.logbooks' %}active{% endif %}"><a href="{{ url_for('bp_logbooks.logbooks', user=current_user.name) }}">My Logbooks</a></li>
             <li class="{% if request.endpoint.startswith('bp_contacts.') %}active{% endif %}"><a href="{{ url_for('bp_contacts.contacts') }}">Contacts</a></li>
 
             <li class="dropdown">
@@ -68,7 +68,14 @@
               </ul>
             </li>
 
-            <li class="{% if request.endpoint.startswith('bp_qsos.logbook_stats') %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook_stats', username=current_user.name) }}">Statistics</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Statistics <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                  {% for l in g.logbooks %}
+                    <li><a href="{{ url_for('bp_qsos.logbook_stats', username=current_user.name, logbook_id=l.id) }}">For {{ l.name }} <small>({{ l.logs.count() }} qsos)</small></a></li>
+                  {% endfor %}
+              </ul>
+            </li>
 
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tools <span class="caret"></span></a>
@@ -79,7 +86,7 @@
             </li>
             {% else %}
                 {% if user %}
-                    <li class="{% if request.endpoint == 'bp_qsos.logbook' %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook', username=user.name) }}">Logbook</a></li>
+                    <li class="{% if request.endpoint == 'bp_logbooks.logbooks' %}active{% endif %}"><a href="{{ url_for('bp_logbooks.logbooks', user=user.name) }}">Logbook</a></li>
                     <li class="{% if request.endpoint.startswith('bp_qsos.logbook_stats') %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook_stats', username=user.name) }}">Statistics</a></li>
                 {% endif %}
             {% endif %}
