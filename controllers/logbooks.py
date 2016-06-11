@@ -15,7 +15,12 @@ bp_logbooks = Blueprint('bp_logbooks', __name__)
 def logbooks(user):
     user = User.query.filter(User.name == user).first()
     pcfg = {"title": "{0}'s logbooks".format(user.name)}
-    return render_template('logbooks/logbooks.jinja2', pcfg=pcfg, user=user)
+    if current_user.is_authenticated:
+        logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    else:
+        logbooks = Logbook.query.filter(Logbook.user_id == user.id,
+                                        Logbook.public.is_(True)).all()
+    return render_template('logbooks/logbooks.jinja2', pcfg=pcfg, user=user, logbooks=logbooks)
 
 
 @bp_logbooks.route('/logbooks/<int:logbook_id>/edit', methods=['GET', 'POST'])

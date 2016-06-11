@@ -80,10 +80,6 @@ def before_request():
         'AHRL_VERSION': "{0} ({1})".format(__VERSION__, git_version),
     }
     g.current_user = current_user
-    g.logbooks = None
-    if current_user.is_authenticated:
-        g.logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
-
 
 @app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):

@@ -113,8 +113,15 @@ def logbook(username, logbook_id):
         }
     }
 
+    if current_user.is_authenticated:
+        logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    else:
+        logbooks = Logbook.query.filter(Logbook.user_id == user.id,
+                                        Logbook.public.is_(True)).all()
+
     return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user, logbook=logbook,
-                           uqth=uqth, stats=stats, filter_form=filter_form, band=rq_band, mode=rq_mode)
+                           uqth=uqth, stats=stats, filter_form=filter_form, band=rq_band, mode=rq_mode,
+                           logbooks=logbooks)
 
 
 @bp_qsos.route('/logbook/<int:logbook_id>/qsos/new/<string:method>', methods=['GET', 'POST'])
@@ -132,6 +139,8 @@ def new(logbook_id, method):
     if not logbook:
         flash("Logbook not found !", 'error')
         return redirect(url_for('bp_logbooks.logbooks', username=current_user.name))
+
+    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
 
     if form.validate_on_submit():
         a = Log()
@@ -193,7 +202,8 @@ def new(logbook_id, method):
 
     qsos = Log.query.filter(User.id == current_user.id).limit(16).all()
 
-    return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, qsos=qsos, method=method, logbook=logbook)
+    return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, qsos=qsos, method=method, logbook=logbook,
+                           logbooks=logbooks)
 
 
 @bp_qsos.route('/logbook/<int:logbook_id>/qsos/<int:qso_id>/edit', methods=['GET', 'POST'])
@@ -205,6 +215,8 @@ def edit(logbook_id, qso_id):
     a = Log.query.get_or_404(qso_id)
     logbook = Logbook.query.filter(Logbook.id == logbook_id,
                                    Logbook.user_id == current_user.id).one()
+
+    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
 
     if not logbook:
         flash("Logbook not found !", 'error')
@@ -278,7 +290,7 @@ def edit(logbook_id, qso_id):
     form.time_on.data = ton_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
     form.time_off.data = toff_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
 
-    return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a, logbook=logbook)
+    return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a, logbook=logbook, logbooks=logbooks)
 
 
 @bp_qsos.route('/qsos/<int:qso_id>/delete', methods=['GET', 'DELETE', 'PUT'])
@@ -549,6 +561,12 @@ def logbook_stats(username, logbook_id):
     if not logbook:
         return abort(404)
 
+    if current_user.is_authenticated:
+        logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    else:
+        logbooks = Logbook.query.filter(Logbook.user_id == user.id,
+                                        Logbook.public.is_(True)).all()
+
     pcfg = {'title': 'Stats for {0}'.format(logbook.name)}
 
     # Bargraph by year (previous and current)
@@ -628,4 +646,5 @@ def logbook_stats(username, logbook_id):
         'dxcc_worked': dxcc_worked
     }
 
-    return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_json=json.dumps(stats), stats=stats, user=user)
+    return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_json=json.dumps(stats), stats=stats, user=user,
+                           logbooks=logbooks)

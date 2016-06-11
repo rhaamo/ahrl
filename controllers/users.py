@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_security import login_required, current_user
-from models import db, User
+from models import db, User, Logbook
 from forms import UserProfileForm
 from utils import check_default_profile
 
@@ -13,7 +13,8 @@ bp_users = Blueprint('bp_users', __name__)
 def profile():
     pcfg = {"title": "My Profile"}
     user = User.query.get_or_404(current_user.id)
-    return render_template('users/profile.jinja2', pcfg=pcfg, user=user)
+    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    return render_template('users/profile.jinja2', pcfg=pcfg, user=user, logbooks=logbooks)
 
 
 @bp_users.route('/user/edit', methods=['GET', 'POST'])
@@ -39,4 +40,5 @@ def edit():
         db.session.commit()
         return redirect(url_for('bp_users.profile'))
 
-    return render_template('users/edit.jinja2', pcfg=pcfg, form=form, user=a)
+    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    return render_template('users/edit.jinja2', pcfg=pcfg, form=form, user=a, logbooks=logbooks)

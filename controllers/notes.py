@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
-from models import db, Note
+from models import db, Note, Logbook
 from forms import NoteForm
 from utils import check_default_profile
 
@@ -13,7 +13,8 @@ bp_notes = Blueprint('bp_notes', __name__)
 def notes():
     pcfg = {"title": "My notes"}
     _notes = Note.query.all()
-    return render_template('notes/view.jinja2', pcfg=pcfg, notes=_notes)
+    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    return render_template('notes/view.jinja2', pcfg=pcfg, notes=_notes, logbooks=logbooks)
 
 
 @bp_notes.route('/notes/<int:note_id>/edit', methods=['GET', 'POST'])
@@ -34,7 +35,8 @@ def edit(note_id):
         flash("Success saving note: {0}".format(a.title), 'success')
         return redirect(url_for('bp_notes.notes'))
 
-    return render_template('notes/edit.jinja2', pcfg=pcfg, form=form, note=a, note_id=note_id)
+    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    return render_template('notes/edit.jinja2', pcfg=pcfg, form=form, note=a, note_id=note_id, logbooks=logbooks)
 
 
 @bp_notes.route('/notes/new', methods=['GET', 'POST'])
@@ -57,7 +59,8 @@ def new():
         flash("Success updating note: {0}".format(a.title), 'success')
         return redirect(url_for('bp_notes.notes'))
 
-    return render_template('notes/new.jinja2', pcfg=pcfg, form=form)
+    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    return render_template('notes/new.jinja2', pcfg=pcfg, form=form, logbooks=logbooks)
 
 
 @bp_notes.route('/notes/<int:note_id>/delete', methods=['GET', 'DELETE', 'PUT'])
