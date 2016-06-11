@@ -28,7 +28,7 @@ def logbook(username, logbook_id):
 
     uqth = user.qth_to_coords()
 
-    _logbooks = Logbook.query.filter(Logbook.id == logbook_id).one()
+    logbook = Logbook.query.filter(Logbook.id == logbook_id).one()
 
     d = datetime.datetime.utcnow()
     mr_m = monthrange(d.year, d.month)
