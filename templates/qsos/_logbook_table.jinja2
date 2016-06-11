@@ -7,7 +7,7 @@
         <th>Recv</th>
         <th>Band</th>
     </tr>
-    {% for log in logbook %}
+    {% for log in qsos %}
         <tr>
         <td>{{ log.time_on | localize | show_date_no_offset }}</td>
         <td>{{ log.call }}</td>

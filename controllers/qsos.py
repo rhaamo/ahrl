@@ -117,16 +117,21 @@ def logbook(username, logbook_id):
                            uqth=uqth, stats=stats, filter_form=filter_form, band=rq_band, mode=rq_mode)
 
 
-@bp_qsos.route('/qsos/new/<string:method>', methods=['GET', 'POST'])
+@bp_qsos.route('/logbook/<int:logbook_id>/qsos/new/<string:method>', methods=['GET', 'POST'])
 @login_required
 @check_default_profile
-def new(method):
+def new(logbook_id, method):
     if method not in ['live', 'manual']:
         return redirect(url_for('bp_qsos.logbook', user_id=current_user.id))
 
     pcfg = {"title": "New QSO"}
 
     form = QsoForm()
+    logbook = Logbook.query.filter(Logbook.id == logbook_id,
+                                   Logbook.user_id == current_user.id).one()
+    if not logbook:
+        flash("Logbook not found !", 'error')
+        return redirect(url_for('bp_logbooks.logbooks', username=current_user.name))
 
     if form.validate_on_submit():
         a = Log()
@@ -174,22 +179,24 @@ def new(method):
         a.band_id = form.band.raw_data[0]
         a.mode_id = form.mode.raw_data[0]
 
+        a.logbook_id = logbook.id
+
         db.session.add(a)
         db.session.commit()
         flash("Success saving QSO with {0} on {1} using {2}".format(
             a.call, a.band.name, a.mode.mode
         ), 'success')
-        return redirect(url_for('bp_qsos.new', method=method))
+        return redirect(url_for('bp_qsos.new', method=method, logbook_id=logbook.id))
 
     qsos = Log.query.filter(User.id == current_user.id).limit(16).all()
 
-    return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, logbook=qsos, method=method)
+    return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, qsos=qsos, method=method, logbook=logbook)
 
 
-@bp_qsos.route('/qsos/<int:qso_id>/edit', methods=['GET', 'POST'])
+@bp_qsos.route('/logbook/<int:logbook_id>/qsos/<int:qso_id>/edit', methods=['GET', 'POST'])
 @login_required
 @check_default_profile
-def edit(qso_id):
+def edit(logbook_id, qso_id):
     pcfg = {"title": "Edit QSO"}
 
     a = Log.query.get_or_404(qso_id)
@@ -262,7 +269,7 @@ def delete(qso_id):
     qso = Log.query.get_or_404(qso_id)
     db.session.delete(qso)
     db.session.commit()
-    return redirect(url_for('bp_qsos.logbook', username=qso.user.name))
+    return redirect(url_for('bp_qsos.logbook', username=qso.user.name, logbook_id=qso.logbook.id))
 
 
 @bp_qsos.route('/qsos/lib/jambon/band_to_freq', methods=['GET'])

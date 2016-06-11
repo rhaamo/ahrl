@@ -6,8 +6,9 @@
     <div class="row">
         <div class="col-lg-5">
             <h3>New QSO <small class="freq_mhz"></small><small>TZ: {{ current_user.timezone }}</small></h3>
+            <h5>Adding in logbook: {{ logbook.name }}</h5>
 
-            <form action="{{ url_for('bp_qsos.new', method=method) }}" method="POST" class="form-horizontal new-qso">
+            <form action="{{ url_for('bp_qsos.new', method=method, logbook_id=logbook.id) }}" method="POST" class="form-horizontal new-qso">
                 {{ form.hidden_tag() }}
                 {{ wtf.form_errors(form, hiddens=True) }}
 
@@ -75,7 +76,7 @@
         </div>
         <div class="col-lg-6 col-lg-offset-1">
             <h3>Last 16 QSO</h3>
-            {% with logbook=logbook %}
+            {% with qsos=qsos %}
                 {% include 'qsos/_logbook_table.jinja2' %}
             {% endwith %}
         </div>
