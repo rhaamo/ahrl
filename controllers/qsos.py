@@ -539,13 +539,17 @@ def single_qso_modal(qso_id):
                            qso_bearing_star=qso_bearing_star, qso_distance_unit='Km')
 
 
-@bp_qsos.route('/logbook/stats/<string:username>', methods=['GET'])
+@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/stats', methods=['GET'])
 @check_default_profile
-def logbook_stats(username):
+def logbook_stats(username, logbook_id):
     user = User.query.filter(User.name == username).first()
     if not user:
         return abort(404)
-    pcfg = {'title': 'Stats'}
+    logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.id == logbook_id).one()
+    if not logbook:
+        return abort(404)
+
+    pcfg = {'title': 'Stats for {0}'.format(logbook.name)}
 
     # Bargraph by year (previous and current)
     stats_months = []
@@ -560,37 +564,46 @@ def logbook_stats(username):
             stats_y.append([
                 i,
                 db.session.query(Log.id).filter(Log.user_id == user.id,
-                                                Log.time_on.between(d_month_start, d_month_end)).count()
+                                                Log.time_on.between(d_month_start, d_month_end),
+                                                Log.logbook_id == logbook.id).count()
             ])
         stats_months.append(stats_y)
 
     # Total this year
-    total_qso_year = db.session.query(Log.id).filter(Log.user_id == user.id).count()
+    total_qso_year = db.session.query(Log.id).filter(Log.user_id == user.id,
+                                                     Log.logbook_id == logbook.id).count()
 
     # Pie with modes
     stats_modes = []
     modes_used = [{'mode': a.mode.mode, 'id': a.mode.id} for a in
-                  Log.query.filter(Log.user_id == user.id).group_by(Log.mode_id).all()]
+                  Log.query.filter(Log.user_id == user.id,
+                                   Log.logbook_id == logbook.id).group_by(Log.mode_id).all()]
     for mode in modes_used:
         stats_modes.append({
-            'data': db.session.query(Log.id).filter(Log.user_id == user.id, Log.mode_id == mode['id']).count(),
+            'data': db.session.query(Log.id).filter(Log.user_id == user.id,
+                                                    Log.mode_id == mode['id'],
+                                                    Log.logbook_id == logbook.id).count(),
             'label': mode['mode']
         })
 
     # Pie with bands
     stats_bands = []
     bands_used = [{'band': a.band.name, 'id': a.band.id} for a in
-                  Log.query.filter(Log.user_id == user.id).group_by(Log.band_id).all()]
+                  Log.query.filter(Log.user_id == user.id,
+                                   Log.logbook_id == logbook.id).group_by(Log.band_id).all()]
     for band in bands_used:
         stats_bands.append({
-            'data': db.session.query(Log.id).filter(Log.user_id == user.id, Log.band_id == band['id']).count(),
+            'data': db.session.query(Log.id).filter(Log.user_id == user.id,
+                                                    Log.band_id == band['id'],
+                                                    Log.logbook_id == logbook.id).count(),
             'label': band['band']
         })
 
     # DXCC Awards worked
     dxcc_bands = ['160m', '80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m', '4m', '2m', '70cm']
     dxcc_worked = []
-    for country in db.session.query(Log.country).filter(Log.user_id == user.id).distinct(Log.country):
+    for country in db.session.query(Log.country).filter(Log.user_id == user.id,
+                                                        Log.logbook_id == logbook.id).distinct(Log.country):
         dxcc_entry = {'country': country.country, 'bands': []}
         for band in dxcc_bands:
             band_id = Band.query.filter(Band.name == band,
@@ -598,7 +611,8 @@ def logbook_stats(username):
                                         Band.modes.is_(None)).one()
             count = db.session.query(Log.id).filter(Log.user_id == user.id,
                                                     Log.band_id == band_id.id,
-                                                    Log.country == country.country).count()
+                                                    Log.country == country.country,
+                                                    Log.logbook_id == logbook.id).count()
             dxcc_entry['bands'].append({'count': count})
         dxcc_worked.append(dxcc_entry)
 
