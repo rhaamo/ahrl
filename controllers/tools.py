@@ -1,7 +1,8 @@
+# coding: utf8
 from flask import Blueprint, render_template, redirect, url_for, stream_with_context, Response, flash
 from flask_security import login_required, current_user
-from models import db, Log, Mode, Band
-from utils import check_default_profile, ADIF_FIELDS
+from models import db, Log, Mode, Band, User, Logbook
+from utils import check_default_profile, ADIF_FIELDS, InvalidUsage
 from adif import parse as adif_parser
 from forms import AdifParse
 from werkzeug.utils import secure_filename
@@ -20,7 +21,7 @@ def adif_import():
     return render_template('tools/adif_import.jinja2', pcfg=pcfg, form=form)
 
 
-@bp_tools.route('/tools/adif/import', methods=['POST'])
+@bp_tools.route('/logbooks/adif/import', methods=['POST'])
 @login_required
 @check_default_profile
 def adif_import_file():
@@ -109,21 +110,20 @@ def adif_import_file():
     return redirect(url_for('bp_qsos.logbook', username=current_user.name))
 
 
-@bp_tools.route('/tools/adif/export', methods=['GET'])
+@bp_tools.route('/logbook/<string:username>/<int:logbook_id>/adif/export', methods=['GET'])
 @login_required
-@check_default_profile
-def adif_export():
-    pcfg = {"title": "Export ADIF"}
-    return render_template('tools/adif_export.jinja2', pcfg=pcfg)
+def adif_export_dl(username, logbook_id):
+    user = User.query.filter(User.name == username).first()
+    if not user:
+        raise InvalidUsage("User not found", 404)
+    logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.id == logbook_id).first()
+    if not logbook:
+        raise InvalidUsage("Logbook not found", 404)
 
-
-@bp_tools.route('/tools/adif/export/dl', methods=['GET'])
-@login_required
-def adif_export_dl():
-    logs = current_user.logs
+    logs = logbook.logs
 
     def a(k, v):
-        v = unicode(v)
+        v = str(v)
         return u"<{0}:{1}>{2} ".format(k, len(v), v)
 
     def generate():
