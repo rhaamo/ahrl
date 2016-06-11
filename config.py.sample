@@ -1,11 +1,11 @@
 DEBUG = True
 
 SECRET_KEY = 'bleh23r29-r2-9jwehoiqrpj'
-#SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://dashie@localhost/ahrl'
+# SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://dashie@localhost/ahrl'
 # SQLALCHEMY_DATABASE_URI = 'postgresql+pg8000://dashie@localhost/ahrl'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///ahrl.db'
-SQLALCHEMY_ECHO=False
-SQLALCHEMY_TRACK_MODIFICATIONS=False
+SQLALCHEMY_ECHO = False
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 SECURITY_CONFIRMABLE = False
 SECURITY_REGISTERABLE = False  # deactivate registration
@@ -30,9 +30,9 @@ DEBUG_TB_INTERCEPT_REDIRECTS = False
 
 # Paginations
 
-CLUBLOG_API_KEY=""
+CLUBLOG_API_KEY = ""
 
-LOOKUP_METHOD="hamqth"
+LOOKUP_METHOD = "hamqth"
 
-QRZ_USERNAME=""
-QRZ_PASSWORD=""
+QRZ_USERNAME = ""
+QRZ_PASSWORD = ""

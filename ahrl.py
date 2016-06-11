@@ -9,7 +9,7 @@ from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from flask_debugtoolbar import DebugToolbarExtension
 
-from models import db, user_datastore, Logbook
+from models import db, user_datastore
 
 from controllers.main import bp_main
 from controllers.users import bp_users
@@ -80,6 +80,7 @@ def before_request():
         'AHRL_VERSION': "{0} ({1})".format(__VERSION__, git_version),
     }
     g.current_user = current_user
+
 
 @app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):

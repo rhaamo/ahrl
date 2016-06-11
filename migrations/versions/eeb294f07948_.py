@@ -10,7 +10,7 @@ Create Date: 2016-06-10 12:59:47.397225
 revision = 'eeb294f07948'
 down_revision = 'dba2c36b8d15'
 
-from models import db, Logbook, User, Log
+from models import db, Logbook, User
 
 
 def upgrade():

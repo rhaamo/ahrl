@@ -1,11 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, Response, json
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
 from models import db, Logbook, User
 from forms import LogbookForm
-from utils import check_default_profile, InvalidUsage, dt_utc_to_user_tz
-from libqth import is_valid_qth, qth_to_coords
-from geohelper import distance, bearing
-from libjambon import geo_bearing_star
+from utils import check_default_profile
 
 bp_logbooks = Blueprint('bp_logbooks', __name__)
 
@@ -16,11 +13,11 @@ def logbooks(user):
     user = User.query.filter(User.name == user).first()
     pcfg = {"title": "{0}'s logbooks".format(user.name)}
     if current_user.is_authenticated:
-        logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+        _logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
     else:
-        logbooks = Logbook.query.filter(Logbook.user_id == user.id,
+        _logbooks = Logbook.query.filter(Logbook.user_id == user.id,
                                         Logbook.public.is_(True)).all()
-    return render_template('logbooks/logbooks.jinja2', pcfg=pcfg, user=user, logbooks=logbooks)
+    return render_template('logbooks/logbooks.jinja2', pcfg=pcfg, user=user, logbooks=_logbooks)
 
 
 @bp_logbooks.route('/logbooks/<int:logbook_id>/edit', methods=['GET', 'POST'])

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_security import login_required, current_user
 from models import db, Contact, User, Logbook
 from forms import ContactsForm
-from utils import check_default_profile, InvalidUsage, dt_utc_to_user_tz
+from utils import check_default_profile, InvalidUsage
 from libqth import is_valid_qth, qth_to_coords
 from geohelper import distance, bearing
 from libjambon import geo_bearing_star
@@ -116,13 +116,7 @@ def contacts_geojson(username):
     if not user:
         raise InvalidUsage('User not found', status_code=404)
 
-    # QSO filter thing
-    q_mode = None
-    q_band = None
-    rq_mode = request.args.get('mode', None)
-    rq_band = request.args.get('band', None)
-
-    contacts = Contact.query.filter(User.id == user.id).all()
+    _contacts = Contact.query.filter(User.id == user.id).all()
 
     if not is_valid_qth(user.locator, 6):
         raise InvalidUsage('QTH is not valid', status_code=400)
@@ -142,7 +136,7 @@ def contacts_geojson(username):
         }
     }]
 
-    for log in contacts:
+    for log in _contacts:
         if log.gridsquare:
             if not is_valid_qth(log.gridsquare, 6):
                 raise InvalidUsage('QTH is not valid', status_code=400)

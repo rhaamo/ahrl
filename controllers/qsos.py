@@ -28,7 +28,7 @@ def logbook(username, logbook_id):
 
     uqth = user.qth_to_coords()
 
-    logbook = Logbook.query.filter(Logbook.id == logbook_id).one()
+    _logbooks = Logbook.query.filter(Logbook.id == logbook_id).one()
 
     d = datetime.datetime.utcnow()
     mr_m = monthrange(d.year, d.month)
@@ -121,7 +121,7 @@ def logbook(username, logbook_id):
 
     return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user, logbook=logbook,
                            uqth=uqth, stats=stats, filter_form=filter_form, band=rq_band, mode=rq_mode,
-                           logbooks=logbooks)
+                           logbooks=_logbooks)
 
 
 @bp_qsos.route('/logbook/<int:logbook_id>/qsos/new/<string:method>', methods=['GET', 'POST'])
