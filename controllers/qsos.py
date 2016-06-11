@@ -121,7 +121,7 @@ def logbook(username, logbook_id):
 
     return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user, logbook=logbook,
                            uqth=uqth, stats=stats, filter_form=filter_form, band=rq_band, mode=rq_mode,
-                           logbooks=_logbooks)
+                           logbooks=logbooks)
 
 
 @bp_qsos.route('/logbook/<int:logbook_id>/qsos/new/<string:method>', methods=['GET', 'POST'])
