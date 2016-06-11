@@ -138,7 +138,9 @@ def new(logbook_id, method):
         # We get from user input a date with timezone offset (we asume that)
         # We store in database in UTC offset, so first convert to DT then makes aware
         # of the user timezone, and then convert to UTC
-        date = form.date.data.strftime('%d-%m-%Y')
+        # Warning: form.xxx.data seems to have month and day reversed ???
+        # So instead of %d-%m we use %m-%d
+        date = form.date.data.strftime('%m-%d-%Y')
         time = form.time.data.strftime('%H:%M:%S')
         date_wo_tz = datetime.datetime.strptime("{0} {1}".format(date, time),
                                                 "%d-%m-%Y %H:%M:%S")
@@ -146,6 +148,7 @@ def new(logbook_id, method):
 
         a.time_on = date_w_tz.astimezone(pytz.timezone('UTC')).replace(tzinfo=None)
         a.time_off = date_w_tz.astimezone(pytz.timezone('UTC')).replace(tzinfo=None)
+
         a.call = form.call.data.upper()
         a.freq = form.freq.data
         a.rst_rcvd = form.rst_rcvd.data
@@ -200,6 +203,12 @@ def edit(logbook_id, qso_id):
     pcfg = {"title": "Edit QSO"}
 
     a = Log.query.get_or_404(qso_id)
+    logbook = Logbook.query.filter(Logbook.id == logbook_id,
+                                   Logbook.user_id == current_user.id).one()
+
+    if not logbook:
+        flash("Logbook not found !", 'error')
+        return redirect(url_for('bp_logbooks.logbooks', username=current_user.name))
 
     form = EditQsoForm(request.form, a)
 
@@ -245,11 +254,21 @@ def edit(logbook_id, qso_id):
         a.lotw_qsl_rcvd = form.lotw_qsl_rcvd.data
         a.lotw_qsl_sent = form.lotw_qsl_sent.data
 
+        a.logbook_id = logbook.id
+
+        ton_as_usr = pytz.timezone(current_user.timezone).localize(form.time_on.data)
+        toff_as_usr = pytz.timezone(current_user.timezone).localize(form.time_off.data)
+
+        ton_as_utc = ton_as_usr.astimezone(pytz.timezone('UTC'))
+        toff_as_utc = toff_as_usr.astimezone(pytz.timezone('UTC'))
+        a.time_on = ton_as_utc
+        a.time_off = toff_as_utc
+
         db.session.commit()
         flash("Success updating QSO with {0} on {1} using {2}".format(
             a.call, a.band.name, a.mode.mode
         ), 'success')
-        return redirect(url_for('bp_qsos.logbook', username=current_user.name))
+        return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=logbook.id))
 
     # DateTimes in database are stored in UTC format
     # Before displaying them, we convert them to a timezone-aware of UTC
@@ -259,7 +278,7 @@ def edit(logbook_id, qso_id):
     form.time_on.data = ton_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
     form.time_off.data = toff_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
 
-    return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a)
+    return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a, logbook=logbook)
 
 
 @bp_qsos.route('/qsos/<int:qso_id>/delete', methods=['GET', 'DELETE', 'PUT'])

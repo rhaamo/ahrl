@@ -49,6 +49,12 @@ Another Ham Radio Log
    - Converted to a timezone-aware DateTime of 'UTC' using pytz
    - Then converted .astimezone() to current_user.timezone with pytz (like qsos:edit part)
 
+# Dates notes
+ - When entering a QSO format is : DD-MM-YYYY HH:MM:SSSS (Two fields)
+ - A Python DateTime is "YYYY MM DD HH:MM:SS" (approximately, order is ok)
+ - In ADIF format is YYYYMMDD HHMMSS (Two fields)
+ - When editing a QSO, the unique field is displayed as "YYYY-MM-DD HH:MM:SS"
+
 # TODO
  - eQSL integration
  - HAMQTH integration
