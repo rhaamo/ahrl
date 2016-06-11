@@ -7,6 +7,7 @@ import os
 from flask_security import current_user
 import pytz
 from flask import flash, current_app, json
+from markupsafe import Markup
 from functools import wraps
 import requests
 
@@ -136,7 +137,7 @@ def check_default_profile(f):
             if current_user.locator == 'JN':
                 errs.append("Profile locator not changed !")
         if len(errs) > 0:
-            flash("Errors:<br />{0}".format("<br />".join(errs)), 'error')
+            flash(Markup("Errors:<br />{0}".format("<br />".join(errs))), 'error')
         return f(*args, **kwargs)
     return wrap
 
