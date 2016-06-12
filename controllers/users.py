@@ -3,6 +3,7 @@ from flask_security import login_required, current_user
 from models import db, User, Logbook
 from forms import UserProfileForm
 from utils import check_default_profile
+import pytz
 
 bp_users = Blueprint('bp_users', __name__)
 
@@ -24,6 +25,7 @@ def edit():
     a = User.query.get_or_404(current_user.id)
 
     form = UserProfileForm(request.form, a)
+    form.timezone.choices = [[str(i), str(i)] for i in pytz.all_timezones]
 
     if form.validate_on_submit():
         a.callsign = form.callsign.data

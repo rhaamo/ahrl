@@ -1,10 +1,14 @@
+{% extends "layout.jinja2" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
 <div class="row">
     <div class="col-lg-12">
         <h3>QSO with {{ qso.call }} on {{ qso.time_on | localize(user=qso.user) | show_date_no_offset }}</h3>
     </div>
 </div>
 <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-4">
         <table class="table table-borderless">
             <tr>
                 <td>Band</td>
@@ -50,9 +54,35 @@
             {% endif %}
         </table>
     </div>
-    <div class="col-lg-6"><div id="map-single-qso" style="width: 400px; height: 250px"></div></div>
+
+    <div class="col-lg-4">
+        <div id="map-single-qso" style="height: 250px"></div>
+        <br/>
+        <form action="{{ url_for('bp_qsos.view_post', logbook_id=qso.logbook.id, username=qso.user.name, qso_id=qso.id) }}" method="POST" enctype="multipart/form-data" class="form-horizontal new-qso" name="gtfo-lastpass-search">
+            {{ new_pic.hidden_tag() }}
+            {{ wtf.form_errors(new_pic, hiddens=True) }}
+
+            {{ wtf.form_field(new_pic.name, 'horizontal', placeholder="New picture name") }}
+            {{ wtf.form_field(new_pic.picture, 'horizontal') }}
+            {{ wtf.form_field(new_pic.submit, button_map={'submit': 'success'}) }}
+        </form>
+    </div>
+
+    <div class="col-lg-4">
+        {% for p in qso.pictures %}
+        {{ p.name }}
+        {% endfor %}
+    </div>
 </div>
-<script>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.ajax.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.awesome-markers.js') }}"></script>
+
+    <script>
     var map_single_qso = L.map('map-single-qso').setView([52, 4], 3);
     map_single_qso.addLayer(L.tileLayer.provider('OpenStreetMap.Mapnik'));
 
@@ -94,3 +124,8 @@
 
     var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_qso_geojson', qso_id=qso.id) }}"],{onEachFeature:popUp}).addTo(map_single_qso);
 </script>
+{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.awesome-markers.css') }}" />
+{% endblock %}

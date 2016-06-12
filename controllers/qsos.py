@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort, flash
+from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort, flash, current_app
 from flask_security import login_required, current_user
-from models import db, User, Log, Band, Mode, Logbook
-from forms import QsoForm, EditQsoForm, FilterLogbookBandMode
+from flask_uploads import UploadSet, IMAGES, configure_uploads
+from models import db, User, Log, Band, Mode, Logbook, Picture
+from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm
 import pytz
 import datetime
 from libjambon import band_to_frequency, geo_bearing_star
@@ -11,6 +12,8 @@ from libqth import is_valid_qth, qth_to_coords
 from calendar import monthrange
 
 bp_qsos = Blueprint('bp_qsos', __name__)
+
+pictures = UploadSet('pictures', IMAGES)
 
 
 @bp_qsos.route('/logbook/<string:username>/<int:logbook_id>', methods=['GET'])
@@ -298,9 +301,10 @@ def edit(logbook_id, qso_id):
 @check_default_profile
 def delete(qso_id):
     qso = Log.query.get_or_404(qso_id)
+    logbook_id = qso.logbook.id
     db.session.delete(qso)
     db.session.commit()
-    return redirect(url_for('bp_qsos.logbook', username=qso.user.name, logbook_id=qso.logbook.id))
+    return redirect(url_for('bp_qsos.logbook', username=qso.user.name, logbook_id=logbook_id))
 
 
 @bp_qsos.route('/qsos/lib/jambon/band_to_freq', methods=['GET'])
@@ -517,6 +521,63 @@ def logbook_qso_geojson(qso_id):
     })
 
     return Response(json.dumps(f), mimetype='application/json')
+
+
+@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>', methods=['GET'])
+@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>/pictures/new', endpoint='view_post', methods=['POST'])
+@check_default_profile
+def view(username, logbook_id, qso_id):
+    user = User.query.filter(User.name == username).first()
+    if not user:
+        return abort(404)
+    qso = Log.query.get_or_404(qso_id)
+    logbook = Logbook.query.get_or_404(logbook_id)
+
+    pcfg = {"title": "View QSO with {0}".format(qso.call)}
+
+    if not qso.gridsquare:
+        qso_gs = qso.country_grid()
+    else:
+        qso_gs = qso.gridsquare
+
+    if not qso_gs or not qso.user.locator:
+        flash('Missing qso.gridsquare or qso.user.locator')
+        return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_id=logbook.id))
+
+    if not is_valid_qth(qso.user.locator, 6) or not is_valid_qth(qso_gs, 6):
+        flash('One of the supplied QTH is not valid')
+        return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_id=logbook.id))
+
+    _f = qth_to_coords(qso.user.locator, 6)  # precision, latitude, longitude
+    _t = qth_to_coords(qso_gs, 6)  # precision, latitude, longitude
+
+    qso_distance = distance.haversine_km(_f['latitude'],
+                                         _f['longitude'],
+                                         _t['latitude'],
+                                         _t['longitude'])
+
+    qso_bearing = bearing.initial_compass_bearing(_f['latitude'],
+                                                  _f['longitude'],
+                                                  _t['latitude'],
+                                                  _t['longitude'])
+    qso_bearing_star = geo_bearing_star(qso_bearing)
+
+    form = PictureForm()
+    if form.validate_on_submit():
+        filename = pictures.save(form.picture.data)
+        a = Picture()
+        a.name = form.name.data
+        a.filename = filename
+        a.filesize = None
+        a.hash = None
+        a.log_id = qso.id
+        db.session.add(a)
+        db.session.commit()
+        return redirect(url_for('bp_qsos.view', username=qso.user.name, logbook_id=qso.logbook.id, qso_id=qso.id))
+
+    return render_template('qsos/view.jinja2', qso=qso, qso_distance=qso_distance, qso_bearing=qso_bearing,
+                           qso_bearing_star=qso_bearing_star, qso_distance_unit='Km', new_pic=form,
+                           pcfg=pcfg)
 
 
 @bp_qsos.route('/logbook/qso/<int:qso_id>/modal', methods=['GET'])

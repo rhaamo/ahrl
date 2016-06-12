@@ -8,7 +8,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from flask_debugtoolbar import DebugToolbarExtension
-
+from flask_uploads import configure_uploads, UploadSet, IMAGES
 from models import db, user_datastore
 
 from controllers.main import bp_main
@@ -87,6 +87,9 @@ def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
+
+pictures = UploadSet('pictures', IMAGES)
+configure_uploads(app, (pictures))
 
 app.register_blueprint(bp_main)
 app.register_blueprint(bp_users)
