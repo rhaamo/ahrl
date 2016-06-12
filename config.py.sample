@@ -36,3 +36,5 @@ LOOKUP_METHOD = "hamqth"
 
 QRZ_USERNAME = ""
 QRZ_PASSWORD = ""
+
+UPLOADED_PICTURES_DEST = "/home/ahrl/uploads/pictures"
