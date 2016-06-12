@@ -6,7 +6,7 @@ click==6.6
 dateutils==0.6.6
 decorator==4.0.10
 dominate==2.2.0
-Flask==0.11.1
+Flask==0.10.1
 Flask-Bootstrap==3.3.6.0
 Flask-DebugToolbar==0.10.0
 Flask-Login==0.3.2
