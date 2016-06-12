@@ -39,3 +39,4 @@ QRZ_PASSWORD = ""
 
 UPLOADED_PICTURES_DEST = "/home/ahrl/uploads/pictures"
 UPLOADS_DEFAULT_DEST = "/home/ahrl/uploads"
+TEMP_DOWNLOAD_FOLDER = "/home/ahrl/tmp"
