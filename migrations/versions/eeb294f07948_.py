@@ -1,4 +1,4 @@
-"""empty message
+"""Do some updates for logbook where user already have qsos logged
 
 Revision ID: eeb294f07948
 Revises: dba2c36b8d15

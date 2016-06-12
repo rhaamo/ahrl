@@ -1,4 +1,4 @@
-"""empty message
+"""Add new DXCC models
 
 Revision ID: b68e04878516
 Revises: 85dc2959dc8c
