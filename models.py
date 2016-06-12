@@ -206,6 +206,18 @@ class Logbook(db.Model):
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
 
 
+class Picture(db.Model):
+    __tablename__ = "picture"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    filename = db.Column(db.String(255), unique=False, nullable=True)
+    filesize = db.Column(db.Integer, unique=False, nullable=True, default=0)  # stored as bytes
+    hash = db.Column(db.String(255), unique=True, nullable=True)
+
+    log_id = db.Column(db.Integer(), db.ForeignKey('log.id'), nullable=False)
+
+
 class Log(db.Model):
     __tablename__ = "log"
 
@@ -334,6 +346,7 @@ class Log(db.Model):
 
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
     logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=False)
+    pictures = db.relationship('Picture', backref='log', lazy='dynamic')
 
     __mapper_args__ = {"order_by": time_on.desc()}
 

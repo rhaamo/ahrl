@@ -2,6 +2,7 @@ from flask_wtf import Form
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, \
     HiddenField, BooleanField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
+from flask_uploads import UploadSet, IMAGES
 from wtforms.validators import DataRequired, ValidationError
 from flask_security import RegisterForm
 from models import db, User, Note, Cat, Mode, Band
@@ -11,9 +12,10 @@ from wtforms.ext.dateutil.fields import DateTimeField
 from utils import dt_utc_to_user_tz
 from libqth import is_valid_qth
 import datetime
-import pytz
 
 BaseModelForm = model_form_factory(Form)
+
+pictures = UploadSet('pictures', IMAGES)
 
 
 class ModelForm(BaseModelForm):
@@ -46,8 +48,7 @@ class UserProfileForm(ModelForm):
 
     firstname = StringField('Firstname')
     lastname = StringField('Lastname')
-    timezone = SelectField(choices=zip(pytz.all_timezones, pytz.all_timezones),
-                           label='Timezone', default='UTC')
+    timezone = SelectField(coerce=str, label='Timezone', default='UTC')
     lotw_name = StringField('LoTW Username')
     lotw_password = PasswordField('LoTW Password')
     eqsl_name = StringField('eQSL.cc Username')
@@ -252,3 +253,9 @@ class LogbookForm(Form):
     public = BooleanField('Make this logbook public ?')
 
     submit = SubmitField('Save logbook')
+
+
+class PictureForm(Form):
+    name = StringField('Name', [DataRequired()])
+    picture = FileField('Image', [FileRequired(), FileAllowed(pictures, 'Images only!')])
+    submit = SubmitField('Add picture')
