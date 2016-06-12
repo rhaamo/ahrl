@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort, flash, current_app
 from flask_security import login_required, current_user
-from flask_uploads import UploadSet, IMAGES, configure_uploads
+from flask_uploads import UploadSet, IMAGES
 from models import db, User, Log, Band, Mode, Logbook, Picture
 from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm
 import pytz
