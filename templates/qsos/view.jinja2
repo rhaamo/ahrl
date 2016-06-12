@@ -64,7 +64,7 @@
                 {{ wtf.form_errors(new_pic, hiddens=True) }}
 
                 {{ wtf.form_field(new_pic.name, 'horizontal', placeholder="New picture name") }}
-                {{ wtf.form_field(new_pic.picture, 'horizontal') }}
+                {{ wtf.form_field(new_pic.picture, 'horizontal', accept='.jpg, .jpeg, .gif, .png') }}
                 {{ wtf.form_field(new_pic.submit, button_map={'submit': 'success'}) }}
             </form>
         {% endif %}
