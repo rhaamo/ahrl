@@ -104,7 +104,7 @@ app.register_blueprint(bp_logbooks)
 @app.route('/uploads/<path:stuff>', methods=['GET'])
 def get_uploads_stuff(stuff):
     print("Get {0} from {1}".format(stuff, app.config['UPLOADS_DEFAULT_DEST']))
-    return send_from_directory(['UPLOADS_DEFAULT_DEST'], stuff, as_attachment=False)
+    return send_from_directory(app.config['UPLOADS_DEFAULT_DEST'], stuff, as_attachment=False)
 
 
 @app.errorhandler(404)

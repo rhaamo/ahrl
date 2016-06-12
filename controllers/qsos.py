@@ -10,6 +10,7 @@ from utils import InvalidUsage, dt_utc_to_user_tz, check_default_profile, get_dx
 from geohelper import distance, bearing
 from libqth import is_valid_qth, qth_to_coords
 from calendar import monthrange
+import os
 
 bp_qsos = Blueprint('bp_qsos', __name__)
 
@@ -578,6 +579,25 @@ def view(username, logbook_id, qso_id):
     return render_template('qsos/view.jinja2', qso=qso, qso_distance=qso_distance, qso_bearing=qso_bearing,
                            qso_bearing_star=qso_bearing_star, qso_distance_unit='Km', new_pic=form,
                            pcfg=pcfg)
+
+
+@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>/pictures/<int:picture_id>/delete', methods=['GET', 'POST'])
+@check_default_profile
+def delete_picture(username, logbook_id, qso_id, picture_id):
+    user = User.query.filter(User.name == username).one()
+    if not user:
+        flash("No user !")
+    logbook = Logbook.query.get_or_404(logbook_id)
+    qso = Log.query.get_or_404(qso_id)
+    picture = Picture.query.get_or_404(picture_id)
+
+    db.session.delete(picture)
+    db.session.commit()
+
+    f = os.path.join(current_app.config['UPLOADED_PICTURES_DEST'], picture.filename)
+    os.remove(f)
+
+    return redirect(url_for('bp_qsos.view', username=user.name, logbook_id=logbook.id, qso_id=qso.id))
 
 
 @bp_qsos.route('/logbook/qso/<int:qso_id>/modal', methods=['GET'])
