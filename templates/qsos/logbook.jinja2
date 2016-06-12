@@ -73,7 +73,13 @@
                     <a href="{{ url_for('bp_qsos.view', username=log.user.name, logbook_id=log.logbook.id, qso_id=log.id) }}"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a data-toggle="modal" data-target="#ModalQsoSingle" data-qso-id="{{ log.id }}">{{ log.call }}</a>
                 </td>
-                <td>{{ log.mode.mode }}</td>
+                <td>
+                    {% if log.pictures.count() > 0 %}
+                    <strong title="Pictures attached">{{ log.mode.mode }}</strong>
+                    {% else %}
+                    {{ log.mode.mode }}
+                {% endif %}
+                </td>
                 <td>{{ log.rst_sent }}</td>
                 <td>{{ log.rst_rcvd }}</td>
                 <td>{{ log.band.name }}</td>
