@@ -441,3 +441,51 @@ class Band(db.Model):
     start = db.Column(db.BigInteger(), nullable=True)
 
     logs = db.relationship('Log', backref='band', lazy='dynamic')
+
+
+class DxccEntities(db.Model):
+    __tablename__ = "dxcc_entities"
+
+    id = db.Column(db.Integer, primary_key=True)
+    adif = db.Column(db.Integer, nullable=False, index=True)
+    name = db.Column(db.String(150), default=None)
+    prefix = db.Column(db.String(30), nullable=False)
+    cqz = db.Column(db.Float, nullable=False)
+    ituz = db.Column(db.Float, nullable=False)
+    cont = db.Column(db.String(5), nullable=False)
+    long = db.Column(db.Float, nullable=False)
+    lat = db.Column(db.Float, nullable=False)
+    start = db.Column(db.DateTime(timezone=False), default=None)
+    end = db.Column(db.DateTime(timezone=False), default=None)
+
+
+class DxccExceptions(db.Model):
+    __tablename__ = "dxcc_exceptions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    record = db.Column(db.Integer, nullable=False, index=True)
+    call = db.Column(db.String(30), default=None)
+    entity = db.Column(db.String(255), nullable=False)
+    adif = db.Column(db.Integer, nullable=False)
+    cqz = db.Column(db.Float, nullable=False)
+    cont = db.Column(db.String(5), default=None)
+    long = db.Column(db.Float, default=None)
+    lat = db.Column(db.Float, default=None)
+    start = db.Column(db.DateTime(timezone=False), default=None)
+    end = db.Column(db.DateTime(timezone=False), default=None)
+
+
+class DxccPrefixes(db.Model):
+    __tablename__ = "dxcc_prefixes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    record = db.Column(db.Integer, nullable=False, index=True)
+    call = db.Column(db.String(30), default=None)
+    entity = db.Column(db.String(255), nullable=False)
+    adif = db.Column(db.Integer, nullable=False)
+    cqz = db.Column(db.Float, nullable=False)
+    cont = db.Column(db.String(5), default=None)
+    long = db.Column(db.Float, default=None)
+    lat = db.Column(db.Float, default=None)
+    start = db.Column(db.DateTime(timezone=False), default=None)
+    end = db.Column(db.DateTime(timezone=False), default=None)
