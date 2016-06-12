@@ -580,7 +580,7 @@ def view(username, logbook_id, qso_id):
 
     return render_template('qsos/view.jinja2', qso=qso, qso_distance=qso_distance, qso_bearing=qso_bearing,
                            qso_bearing_star=qso_bearing_star, qso_distance_unit='Km', new_pic=form,
-                           pcfg=pcfg)
+                           pcfg=pcfg, logbook=logbook)
 
 
 @bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>/pictures/<int:picture_id>/delete', methods=['GET', 'POST'])
