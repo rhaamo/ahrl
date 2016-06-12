@@ -563,18 +563,20 @@ def view(username, logbook_id, qso_id):
                                                   _t['longitude'])
     qso_bearing_star = geo_bearing_star(qso_bearing)
 
-    form = PictureForm()
-    if form.validate_on_submit():
-        filename = pictures.save(form.picture.data)
-        a = Picture()
-        a.name = form.name.data
-        a.filename = filename
-        a.filesize = None
-        a.hash = None
-        a.log_id = qso.id
-        db.session.add(a)
-        db.session.commit()
-        return redirect(url_for('bp_qsos.view', username=qso.user.name, logbook_id=qso.logbook.id, qso_id=qso.id))
+    form = None
+    if current_user.is_authenticated:
+        form = PictureForm()
+        if form.validate_on_submit():
+            filename = pictures.save(form.picture.data)
+            a = Picture()
+            a.name = form.name.data
+            a.filename = filename
+            a.filesize = None
+            a.hash = None
+            a.log_id = qso.id
+            db.session.add(a)
+            db.session.commit()
+            return redirect(url_for('bp_qsos.view', username=qso.user.name, logbook_id=qso.logbook.id, qso_id=qso.id))
 
     return render_template('qsos/view.jinja2', qso=qso, qso_distance=qso_distance, qso_bearing=qso_bearing,
                            qso_bearing_star=qso_bearing_star, qso_distance_unit='Km', new_pic=form,
@@ -583,6 +585,7 @@ def view(username, logbook_id, qso_id):
 
 @bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>/pictures/<int:picture_id>/delete', methods=['GET', 'POST'])
 @check_default_profile
+@login_required
 def delete_picture(username, logbook_id, qso_id, picture_id):
     user = User.query.filter(User.name == username).one()
     if not user:
