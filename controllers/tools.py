@@ -42,7 +42,8 @@ def adif_import_file():
             _date_wo_tz = datetime.datetime.strptime(_date, "%Y%m%d %H%M%S")
             duplicates_count = db.session.query(Log.id).filter(Log.user_id == current_user.id,
                                                                Log.call == log['call'],
-                                                               Log.time_on == _date_wo_tz).count()
+                                                               Log.time_on == _date_wo_tz,
+                                                               Log.logbook_id == form.logbook.raw_data[0]).count()
             if duplicates_count > 0:
                 duplicates += 1
                 continue  # duplicate found, skip record
