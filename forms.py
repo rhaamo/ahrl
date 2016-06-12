@@ -5,7 +5,7 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from flask_uploads import UploadSet, IMAGES
 from wtforms.validators import DataRequired, ValidationError
 from flask_security import RegisterForm
-from models import db, User, Note, Cat, Mode, Band
+from models import db, User, Note, Cat, Mode, Band, Logbook
 from wtforms_alchemy import model_form_factory
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.ext.dateutil.fields import DateTimeField
@@ -104,6 +104,10 @@ def get_radios():
 
 def foo_bar_baz_qux():
     return dt_utc_to_user_tz(datetime.datetime.utcnow())
+
+
+def get_logbooks():
+    return Logbook.query.all()
 
 
 class BaseQsoForm(Form):
@@ -215,6 +219,8 @@ class EditQsoForm(BaseQsoForm):
 class AdifParse(Form):
     adif_file = FileField('File', [FileRequired(),
                                    FileAllowed(['adi', 'adif'], 'Adif only !')])
+    logbook = QuerySelectField(query_factory=get_logbooks, allow_blank=False, label='Logbook', get_label='name')
+
     submit = SubmitField('Import file')
 
 

@@ -3,17 +3,17 @@ import datetime
 
 # Comes from https://web.bxhome.org/content/adifpy
 
-ADIF_REC_RE = re.compile(r'<(.*?):(\d+).*?>([^<\t\f\v]+)')
+ADIF_REC_RE = re.compile(b'<(.*?):(\d+).*?>([^<\t\f\v]+)')
 
 
 def parse(s):
-    raw = re.split('<eor>|<eoh>(?i)', s)
+    raw = re.split(b'<eor>|<eoh>(?i)', s)
     logbook = []
     for record in raw[1:-1]:
         qso = {}
         tags = ADIF_REC_RE.findall(record)
         for tag in tags:
-                qso[tag[0].lower()] = tag[2][:int(tag[1])]
+                qso[tag[0].lower().decode("utf-8")] = tag[2][:int(tag[1])].decode("utf-8")
         logbook.append(qso)
     return logbook
 

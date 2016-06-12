@@ -94,10 +94,11 @@ def adif_import_file():
                     l.notes = ""
                 l.notes = "\r\nDate set to the import date because not found in ADIF"
             if 'comment' in log:
-                l.comment = log['comment'].decode('UTF-8')
+                l.comment = log['comment']
             if 'comment_intl' in log:
-                l.comment = log['comment_intl'].decode('UTF-8')
+                l.comment = log['comment_intl']
             l.user = current_user  # oops dont miss it
+            l.logbook_id = form.logbook.raw_data[0]
 
             db.session.add(l)
             count += 1  # One more in the stack
@@ -107,7 +108,7 @@ def adif_import_file():
     else:
         return render_template('tools/adif_import.jinja2', pcfg=pcfg, form=form, flash='Error with the file')
 
-    return redirect(url_for('bp_qsos.logbook', username=current_user.name))
+    return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=form.logbook.raw_data[0]))
 
 
 @bp_tools.route('/logbook/<string:username>/<int:logbook_id>/adif/export', methods=['GET'])
