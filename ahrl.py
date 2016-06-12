@@ -18,7 +18,7 @@ from controllers.qsos import bp_qsos
 from controllers.tools import bp_tools
 from controllers.contacts import bp_contacts
 from controllers.logbooks import bp_logbooks
-from crons import update_qsos_without_countries
+from crons import update_qsos_without_countries, update_dxcc_from_cty_xml
 
 import texttable
 from dbseed import make_db_seed
@@ -172,7 +172,17 @@ def cron_update_qsos_countries():
     update_qsos_without_countries(db)
 
 
+@manager.command
+def cron_update_dxcc_from_cty_xml():
+    """Update DXCC tables from cty.xml"""
+    update_dxcc_from_cty_xml(db)
+
+
 manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
-    manager.run()
+    try:
+        manager.run()
+    except KeyboardInterrupt as e:
+        print("Got KeyboardInterrupt, halting...")
+        print(e)

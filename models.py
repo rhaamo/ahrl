@@ -145,37 +145,6 @@ class Contest(db.Model):
     # possible FK template->contest_template
 
 
-class Dxcc(db.Model):
-    __tablename__ = "dxcc"
-
-    id = db.Column(db.Integer, primary_key=True)
-    prefix = db.Column(db.String(30), nullable=False, index=True)
-    name = db.Column(db.String(150), default=None)
-    cqz = db.Column(db.Float, nullable=False)
-    ituz = db.Column(db.Float, nullable=False)
-    cont = db.Column(db.String(5), nullable=False)
-    long = db.Column(db.Float, nullable=False)
-    lat = db.Column(db.Float, nullable=False)
-
-
-class DxccException(db.Model):
-    __tablename__ = "dxccexceptions"
-
-    id = db.Column(db.Integer, primary_key=True)
-    prefix = db.Column(db.String(30), nullable=False, index=True)
-    name = db.Column(db.String(150), default=None)
-    cqz = db.Column(db.Float, nullable=False)
-    ituz = db.Column(db.Float, nullable=False)
-    cont = db.Column(db.String(5), nullable=False)
-    long = db.Column(db.Float, nullable=False)
-    lat = db.Column(db.Float, nullable=False)
-
-    # 0000-00-00 00:00:00 date is invalid for DateTime
-    # So instead we EPOCH them
-    start = db.Column(db.DateTime(timezone=False), nullable=False)
-    end = db.Column(db.DateTime(timezone=False), nullable=False)
-
-
 class Contact(db.Model):
     __tablename__ = "contact"
 
@@ -361,11 +330,13 @@ class Log(db.Model):
 
     def country_grid_coords(self):
         if 'sqlite' in db.engine.driver:
-            q = Dxcc.query.filter(Dxcc.prefix == func.substr(self.call, 1, func.LENGTH(Dxcc.prefix))).order_by(
-                func.length(Dxcc.prefix).desc()).limit(1)
+            q = DxccEntities.query.filter(
+                DxccEntities.prefix == func.substr(self.call, 1, func.LENGTH(DxccEntities.prefix))
+            ).order_by(func.length(DxccEntities.prefix).desc()).limit(1)
         else:
-            q = Dxcc.query.filter(Dxcc.prefix == func.substring(self.call, 1, func.LENGTH(Dxcc.prefix))).order_by(
-                func.length(Dxcc.prefix).desc()).limit(1)
+            q = DxccEntities.query.filter(
+                DxccEntities.prefix == func.substring(self.call, 1, func.LENGTH(DxccEntities.prefix))
+            ).order_by(func.length(DxccEntities.prefix).desc()).limit(1)
         if q.count() <= 0:
             return None
         else:
