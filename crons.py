@@ -86,6 +86,8 @@ def update_dxcc_from_cty_xml(db):
 def parse_element(element):
     elements = 0
     for child in element:
+        skip = False
+
         if element.tag == '{http://www.clublog.org/cty/v1.0}entities':
             _type = 'entity'
             _obj = DxccEntities()
@@ -110,6 +112,8 @@ def parse_element(element):
             elif attr.tag == '{http://www.clublog.org/cty/v1.0}prefix':
                 _obj.prefix = attr.text
             elif attr.tag == '{http://www.clublog.org/cty/v1.0}entity':
+                if attr.text == 'INVALID':
+                    skip = True
                 _obj.entity = attr.text
             elif attr.tag == '{http://www.clublog.org/cty/v1.0}adif':
                 _obj.adif = int(attr.text)
@@ -130,6 +134,9 @@ def parse_element(element):
                 _obj.adif = 999
             elif not _obj.cqz:
                 _obj.cqz = 999
+
+        if skip:
+            continue  # We have god an entity=INVALID, skip it
 
         db.session.add(_obj)
         elements += 1
