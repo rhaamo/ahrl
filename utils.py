@@ -1,6 +1,6 @@
 import re
 from unidecode import unidecode
-from models import Apitoken
+from models import db, Apitoken, Band
 import random
 import string
 import os
@@ -136,6 +136,13 @@ def check_default_profile(f):
                 errs.append("Profile callsign not changed !")
             if current_user.locator == 'JN':
                 errs.append("Profile locator not changed !")
+
+            bands = db.session.query(Band.id).filter(Band.modes.is_(None),
+                                                     Band.start.is_(None),
+                                                     Band.zone == current_user.zone).count()
+            if bands <= 0 or not bands:
+                errs.append("The IARU Zone you selected doesn't have any band defined in AHRL yet. See with devs please.")
+
         if len(errs) > 0:
             flash(Markup("Errors:<br />{0}".format("<br />".join(errs))), 'error')
         return f(*args, **kwargs)

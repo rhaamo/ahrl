@@ -27,6 +27,10 @@
                 <td>{{ current_user.locator or "Please fill me !" }}</td>
             </tr>
             <tr>
+                <td>Zone</td>
+                <td>{{ current_user.zone_str() }}</td>
+            </tr>
+            <tr>
                 <td>Is a SWL ?</td>
                 <td><span class="glyphicon glyphicon-{{ 'ok' if current_user.swl else 'remove' }}"></span></td>
             </tr>

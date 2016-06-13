@@ -76,6 +76,16 @@ class User(db.Model, UserMixin):
         cute += self.callsign
         return cute
 
+    def zone_str(self):
+        if self.zone == 'iaru1':
+            return 'IARU Zone 1'
+        elif self.zone == 'iaru2':
+            return 'IARU Zone 2'
+        elif self.zone == 'iaru3':
+            return 'IARU Zone 3'
+        else:
+            return 'You should not do that'
+
 
 class Apitoken(db.Model):
     id = db.Column(db.Integer, primary_key=True)

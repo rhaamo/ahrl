@@ -4,7 +4,7 @@ from wtforms import StringField, PasswordField, SubmitField, TextAreaField, Sele
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from flask_uploads import UploadSet, IMAGES
 from wtforms.validators import DataRequired, ValidationError
-from flask_security import RegisterForm
+from flask_security import RegisterForm, current_user
 from models import db, User, Note, Cat, Mode, Band, Logbook
 from wtforms_alchemy import model_form_factory
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -56,6 +56,10 @@ class UserProfileForm(ModelForm):
 
     swl = BooleanField('Are you a SWL HAM ?')
 
+    zone = SelectField('Zone', choices=[['iaru1', 'IARU Zone 1'],
+                                                ['iaru2', 'IARU Zone 2'],
+                                                ['iaru3', 'IARU Zone 3']], validators=[DataRequired()])
+
     submit = SubmitField('Update profile')
 
 
@@ -78,7 +82,9 @@ def get_modes():
 
 
 def get_bands():
-    return Band.query.filter(Band.modes.is_(None), Band.start.is_(None)).all()
+    return Band.query.filter(Band.modes.is_(None),
+                             Band.start.is_(None),
+                             Band.zone == current_user.zone).all()
 
 
 def dflt_mode():

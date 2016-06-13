@@ -38,6 +38,7 @@ def edit():
         a.eqsl_name = form.eqsl_name.data
         a.eqsl_password = form.eqsl_password.data
         a.swl = form.swl.data
+        a.zone = form.zone.data
 
         db.session.commit()
         return redirect(url_for('bp_users.profile'))
