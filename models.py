@@ -44,6 +44,7 @@ class User(db.Model, UserMixin):
     eqsl_password = db.Column(db.String(255))
     timezone = db.Column(db.String(255), nullable=False)  # Managed and fed by pytz
     swl = db.Column(db.Boolean(), nullable=False, default=False)
+    zone = db.Column(db.String(10), nullable=False, default='iaru1')
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
     logbooks = db.relationship('Logbook', backref='user', lazy='dynamic')

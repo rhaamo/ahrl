@@ -23,7 +23,7 @@ def band_to_frequency(band, mode):
         return frequencies.first().start
 
 
-def frequency_to_band(frequency):
+def frequency_to_band(frequency, zone='iaru1'):
     f = frequency
     if type(f) == str:
         f = int(frequency)
