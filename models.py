@@ -346,7 +346,7 @@ class Log(db.Model):
             ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
         else:
             q = DxccPrefixes.query.filter(
-                DxccPrefixes.prefix == func.substring(self.call, 1, func.LENGTH(DxccPrefixes.call))
+                DxccPrefixes.call == func.substring(self.call, 1, func.LENGTH(DxccPrefixes.call))
             ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
         if q.count() <= 0:
             return None
