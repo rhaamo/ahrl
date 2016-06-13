@@ -1,9 +1,18 @@
-"""Delete old band plan and add default IARU Zone 1 Band Plan
+"""Delete old band plan and add default IARU Zone 1 Band Plan (Will break if QSO already present, see this file for help)
 
 Revision ID: 488cd2ea543d
 Revises: f4d4e3c42eb7
 Create Date: 2016-06-13 21:55:03.390082
 
+Help:
+    SQLAlchemy will not allow with MySQL to delete with breaking relations so let the upgrade fail
+    mysql -u whatever -p
+    use ahrl;
+    SET FOREIGN_KEY_CHECKS=0;
+    TRUNCATE TABLE bands;
+    SET FOREIGN_KEY_CHECKS=1;
+    exit mysql;
+    re-run upgrade, it should pass
 """
 
 # revision identifiers, used by Alembic.
