@@ -341,13 +341,13 @@ class Log(db.Model):
 
     def country_grid_coords(self):
         if 'sqlite' in db.engine.driver:
-            q = DxccEntities.query.filter(
-                DxccEntities.prefix == func.substr(self.call, 1, func.LENGTH(DxccEntities.prefix))
-            ).order_by(func.length(DxccEntities.prefix).desc()).limit(1)
+            q = DxccPrefixes.query.filter(
+                DxccPrefixes.call == func.substr(self.call, 1, func.LENGTH(DxccPrefixes.call))
+            ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
         else:
-            q = DxccEntities.query.filter(
-                DxccEntities.prefix == func.substring(self.call, 1, func.LENGTH(DxccEntities.prefix))
-            ).order_by(func.length(DxccEntities.prefix).desc()).limit(1)
+            q = DxccPrefixes.query.filter(
+                DxccPrefixes.prefix == func.substring(self.call, 1, func.LENGTH(DxccPrefixes.call))
+            ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
         if q.count() <= 0:
             return None
         else:
