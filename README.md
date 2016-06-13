@@ -34,6 +34,14 @@ Another Ham Radio Log
  - This is majoritary a fork of https://github.com/magicbug/Cloudlog by 2E0SQL
  - Thanks to him for all his work on CloudLog which inspired me (and from which I reused some things)
 
+# Random notes (since I am currently no licensed and then I am SWL at the moment)
+ - Your user have a CALLSIGN, LOCATOR and IARU Zone
+  - Each logbook can have a different LOCATOR or CALLSIGN
+  - I see that more like to have a different logbook if you do SAT / GHZ / Portable / Mobile etc.
+  - Or if you want to have a log for your home base, from some DX remote site, etc.
+  - So the IARU Zone isn't a choice for logbook, they use user profile anyway
+ - Any things can be subject to discussion anyway, if something isn't really ok, no problem to see what to do
+
 # How we handle DateTimes and timezones
  - DateTimes are stored in database without timezone, so we manage to always save them in UTC:
 
