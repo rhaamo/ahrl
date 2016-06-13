@@ -156,7 +156,7 @@ def new(logbook_id, method):
         date = form.date.data.strftime('%m-%d-%Y')
         time = form.time.data.strftime('%H:%M:%S')
         date_wo_tz = datetime.datetime.strptime("{0} {1}".format(date, time),
-                                                "%d-%m-%Y %H:%M:%S")
+                                                "%m-%d-%Y %H:%M:%S")
         date_w_tz = pytz.timezone(current_user.timezone).localize(date_wo_tz)
 
         a.time_on = date_w_tz.astimezone(pytz.timezone('UTC')).replace(tzinfo=None)
