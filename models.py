@@ -410,6 +410,8 @@ class Band(db.Model):
     lower = db.Column(db.BigInteger(), nullable=True)
     upper = db.Column(db.BigInteger(), nullable=True)
     start = db.Column(db.BigInteger(), nullable=True)
+    # Zone format 'iaru1', 'iaru2', 'iaru3'
+    zone = db.Column(db.String(10), nullable=False, default='iaru1')
 
     logs = db.relationship('Log', backref='band', lazy='dynamic')
 
