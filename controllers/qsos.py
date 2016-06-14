@@ -733,4 +733,4 @@ def logbook_stats(username, logbook_id):
     }
 
     return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_json=json.dumps(stats), stats=stats, user=user,
-                           logbooks=logbooks)
+                           logbooks=logbooks, logbook=logbook)
