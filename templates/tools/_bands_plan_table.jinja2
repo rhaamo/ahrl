@@ -3,22 +3,37 @@
         <th>Name</th>
         <th>Lower frequency</th>
         <th>Upper frequency</th>
+        <th>Total avail bandwidth</th>
     </tr>
     {% for band in bands['bands'] %}
         <tr>
             <td>{{ band.name }}</td>
-            <td>
-                {% if band.lower < 1240000000 %}
+            <td title="{{ band.lower }} KHz">
+                {% if band.lower < 1000000 %}
+                    {{ band.lower / 1000.0 | round}} KHz
+                {% elif band.lower < 1000000000 %}
                     {{ band.lower / 1000000.0 | round }} MHz
                 {% elif band.lower >= 1240000000 %}
                     {{ band.lower / 1000000000.0 | round }} GHz
                 {% endif %}
             </td>
-            <td>
-                {% if band.upper < 1240000000 %}
+            <td title="{{ band.upper }} KHz">
+                {% if band.upper < 1000000 %}
+                    {{ band.upper / 1000.0 | round }} KHz
+                {% elif band.upper < 1000000000 %}
                     {{ band.upper / 1000000.0 | round }} MHz
                 {% elif band.upper >= 1240000000 %}
                     {{ band.upper / 1000000000.0 | round }} GHz
+                {% endif %}
+            </td>
+            <td>
+                {% set bw = (band.upper - band.lower) %}
+                {% if bw < 1000000 %}
+                    {{ bw / 1000.0 | round }} KHz
+                {% elif bw < 1000000000 %}
+                    {{ bw / 1000000.0 | round }} MHz
+                {% elif bw >= 1240000000 %}
+                    {{ bw / 1000000000.0 | round }} GHz
                 {% endif %}
             </td>
         </tr>
