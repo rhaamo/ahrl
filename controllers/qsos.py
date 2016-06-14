@@ -702,7 +702,9 @@ def logbook_stats(username, logbook_id):
         })
 
     # DXCC Awards worked
-    dxcc_bands = ['160m', '80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m', '4m', '2m', '70cm']
+    dxcc_bands = ['2222m', '160m', '80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m', '2m',
+                  '70cm', '23cm', '13cm', '5cm', '3cm', '1,2cm',
+                  '6mm', '4mm', '2,4mm', '2mm', '1,2mm']
     dxcc_worked = []
     for country in db.session.query(Log.country).filter(Log.user_id == user.id,
                                                         Log.logbook_id == logbook.id).distinct(Log.country):
