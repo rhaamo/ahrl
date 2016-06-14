@@ -1,0 +1,49 @@
+{% extends "layout.jinja2" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-6">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#iaru1" aria-controls="iaru1" role="tab" data-toggle="tab">IARU Zone 1</a></li>
+                <li role="presentation">
+                    <a href="#iaru2" aria-controls="iaru2" role="tab" data-toggle="tab">IARU Zone 2</a></li>
+                <li role="presentation">
+                    <a href="#iaru3" aria-controls="iaru3" role="tab" data-toggle="tab">IARU Zone 3</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="iaru1">
+                    {% if bands['iaru1']['bands'] | count <= 0 %}
+                        No band plan available
+                    {% else %}
+                        {% with bands=bands['iaru1'] %}
+                            {% include 'tools/_bands_plan_table.jinja2' %}
+                        {% endwith %}
+                    {% endif %}
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="iaru2">
+                    {% if bands['iaru2']['bands'] | count <= 0 %}
+                        No band plan available
+                    {% else %}
+                        {% with bands=bands['iaru2'] %}
+                            {% include 'tools/_bands_plan_table.jinja2' %}
+                        {% endwith %}
+                    {% endif %}
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="iaru3">
+                    {% if bands['iaru3']['bands'] | count <= 0 %}
+                        No band plan available
+                    {% else %}
+                        {% with bands=bands['iaru3'] %}
+                            {% include 'tools/_bands_plan_table.jinja2' %}
+                        {% endwith %}
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

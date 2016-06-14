@@ -1,7 +1,7 @@
 # coding: utf8
 from flask import Blueprint, render_template, redirect, url_for, stream_with_context, Response, flash
 from flask_security import login_required, current_user
-from models import db, Log, Mode, Band, User, Logbook
+from models import db, Log, Mode, Band, User, Logbook, Band
 from utils import check_default_profile, ADIF_FIELDS, InvalidUsage
 from adif import parse as adif_parser
 from forms import AdifParse
@@ -171,3 +171,27 @@ def adif_export_dl(username, logbook_id):
 
     return Response(stream_with_context(generate()), mimetype="text/plain",
                     headers={"Content-Disposition": "attachment;filename=qsos-{0}.adi".format(current_user.name)})
+
+
+@bp_tools.route('/tools/bands/plan', methods=['GET'])
+@check_default_profile
+def bands_plan():
+    pcfg = {"title": "IARU Band Plans"}
+    bands = {
+        'iaru1': {
+            'name': 'IARU Zone 1',
+            'slug': 'iaru1',
+            'bands': Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.zone == 'iaru1').all()
+        },
+        'iaru2': {
+            'name': 'IARU Zone 2',
+            'slug': 'iaru2',
+            'bands': Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.zone == 'iaru2').all()
+        },
+        'iaru3': {
+            'name': 'IARU Zone 3',
+            'slug': 'iaru3',
+            'bands': Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.zone == 'iaru3').all()
+        }
+    }
+    return render_template('tools/bands_plan.jinja2', pcfg=pcfg, bands=bands)
