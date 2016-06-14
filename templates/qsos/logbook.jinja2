@@ -104,6 +104,10 @@
             {% if user.swl %}
                 <tr><td width="60%">SWL</td><td><span class="glyphicon glyphicon-{{ 'ok' if user.swl else 'remove' }}"></span></td></tr>
             {% endif %}
+            <tr>
+                <td width="60%">Zone</td>
+                <td>{{ user.zone_str() }}</td>
+            </tr>
         </table>
 
         <table class="table table-condensed table-stripped">
