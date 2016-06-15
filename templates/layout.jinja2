@@ -55,7 +55,7 @@
             {% endif %}
             <li class="{% if request.endpoint.startswith('bp_contacts.') %}active{% endif %}"><a href="{{ url_for('bp_contacts.contacts') }}">Contacts</a></li>
 
-            {% if logbook %}
+            {% if logbook and (current_user.id == logbook.user_id) %}
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">QSOs <span class="caret"></span></a>
               <ul class="dropdown-menu">

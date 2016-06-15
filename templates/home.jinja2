@@ -11,7 +11,13 @@
                     <ul>
                     {% for l in u.logbooks %}
                         {% if l.public %}
-                        <li><a href="{{ url_for('bp_qsos.logbook', username=u.name, logbook_id=l.id) }}">{{ l.name }}</a> <small>({{ l.logs.count() }} qsos)</small></li>
+                        <li>
+                            <a href="{{ url_for('bp_qsos.logbook', username=u.name, logbook_id=l.id) }}">{{ l.name }}</a> <small>({{ l.logs.count() }} qsos)</small>
+                            {% if current_user.id == l.user.id %}
+                            <a href="{{ url_for('bp_tools.adif_export_dl', username=l.user.name, logbook_id=l.id) }}" class="btn btn-success btn-xs">adif export</a>
+                            {% endif %}
+                            <a href="{{ url_for('bp_qsos.logbook_stats', username=l.user.name, logbook_id=l.id) }}" class="btn btn-info btn-xs">stats</a>
+                        </li>
                         {% endif %}
                     {% endfor %}
                     </ul>

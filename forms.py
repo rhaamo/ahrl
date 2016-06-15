@@ -122,7 +122,7 @@ def foo_bar_baz_qux():
 
 
 def get_logbooks():
-    return Logbook.query.all()
+    return Logbook.query.filter(Logbook.user_id == current_user.id).all()
 
 
 class BaseQsoForm(Form):

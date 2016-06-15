@@ -119,7 +119,7 @@ def adif_export_dl(username, logbook_id):
     if not user:
         raise InvalidUsage("User not found", 404)
     logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.id == logbook_id).first()
-    if not logbook:
+    if not logbook or (current_user.id != user.id):
         raise InvalidUsage("Logbook not found", 404)
 
     logs = logbook.logs
@@ -133,8 +133,8 @@ def adif_export_dl(username, logbook_id):
         yield '\r\n'
         yield '<adif_ver:5>3.0.4\r\n'
         yield '<programid:4>AHRL\r\n'
-        yield a('station_callsign', current_user.callsign) + '\r\n'
-        yield a('operator', current_user.callsign) + '\r\n'
+        yield a('station_callsign', user.callsign) + '\r\n'
+        yield a('operator', user.callsign) + '\r\n'
         yield '\r\n'
         yield '<eoh>\r\n\r\n'
 
@@ -170,7 +170,7 @@ def adif_export_dl(username, logbook_id):
             yield '\r\n<eor>\r\n\r\n'
 
     return Response(stream_with_context(generate()), mimetype="text/plain",
-                    headers={"Content-Disposition": "attachment;filename=qsos-{0}.adi".format(current_user.name)})
+                    headers={"Content-Disposition": "attachment;filename=qsos-{0}.adi".format(user.name)})
 
 
 @bp_tools.route('/tools/bands/plan', methods=['GET'])

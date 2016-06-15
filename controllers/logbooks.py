@@ -25,7 +25,7 @@ def logbooks(user):
 @check_default_profile
 def edit(logbook_id):
     pcfg = {"title": "Edit my logbooks"}
-    a = Logbook.query.get_or_404(logbook_id)
+    a = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.id == logbook_id).first_or_404()
 
     form = LogbookForm(request.form, a)
 
@@ -88,7 +88,10 @@ def new():
                 l.default = False
         else:
             fl = Logbook.query.filter(Logbook.user_id == current_user.id).first()
-            fl.default = True
+            if fl:
+                fl.default = True
+            else:
+                a.default = True
 
         db.session.add(a)
         db.session.commit()
@@ -102,7 +105,7 @@ def new():
 @login_required
 @check_default_profile
 def delete(logbook_id):
-    logbook = Logbook.query.get_or_404(logbook_id)
+    logbook = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.id == logbook_id).first_or_404()
     db.session.delete(logbook)
     db.session.commit()
     flash("Success deleting logbook: {0}".format(logbook.name), 'success')

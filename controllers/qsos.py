@@ -34,6 +34,10 @@ def logbook(username, logbook_id):
 
     logbook = Logbook.query.filter(Logbook.id == logbook_id).one()
 
+    #if logbook.user != user:
+    #    flash("Logbook not found", 'error')
+    #    return redirect(url_for('bp_logbooks.logbooks', username=user.name))
+
     d = datetime.datetime.utcnow()
     mr_m = monthrange(d.year, d.month)
     mr_y = monthrange(d.year, 12)
@@ -140,7 +144,7 @@ def new(logbook_id, method):
     form = QsoForm()
 
     logbook = Logbook.query.filter(Logbook.id == logbook_id,
-                                   Logbook.user_id == current_user.id).one()
+                                   Logbook.user_id == current_user.id).first_or_404()
     if not logbook:
         flash("Logbook not found !", 'error')
         return redirect(url_for('bp_logbooks.logbooks', username=current_user.name))
@@ -219,7 +223,7 @@ def edit(logbook_id, qso_id):
 
     a = Log.query.get_or_404(qso_id)
     logbook = Logbook.query.filter(Logbook.id == logbook_id,
-                                   Logbook.user_id == current_user.id).one()
+                                   Logbook.user_id == current_user.id).first_or_404()
 
     logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
 
@@ -306,7 +310,7 @@ def edit(logbook_id, qso_id):
 @login_required
 @check_default_profile
 def delete(qso_id):
-    qso = Log.query.get_or_404(qso_id)
+    qso = Log.query.filter(Log.user_id == current_user.id, Log.id == qso_id).first_or_404()
     logbook_id = qso.logbook.id
     db.session.delete(qso)
     db.session.commit()
@@ -387,6 +391,9 @@ def logbook_geojson(username, logbook_id):
 
     logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
     if not logbook:
+        raise InvalidUsage('Logbook not found', status_code=404)
+
+    if logbook.user_id != user.id:
         raise InvalidUsage('Logbook not found', status_code=404)
 
     # QSO filter thing
@@ -652,6 +659,7 @@ def logbook_stats(username, logbook_id):
     user = User.query.filter(User.name == username).first()
     if not user:
         return abort(404)
+
     logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.id == logbook_id).one()
     if not logbook:
         return abort(404)

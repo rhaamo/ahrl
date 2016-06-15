@@ -57,7 +57,7 @@
 
     <div class="col-lg-4">
         <div id="map-single-qso" style="height: 250px"></div>
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated and (current_user.id == qso.user_id) %}
             <br/>
             <form action="{{ url_for('bp_qsos.view_post', logbook_id=qso.logbook.id, username=qso.user.name, qso_id=qso.id) }}" method="POST" enctype="multipart/form-data" class="form-horizontal new-qso" name="gtfo-lastpass-search">
                 {{ new_pic.hidden_tag() }}
