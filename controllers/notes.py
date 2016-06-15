@@ -12,8 +12,10 @@ bp_notes = Blueprint('bp_notes', __name__)
 @check_default_profile
 def notes():
     pcfg = {"title": "My notes"}
+
     _notes = Note.query.filter(Note.user_id == current_user.id).all()
     logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+
     return render_template('notes/view.jinja2', pcfg=pcfg, notes=_notes, logbooks=logbooks)
 
 
@@ -22,7 +24,11 @@ def notes():
 @check_default_profile
 def edit(note_id):
     pcfg = {"title": "Edit my notes"}
-    a = Note.query.filter(Note.user_id == current_user.id, Note.id == note_id).first_or_404()
+
+    a = Note.query.filter(Note.user_id == current_user.id, Note.id == note_id).first()
+    if not a:
+        flash("Note not found", 'error')
+        return redirect(url_for('bp_notes.notes'))
 
     form = NoteForm(request.form, a)
 
@@ -32,10 +38,12 @@ def edit(note_id):
         a.note = form.note.data
 
         db.session.commit()
+
         flash("Success saving note: {0}".format(a.title), 'success')
         return redirect(url_for('bp_notes.notes'))
 
     logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+
     return render_template('notes/edit.jinja2', pcfg=pcfg, form=form, note=a, note_id=note_id, logbooks=logbooks)
 
 
@@ -56,6 +64,7 @@ def new():
 
         db.session.add(a)
         db.session.commit()
+
         flash("Success updating note: {0}".format(a.title), 'success')
         return redirect(url_for('bp_notes.notes'))
 
@@ -67,7 +76,12 @@ def new():
 @login_required
 @check_default_profile
 def delete(note_id):
-    note = Note.query.filter(Note.user_id == current_user.id, Note.id == note_id).first_or_404()
+    note = Note.query.filter(Note.user_id == current_user.id, Note.id == note_id).first()
+    if not note:
+        flash("Note not found", 'error')
+        return redirect(url_for('bp_notes.notes'))
+
     db.session.delete(note)
     db.session.commit()
+
     return redirect(url_for('bp_notes.notes'))

@@ -22,7 +22,9 @@ pictures = UploadSet('pictures', IMAGES)
 def logbook(username, logbook_id):
     user = User.query.filter(User.name == username).first()
     if not user:
-        return abort(404)
+        flash("User not found", "error")
+        return redirect(url_for("bp_main.home"))
+
     try:
         page = int(request.args.get('page', 1))
     except ValueError:
@@ -32,11 +34,18 @@ def logbook(username, logbook_id):
 
     uqth = user.qth_to_coords()
 
-    logbook = Logbook.query.filter(Logbook.id == logbook_id).one()
+    logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
+    if not logbook:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
-    #if logbook.user != user:
-    #    flash("Logbook not found", 'error')
-    #    return redirect(url_for('bp_logbooks.logbooks', username=user.name))
+    if not logbook.public and not current_user.is_authenticated:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if not logbook.public and logbook.user_id != current_user.id:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
     d = datetime.datetime.utcnow()
     mr_m = monthrange(d.year, d.month)
@@ -144,8 +153,8 @@ def new(logbook_id, method):
     form = QsoForm()
 
     logbook = Logbook.query.filter(Logbook.id == logbook_id,
-                                   Logbook.user_id == current_user.id).first_or_404()
-    if not logbook:
+                                   Logbook.user_id == current_user.id).first()
+    if not logbook or logbook.user_id != current_user.id:
         flash("Logbook not found !", 'error')
         return redirect(url_for('bp_logbooks.logbooks', username=current_user.name))
 
@@ -221,19 +230,18 @@ def new(logbook_id, method):
 def edit(logbook_id, qso_id):
     pcfg = {"title": "Edit QSO"}
 
-    a = Log.query.get_or_404(qso_id)
+    a = Log.query.filter(Log.id == qso_id, Log.user_id == current_user.id).first()
+    if not a:
+        flash("Qso not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
+
     logbook = Logbook.query.filter(Logbook.id == logbook_id,
-                                   Logbook.user_id == current_user.id).first_or_404()
+                                   Logbook.user_id == current_user.id).first()
+    if not logbook or logbook.user_id != current_user.id:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
 
     logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
-
-    if not logbook:
-        flash("Logbook not found !", 'error')
-        return redirect(url_for('bp_logbooks.logbooks', username=current_user.name))
-
-    if q.logbook != logbook:
-        flash("QSO Not found", 'error')
-        return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=logbook.id))
 
     form = EditQsoForm(request.form, a)
 
@@ -310,7 +318,11 @@ def edit(logbook_id, qso_id):
 @login_required
 @check_default_profile
 def delete(qso_id):
-    qso = Log.query.filter(Log.user_id == current_user.id, Log.id == qso_id).first_or_404()
+    qso = Log.query.filter(Log.user_id == current_user.id, Log.id == qso_id).first()
+    if not qso or qso.user_id != current_user.id:
+        flash("Qso not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
+
     logbook_id = qso.logbook.id
     db.session.delete(qso)
     db.session.commit()
@@ -390,10 +402,16 @@ def logbook_geojson(username, logbook_id):
         raise InvalidUsage('User not found', status_code=404)
 
     logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
-    if not logbook:
+    if not logbook :
+        raise InvalidUsage('Logbook not found', status_code=404)
+
+    if not logbook.public and not current_user.is_authenticated:
         raise InvalidUsage('Logbook not found', status_code=404)
 
     if logbook.user_id != user.id:
+        raise InvalidUsage('Logbook not found', status_code=404)
+
+    if not logbook.public and logbook.user_id != current_user.id:
         raise InvalidUsage('Logbook not found', status_code=404)
 
     # QSO filter thing
@@ -486,6 +504,12 @@ def logbook_qso_geojson(qso_id):
     if not qso:
         raise InvalidUsage('Qso not found', status_code=404)
 
+    if not qso.logbook.public and not current_user.is_authenticated:
+        raise InvalidUsage('Qso not found', status_code=404)
+
+    if not qso.logbook.public and qso.logbook.user_id != current_user.id:
+        raise InvalidUsage('Qso not found', status_code=404)
+
     if qso.gridsquare:
         if not is_valid_qth(qso.gridsquare, 6):
             raise InvalidUsage('QTH is not valid', status_code=400)
@@ -544,13 +568,30 @@ def logbook_qso_geojson(qso_id):
 def view(username, logbook_id, qso_id):
     user = User.query.filter(User.name == username).first()
     if not user:
-        return abort(404)
-    qso = Log.query.get_or_404(qso_id)
-    logbook = Logbook.query.get_or_404(logbook_id)
+        flash("User not found", 'error')
+        return redirect(url_for("bp_main.home"))
+
+    logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
+    if not logbook:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    qso = Log.query.filter(Log.id == qso_id, Log.user_id == user.id).first()
+    if not qso:
+        flash("Qso not found", 'error')
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
 
     if qso.logbook != logbook:
-        flash("QSO Not found", 'error')
-        return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_id=logbook.id))
+        flash("Qso not found", 'error')
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
+
+    if not qso.logbook.public and not current_user.is_authenticated:
+        flash("Qso not found", 'error')
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
+
+    if not qso.logbook.public and qso.user_id != current_user.id:
+        flash("Qso not found", 'error')
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
 
     pcfg = {"title": "View QSO with {0}".format(qso.call)}
 
@@ -605,12 +646,25 @@ def view(username, logbook_id, qso_id):
 @check_default_profile
 @login_required
 def delete_picture(username, logbook_id, qso_id, picture_id):
-    user = User.query.filter(User.name == username).one()
+    user = User.query.filter(User.name == username).first()
     if not user:
-        flash("No user !")
-    logbook = Logbook.query.get_or_404(logbook_id)
-    qso = Log.query.get_or_404(qso_id)
-    picture = Picture.query.get_or_404(picture_id)
+        flash("User not found")
+        return redirect(url_for("bp_main.home"))
+
+    logbook = Logbook.query.filter(Logbook.id == logbook_id).first()
+    if not logbook:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    qso = Log.query.filter(Log.id == qso_id, Log.logbook_id == Logbook.id).first()
+    if not qso:
+        flash("Qso not found", 'error')
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
+
+    picture = Picture.query.filter(Picture.id == picture_id, Picture.log_id == qso.id).first()
+    if not picture:
+        flash("Picture not found", 'error')
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
 
     db.session.delete(picture)
     db.session.commit()
@@ -623,7 +677,12 @@ def delete_picture(username, logbook_id, qso_id, picture_id):
 
 @bp_qsos.route('/logbook/qso/<int:qso_id>/modal', methods=['GET'])
 def single_qso_modal(qso_id):
-    qso = Log.query.get_or_404(qso_id)
+    qso = Log.query.filter(Log.id == qso_id).first()
+    if not qso.logbook.public and not current_user.is_authenticated:
+        raise InvalidUsage('Qso not found', status_code=404)
+    if not qso.logbook.public and qso.user_id != current_user.id:
+        raise InvalidUsage('Qso not found', status_code=404)
+
     if not qso.gridsquare:
         qso_gs = qso.country_grid()
     else:
@@ -658,11 +717,21 @@ def single_qso_modal(qso_id):
 def logbook_stats(username, logbook_id):
     user = User.query.filter(User.name == username).first()
     if not user:
-        return abort(404)
+        flash("User not found", "error")
+        return redirect(url_for("bp_main.home"))
 
-    logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.id == logbook_id).one()
+    logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.id == logbook_id).first()
     if not logbook:
-        return abort(404)
+        flash("Logbook not found", "error")
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if not logbook.public and not current_user.is_authenticated:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if not logbook.public and logbook.user_id != current_user.id:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
     if current_user.is_authenticated:
         logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()

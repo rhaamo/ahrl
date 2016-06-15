@@ -26,7 +26,9 @@ def adif_import():
 @check_default_profile
 def adif_import_file():
     pcfg = {"title": "Import ADIF"}
+
     form = AdifParse()
+
     if form.validate_on_submit():
         filename = secure_filename(form.adif_file.data.filename)
         files = form.adif_file.raw_data[0].stream.read()
@@ -118,6 +120,7 @@ def adif_export_dl(username, logbook_id):
     user = User.query.filter(User.name == username).first()
     if not user:
         raise InvalidUsage("User not found", 404)
+
     logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.id == logbook_id).first()
     if not logbook or (current_user.id != user.id):
         raise InvalidUsage("Logbook not found", 404)
@@ -174,9 +177,9 @@ def adif_export_dl(username, logbook_id):
 
 
 @bp_tools.route('/tools/bands/plan', methods=['GET'])
-@check_default_profile
 def bands_plan():
     pcfg = {"title": "IARU Band Plans"}
+
     bands = {
         'iaru1': {
             'name': 'IARU Zone 1',

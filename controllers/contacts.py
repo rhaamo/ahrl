@@ -25,7 +25,10 @@ def contacts():
 @check_default_profile
 def edit(contact_id):
     pcfg = {"title": "Edit my contacts"}
-    a = Contact.query.get_or_404(contact_id)
+    a = Contact.query.filter(Contact.id == contact_id, Contact.user_id == current_user.id).first()
+    if not a:
+        flash("Contact not found", "error")
+        return redirect(url_for("bp_contacts.contacts"))
 
     form = ContactsForm(request.form, a)
 
@@ -34,10 +37,12 @@ def edit(contact_id):
         a.gridsquare = form.gridsquare.data
 
         if not current_user.locator or not form.gridsquare.data:
-            raise InvalidUsage('Missing locator_qso or locator_user', status_code=400)
+            flash('Missing locator_qso or locator_user', 'error')
+            return redirect(url_for("bp_contacts.contacts"))
 
         if not is_valid_qth(current_user.locator, 6) or not is_valid_qth(form.gridsquare.data, 6):
-            raise InvalidUsage('One of the supplied QTH is not valid', status_code=400)
+            flash('One of the supplied QTH is not valid', 'error')
+            return redirect(url_for("bp_contacts.contacts"))
 
         _f = qth_to_coords(current_user.locator, 6)  # precision, latitude, longitude
         _t = qth_to_coords(form.gridsquare.data, 6)  # precision, latitude, longitude
@@ -71,10 +76,12 @@ def new():
         a.gridsquare = form.gridsquare.data
 
         if not current_user.locator or not form.gridsquare.data:
-            raise InvalidUsage('Missing locator_qso or locator_user', status_code=400)
+            flash('Missing locator_qso or locator_user', 'error')
+            return redirect(url_for("bp_contacts.contacts"))
 
         if not is_valid_qth(current_user.locator, 6) or not is_valid_qth(form.gridsquare.data, 6):
-            raise InvalidUsage('One of the supplied QTH is not valid', status_code=400)
+            flash('One of the supplied QTH is not valid', 'error')
+            return redirect(url_for("bp_contacts.contacts"))
 
         _f = qth_to_coords(current_user.locator, 6)  # precision, latitude, longitude
         _t = qth_to_coords(form.gridsquare.data, 6)  # precision, latitude, longitude
@@ -100,7 +107,11 @@ def new():
 @login_required
 @check_default_profile
 def delete(contact_id):
-    contact = Contact.query.get_or_404(contact_id)
+    contact = Contact.query.filter(Contact.id == contact_id, Contact.user_id == current_user.id).first()
+    if not contact:
+        flash("Contact not found", "error")
+        return redirect(url_for("bp_contacts.contacts"))
+
     db.session.delete(contact)
     db.session.commit()
     flash("Success deleting contact: {0}".format(contact.callsign), 'success')

@@ -11,12 +11,18 @@ bp_logbooks = Blueprint('bp_logbooks', __name__)
 @check_default_profile
 def logbooks(user):
     user = User.query.filter(User.name == user).first()
+    if not user:
+        flash("User not found", 'error')
+        return redirect(url_for('bp_main.home'))
+
     pcfg = {"title": "{0}'s logbooks".format(user.name)}
+
     if current_user.is_authenticated:
         _logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
     else:
         _logbooks = Logbook.query.filter(Logbook.user_id == user.id,
                                         Logbook.public.is_(True)).all()
+
     return render_template('logbooks/logbooks.jinja2', pcfg=pcfg, user=user, logbooks=_logbooks)
 
 
@@ -25,7 +31,10 @@ def logbooks(user):
 @check_default_profile
 def edit(logbook_id):
     pcfg = {"title": "Edit my logbooks"}
-    a = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.id == logbook_id).first_or_404()
+    a = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.id == logbook_id).first()
+    if not a:
+        flash("Logbook not found", 'error')
+        return redirect(url_for('bp_logbooks.logbooks', user=current_user.name))
 
     form = LogbookForm(request.form, a)
 
@@ -95,6 +104,7 @@ def new():
 
         db.session.add(a)
         db.session.commit()
+
         flash("Success updating logbook: {0}".format(a.name), 'success')
         return redirect(url_for('bp_logbooks.logbooks', user=current_user.name))
 
@@ -105,8 +115,14 @@ def new():
 @login_required
 @check_default_profile
 def delete(logbook_id):
-    logbook = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.id == logbook_id).first_or_404()
+    logbook = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.id == logbook_id).first()
+    if not logbook:
+        flash("Logbook not found", 'error')
+        return redirect(url_for('bp_logbooks.logbooks', user=current_user.name))
+
     db.session.delete(logbook)
     db.session.commit()
+
     flash("Success deleting logbook: {0}".format(logbook.name), 'success')
+
     return redirect(url_for('bp_logbooks.logbooks', user=current_user.name))
