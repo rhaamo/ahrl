@@ -796,9 +796,9 @@ def logbook_stats(username, logbook_id):
                                                         Log.logbook_id == _logbook.id).distinct(Log.country):
         dxcc_entry = {'country': country.country, 'bands': []}
         for band in dxcc_bands:
-            band_id = Band.query.filter(Band.name == band,
-                                        Band.start.is_(None),
-                                        Band.modes.is_(None)).one()
+            band_id = db.session.query(Band.id).filter(Band.name == band,
+                                                       Band.start.is_(None),
+                                                       Band.modes.is_(None)).one()
             count = db.session.query(Log.id).filter(Log.user_id == user.id,
                                                     Log.band_id == band_id.id,
                                                     Log.country == country.country,
