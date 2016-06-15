@@ -15,8 +15,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.create_index('name', 'bands', 'name')
-    op.create_index('country', 'log', 'country')
+    op.create_index('ix_name', 'bands', ['name'])
+    op.create_index('ix_country', 'log', ['country'])
 
 
 def downgrade():
