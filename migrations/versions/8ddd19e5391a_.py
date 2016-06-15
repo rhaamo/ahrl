@@ -14,37 +14,17 @@ from models import db, Mode
 
 
 def upgrade():
-    # 1/ Update existing modes
-    ssb = Mode.query.filter(Mode.mode == 'SSB').one()
-    ssb.submode = 'LSB'
-    am = Mode.query.filter(Mode.mode == 'AM').one()
-    am.submode = 'AM'
-    fm = Mode.query.filter(Mode.mode == 'FM').one()
-    fm.submode = 'FM'
-    cw = Mode.query.filter(Mode.mode == 'CW').one()
-    cw.submode = 'PCW'
-    rtty = Mode.query.filter(Mode.mode == 'RTTY').one()
-    rtty.submode = 'RTTY'
+    # -- Feed using ADIF Enumerations
     # RTTY note: it should be 'ASCII' according to ADIF format but
     # I think that 'RTTY' is more well-known that 'ASCII'
     # CW or PSK are ASCII too, why RTTY should be named 'ASCII' ?
-    psk31 = Mode.query.filter(Mode.mode == 'PSK31').one()
-    psk31.mode = 'PSK'
-    psk31.submode = 'PSK31'
-    psk63 = Mode.query.filter(Mode.mode == 'PSK63').one()
-    psk63.mode = 'PSK'
-    psk63.submode = 'PSK63'
-    sstv = Mode.query.filter(Mode.mode == 'SSTV').one()
-    sstv.submode = 'SSTV'
-    pkt = Mode.query.filter(Mode.mode == 'PKT').one()
-    pkt.submode = 'PKT'
-    for i in ['JT65', 'JT65B', 'JT6C', 'JT6M', 'JT9-1',
-              'FSK441', 'JTMS', 'ISCAT']:
-        db.session.delete(Mode.query.filter(Mode.mode == i).one())
-
-    # 2/ Feed using ADIF Enumerations
     modes = {
+        'AM': ['AM'],
+        'FM': ['FM'],
+        'CW': ['CW'],
         'ATV': ['ATV'],
+        'RTTY': ['RTTY'],
+        'SSTV': ['SSTV'],
         'CHIP': ['CHIP64', 'CHIP128'],
         'CLO': ['CLO'],
         'CONTESTI': ['CONTESTI'],
@@ -68,13 +48,13 @@ def upgrade():
         'PAC': ['PAC2', 'PAC3', 'PAC4'],
         'PAX': ['PAX2'],
         'PKT': ['PKT'],
-        'PSK': ['FSK31', 'PSK10', 'PSK63F', 'PSK125', 'PSK250', 'PSK500', 'PSK1000',
+        'PSK': ['FSK31', 'PSK10', 'PSK31', 'PSK63', 'PSK63F', 'PSK125', 'PSK250', 'PSK500', 'PSK1000',
                 'PSKAM10', 'PSKAM31', 'PSKAM50', 'PSKFEC31', 'QPSK31', 'QPSK63', 'QPSK125', 'QPSK250', 'QPSK500'],
         'PSK2K': ['PSK2K'],
         'Q15': ['Q15'],
         'ROS': ['ROS-EME', 'ROS-HF', 'ROS-MF'],
         'RTTYM': ['RTTYM'],
-        'SSB': ['USB'],
+        'SSB': ['USB', 'LSB'],
         'THOR': ['THOR'],
         'THRB': ['THRBX'],
         'TOR': ['AMTORFEC', 'GTOR'],

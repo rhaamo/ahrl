@@ -1,4 +1,4 @@
-"""empty message
+"""Add zone column to bands
 
 Revision ID: f4d4e3c42eb7
 Revises: d1c8faa24092
