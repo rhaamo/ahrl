@@ -184,17 +184,20 @@ def bands_plan():
         'iaru1': {
             'name': 'IARU Zone 1',
             'slug': 'iaru1',
-            'bands': Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.zone == 'iaru1').all()
+            'bands': db.session.query(Band.lower, Band.upper, Band.name).filter(
+                Band.modes.is_(None), Band.start.is_(None), Band.zone == 'iaru1').all()
         },
         'iaru2': {
             'name': 'IARU Zone 2',
             'slug': 'iaru2',
-            'bands': Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.zone == 'iaru2').all()
+            'bands': db.session.query(Band.lower, Band.upper, Band.name).filter(
+                Band.modes.is_(None), Band.start.is_(None), Band.zone == 'iaru2').all()
         },
         'iaru3': {
             'name': 'IARU Zone 3',
             'slug': 'iaru3',
-            'bands': Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.zone == 'iaru3').all()
+            'bands': db.session.query(Band.lower, Band.upper, Band.name).filter(
+                Band.modes.is_(None), Band.start.is_(None), Band.zone == 'iaru3').all()
         }
     }
     return render_template('tools/bands_plan.jinja2', pcfg=pcfg, bands=bands)
