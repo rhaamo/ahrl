@@ -79,7 +79,6 @@ def before_request():
     g.cfg = {
         'AHRL_VERSION': "{0} ({1})".format(__VERSION__, git_version),
     }
-    g.current_user = current_user
 
 
 @app.errorhandler(InvalidUsage)
