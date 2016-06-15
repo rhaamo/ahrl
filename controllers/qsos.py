@@ -227,6 +227,10 @@ def edit(logbook_id, qso_id):
         flash("Logbook not found !", 'error')
         return redirect(url_for('bp_logbooks.logbooks', username=current_user.name))
 
+    if q.logbook != logbook:
+        flash("QSO Not found", 'error')
+        return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=logbook.id))
+
     form = EditQsoForm(request.form, a)
 
     if form.validate_on_submit():
