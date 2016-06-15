@@ -537,6 +537,10 @@ def view(username, logbook_id, qso_id):
     qso = Log.query.get_or_404(qso_id)
     logbook = Logbook.query.get_or_404(logbook_id)
 
+    if qso.logbook != logbook:
+        flash("QSO Not found", 'error')
+        return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_id=logbook.id))
+
     pcfg = {"title": "View QSO with {0}".format(qso.call)}
 
     if not qso.gridsquare:
