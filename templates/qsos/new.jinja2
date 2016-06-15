@@ -10,7 +10,7 @@
 
             <form action="{{ url_for('bp_qsos.new', method=method, logbook_id=logbook.id) }}" method="POST" class="form-horizontal new-qso" name="gtfo-lastpass-search">
                 {{ form.hidden_tag() }}
-                {{ wtf.form_errors(form, hiddens=True) }}
+                {{ wtf.form_errors(form) }}
 
                 <div class="row">
                     <div class="col-lg-6">{{ wtf.form_field(form.date, 'inline', placeholder='DD-MM-YYYY') }}</div>

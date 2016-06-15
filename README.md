@@ -63,6 +63,12 @@ Another Ham Radio Log
  - In ADIF format is YYYYMMDD HHMMSS (Two fields)
  - When editing a QSO, the unique field is displayed as "YYYY-MM-DD HH:MM:SS"
 
+# Modes and Submodes
+ - They are based on ADIF ones (http://adif.org/304/ADIF_304.htm#Mode_Enumeration)
+ - 'mode' is like a category and 'submode' the real mode used (anyway...)
+ - SSB is 'category' and in fact you use 'USB' or 'LSB'
+ - So in some places the keyword 'mode' is used but in fact it's really 'submode' which is used
+
 # TODO
  - eQSL integration
  - HAMQTH integration

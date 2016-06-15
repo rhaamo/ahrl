@@ -1,5 +1,6 @@
 import math
 from models import Band, Mode
+from sqlalchemy import or_
 
 
 def band_to_frequency(band, mode):
@@ -15,10 +16,11 @@ def band_to_frequency(band, mode):
     frequencies = Band.query.filter(Band.lower.is_(None),
                                     Band.upper.is_(None),
                                     Band.name == b.name,
-                                    Band.modes.contains(m.mode))
+                                    or_(Band.modes.contains(m.submode),
+                                        Band.modes.contains(m.mode)))
 
     if frequencies.count() <= 0:
-        return None
+        return b.lower
     else:
         return frequencies.first().start
 

@@ -53,7 +53,7 @@ def logbook(username, logbook_id):
     rq_band = request.args.get('band', None)
 
     if rq_mode or rq_mode != 'all':
-        q_mode = Mode.query.filter(Mode.mode == rq_mode)
+        q_mode = Mode.query.filter(Mode.submode == rq_mode)
         if q_mode.count() == 1:
             q_mode = q_mode.first()
         else:
@@ -66,7 +66,7 @@ def logbook(username, logbook_id):
             q_band = None
 
     # Form choices building
-    _modes = [[a.mode.mode, a.mode.mode] for a in Log.query.filter(Log.user_id == user.id,
+    _modes = [[a.mode.submode, '{0} - {1}'.format(a.mode.mode, a.mode.submode)] for a in Log.query.filter(Log.user_id == user.id,
                                                                    Log.logbook_id == logbook.id
                                                                    ).group_by(Log.mode_id).all()]
     _bands = [[a.band.name, a.band.name] for a in Log.query.filter(Log.user_id == user.id,
@@ -138,6 +138,7 @@ def new(logbook_id, method):
     pcfg = {"title": "New QSO"}
 
     form = QsoForm()
+
     logbook = Logbook.query.filter(Logbook.id == logbook_id,
                                    Logbook.user_id == current_user.id).one()
     if not logbook:
@@ -677,7 +678,7 @@ def logbook_stats(username, logbook_id):
 
     # Pie with modes
     stats_modes = []
-    modes_used = [{'mode': a.mode.mode, 'id': a.mode.id} for a in
+    modes_used = [{'mode': a.mode.submode, 'id': a.mode.id} for a in
                   Log.query.filter(Log.user_id == user.id,
                                    Log.logbook_id == logbook.id).group_by(Log.mode_id).all()]
     for mode in modes_used:

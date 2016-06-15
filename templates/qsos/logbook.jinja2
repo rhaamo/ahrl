@@ -75,9 +75,9 @@
                 </td>
                 <td>
                     {% if log.pictures.count() > 0 %}
-                    <strong title="Pictures attached">{{ log.mode.mode }}</strong>
+                    <strong title="Pictures attached">{{ log.mode.submode }}</strong>
                     {% else %}
-                    {{ log.mode.mode }}
+                    {{ log.mode.submode }}
                 {% endif %}
                 </td>
                 <td>{{ log.rst_sent }}</td>
@@ -173,6 +173,7 @@
                         string += "<br />Date: " + f.properties['date'];
                         string += "<br />Band: " + f.properties['band'];
                         string += "<br />Mode: " + f.properties['mode'];
+                        string += "<br />Submode: " + f.properties['submode'];
                         l.bindPopup("<div class='popupMap'>" + string + '</div>');
                     }
 

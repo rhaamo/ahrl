@@ -1,6 +1,7 @@
 from flask_wtf import Form
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, \
     HiddenField, BooleanField
+from wtforms_components.fields import SelectField as WTFComponentsSelectField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from flask_uploads import UploadSet, IMAGES
 from wtforms.validators import DataRequired, ValidationError
@@ -78,7 +79,15 @@ class NoteForm(ModelForm):
 
 
 def get_modes():
-    return Mode.query.all()
+    modes = {}
+    for mode in Mode.query.order_by(Mode.mode.asc()).all():
+        sm = Mode.query.filter(Mode.mode == mode.mode).order_by(Mode.mode.asc()).all()
+        m = []
+        for i in sm:
+            m.append((i.id, i.submode))
+        modes[mode.mode] = m
+
+    return list(sorted(modes.items()))
 
 
 def get_bands():
@@ -88,7 +97,7 @@ def get_bands():
 
 
 def dflt_mode():
-    return Mode.query.filter(Mode.mode == 'SSB').first()
+    return str(Mode.query.filter(Mode.submode == 'LSB').first())
 
 
 def dflt_band():
@@ -117,9 +126,11 @@ def get_logbooks():
 
 
 class BaseQsoForm(Form):
+    # Hardcoded value for mode default
+    # WTFORMS-Components doesn't seems to be able to manage callable for default= unfortunately
+    # We use 1 which should be the first Mode ID in database (LSB)
     call = StringField('Callsign', [DataRequired()])
-    mode = QuerySelectField(query_factory=get_modes, default=dflt_mode, label='Mode',
-                            validators=[DataRequired()], get_label='mode')
+    mode = WTFComponentsSelectField('Mode', choices=get_modes, validators=[DataRequired()], coerce=int, default='1')
     band = QuerySelectField(query_factory=get_bands, default=dflt_band, label='Band',
                             validators=[DataRequired()], get_label='name')
     rst_sent = IntegerField('RST (S)', [DataRequired()], default=59)
