@@ -11,12 +11,13 @@ Another Ham Radio Log
     cd ahrl
     git submodule init
     git submodule update
-    pip install --requirement requirements.txt  # if present
+    pip3 install --requirement requirements.txt  # if present
     cp config.py.sample config.py
     $EDITOR config.py
-    python ahrl.py db upgrade
-    python ahrl.py db_seed
-    python ahrl.py runserver # or whatever gunicorn whatever stuff
+    python3 ahrl.py db upgrade
+    python3 ahrl.py db_seed
+    python3 ahrl.py cron_update_dxcc_from_cty_xml
+    python3 ahrl.py runserver # or whatever gunicorn whatever stuff
 
 # Gunicorn
     gunicorn -w 2 -b 127.0.0.1:8000 --error-logfile=errors.log --access-logfile=access.log --chdir=$PWD ahrl:app
