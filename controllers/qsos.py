@@ -453,6 +453,7 @@ def logbook_geojson(username, logbook_id):
                 "date": dt_utc_to_user_tz(log.time_on, user=user),
                 "band": log.band.name,
                 "mode": log.mode.mode,
+                "submode": log.mode.submode,
                 "icon": "qso"
             },
             "geometry": {
@@ -491,6 +492,7 @@ def logbook_qso_geojson(qso_id):
             "date": dt_utc_to_user_tz(qso.time_on, user=qso.user),
             "band": qso.band.name,
             "mode": qso.mode.mode,
+            "submode": qso.mode.submode,
             "icon": 'qso'
         },
         "geometry": {
