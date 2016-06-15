@@ -234,15 +234,9 @@ def new(logbook_id, method):
 def edit(logbook_id, qso_id):
     pcfg = {"title": "Edit QSO"}
 
-    a = Log.query.filter(Log.id == qso_id, Log.user_id == current_user.id).first()
+    a = Log.query.filter(Log.id == qso_id, Log.user_id == current_user.id, Log.logbook_id == logbook_id).first()
     if not a:
         flash("Qso not found", 'error')
-        return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
-
-    _logbook = Logbook.query.filter(Logbook.id == logbook_id,
-                                    Logbook.user_id == current_user.id).first()
-    if not _logbook or _logbook.user_id != current_user.id:
-        flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
 
     logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
@@ -291,8 +285,6 @@ def edit(logbook_id, qso_id):
         a.lotw_qsl_rcvd = form.lotw_qsl_rcvd.data
         a.lotw_qsl_sent = form.lotw_qsl_sent.data
 
-        a.logbook_id = _logbook.id
-
         ton_as_usr = pytz.timezone(current_user.timezone).localize(form.time_on.data)
         toff_as_usr = pytz.timezone(current_user.timezone).localize(form.time_off.data)
 
@@ -305,7 +297,7 @@ def edit(logbook_id, qso_id):
         flash("Success updating QSO with {0} on {1} using {2}".format(
             a.call, a.band.name, a.mode.mode
         ), 'success')
-        return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=_logbook.id))
+        return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=a.logbook.id))
 
     # DateTimes in database are stored in UTC format
     # Before displaying them, we convert them to a timezone-aware of UTC
@@ -315,7 +307,7 @@ def edit(logbook_id, qso_id):
     form.time_on.data = ton_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
     form.time_off.data = toff_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
 
-    return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a, logbook=_logbook, logbooks=logbooks)
+    return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a, logbook=a.logbook, logbooks=logbooks)
 
 
 @bp_qsos.route('/qsos/<int:qso_id>/delete', methods=['GET', 'DELETE', 'PUT'])
