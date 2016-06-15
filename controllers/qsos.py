@@ -753,24 +753,24 @@ def logbook_stats(username, logbook_id):
                 i,
                 db.session.query(Log.id).filter(Log.user_id == user.id,
                                                 Log.time_on.between(d_month_start, d_month_end),
-                                                Log.logbook_id == logbook.id).count()
+                                                Log.logbook_id == _logbook.id).count()
             ])
         stats_months.append(stats_y)
 
     # Total this year
     total_qso_year = db.session.query(Log.id).filter(Log.user_id == user.id,
-                                                     Log.logbook_id == logbook.id).count()
+                                                     Log.logbook_id == _logbook.id).count()
 
     # Pie with modes
     stats_modes = []
     modes_used = [{'mode': a.mode.submode, 'id': a.mode.id} for a in
                   Log.query.filter(Log.user_id == user.id,
-                                   Log.logbook_id == logbook.id).group_by(Log.mode_id).all()]
+                                   Log.logbook_id == _logbook.id).group_by(Log.mode_id).all()]
     for mode in modes_used:
         stats_modes.append({
             'data': db.session.query(Log.id).filter(Log.user_id == user.id,
                                                     Log.mode_id == mode['id'],
-                                                    Log.logbook_id == logbook.id).count(),
+                                                    Log.logbook_id == _logbook.id).count(),
             'label': mode['mode']
         })
 
@@ -778,7 +778,7 @@ def logbook_stats(username, logbook_id):
     stats_bands = []
     bands_used = [{'band': a.band.name, 'id': a.band.id} for a in
                   Log.query.filter(Log.user_id == user.id,
-                                   Log.logbook_id == logbook.id).group_by(Log.band_id).all()]
+                                   Log.logbook_id == _logbook.id).group_by(Log.band_id).all()]
     for band in bands_used:
         stats_bands.append({
             'data': db.session.query(Log.id).filter(Log.user_id == user.id,
