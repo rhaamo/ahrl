@@ -1,4 +1,4 @@
-"""empty message
+"""Refactoring of Modes table
 
 Revision ID: 8ddd19e5391a
 Revises: 516077ddda8d
