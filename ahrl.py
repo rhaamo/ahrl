@@ -71,7 +71,7 @@ gitpath = os.path.join(os.getcwd(), ".git")
 if os.path.isdir(gitpath):
     git_version = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'])
     if git_version:
-        git_version = git_version.strip()
+        git_version = git_version.strip().decode('UTF-8')
 
 
 @app.before_request
