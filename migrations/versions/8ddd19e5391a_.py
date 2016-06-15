@@ -24,7 +24,10 @@ def upgrade():
     cw = Mode.query.filter(Mode.mode == 'CW').one()
     cw.submode = 'PCW'
     rtty = Mode.query.filter(Mode.mode == 'RTTY').one()
-    rtty.submode = 'ASCII'
+    rtty.submode = 'RTTY'
+    # RTTY note: it should be 'ASCII' according to ADIF format but
+    # I think that 'RTTY' is more well-known that 'ASCII'
+    # CW or PSK are ASCII too, why RTTY should be named 'ASCII' ?
     psk31 = Mode.query.filter(Mode.mode == 'PSK31').one()
     psk31.mode = 'PSK'
     psk31.submode = 'PSK31'
