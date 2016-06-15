@@ -141,7 +141,8 @@ def check_default_profile(f):
                                                      Band.start.is_(None),
                                                      Band.zone == current_user.zone).count()
             if bands <= 0 or not bands:
-                errs.append("The IARU Zone you selected doesn't have any band defined in AHRL yet. See with devs please.")
+                errs.append(
+                    "The IARU Zone you selected doesn't have any band defined in AHRL yet. See with devs please.")
 
         if len(errs) > 0:
             flash(Markup("Errors:<br />{0}".format("<br />".join(errs))), 'error')

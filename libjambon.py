@@ -32,7 +32,8 @@ def frequency_to_band(frequency, zone='iaru1'):
 
     f_q = Band.query.filter(Band.start.is_(None),
                             Band.lower < f,
-                            Band.upper > f).single()
+                            Band.upper > f,
+                            Band.zone == zone).single()
     return f_q.name
 
 

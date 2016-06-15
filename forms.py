@@ -40,7 +40,7 @@ class UserProfileForm(ModelForm):
     callsign = StringField('Callsign', [DataRequired()])
 
     locator = StringField('Locator', [DataRequired()])
-    
+
     def validate_locator(form, field):
         if len(field.data) <= 2:
             raise ValidationError("QTH is too broad, please input valid QTH")
@@ -58,8 +58,8 @@ class UserProfileForm(ModelForm):
     swl = BooleanField('Are you a SWL HAM ?')
 
     zone = SelectField('Zone', choices=[['iaru1', 'IARU Zone 1'],
-                                                ['iaru2', 'IARU Zone 2'],
-                                                ['iaru3', 'IARU Zone 3']], validators=[DataRequired()])
+                                        ['iaru2', 'IARU Zone 2'],
+                                        ['iaru3', 'IARU Zone 3']], validators=[DataRequired()])
 
     submit = SubmitField('Update profile')
 

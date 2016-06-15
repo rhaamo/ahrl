@@ -11,7 +11,7 @@ def home():
     pcfg = {"title": "AHRL - Another Ham Radio Log"}
     users = User.query.all()
 
-    logbooks=None
+    logbooks = None
     if current_user.is_authenticated:
         logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
 

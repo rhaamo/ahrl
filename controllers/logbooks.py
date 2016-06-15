@@ -21,7 +21,7 @@ def logbooks(user):
         _logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
     else:
         _logbooks = Logbook.query.filter(Logbook.user_id == user.id,
-                                        Logbook.public.is_(True)).all()
+                                         Logbook.public.is_(True)).all()
 
     return render_template('logbooks/logbooks.jinja2', pcfg=pcfg, user=user, logbooks=_logbooks)
 

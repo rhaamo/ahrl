@@ -89,7 +89,7 @@ def handle_invalid_usage(error):
     return response
 
 pictures = UploadSet('pictures', IMAGES)
-configure_uploads(app, (pictures))
+configure_uploads(app, pictures)
 
 app.register_blueprint(bp_main)
 app.register_blueprint(bp_users)
@@ -108,30 +108,30 @@ def get_uploads_stuff(stuff):
 
 
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found(msg):
     pcfg = {"title": "Whoops, something failed.",
-            "error": 404, "message": "Page not found", "e": e}
+            "error": 404, "message": "Page not found", "e": msg}
     return render_template('error_page.jinja2', pcfg=pcfg), 404
 
 
 @app.errorhandler(403)
-def err_forbidden(e):
+def err_forbidden(msg):
     pcfg = {"title": "Whoops, something failed.",
-            "error": 403, "message": "Access forbidden", "e": e}
+            "error": 403, "message": "Access forbidden", "e": msg}
     return render_template('error_page.jinja2', pcfg=pcfg), 403
 
 
 @app.errorhandler(410)
-def err_gone(e):
+def err_gone(msg):
     pcfg = {"title": "Whoops, something failed.",
-            "error": 410, "message": "Gone", "e": e}
+            "error": 410, "message": "Gone", "e": msg}
     return render_template('error_page.jinja2', pcfg=pcfg), 410
 
 
 if not app.debug:
     @app.errorhandler(500)
-    def err_failed(e):
-        pcfg = {"title": "Whoops, something failed.", "error": 500, "message": "Something is broken", "e": e}
+    def err_failed(msg):
+        pcfg = {"title": "Whoops, something failed.", "error": 500, "message": "Something is broken", "e": msg}
         return render_template('error_page.jinja2', pcfg=pcfg), 500
 
 
@@ -169,13 +169,13 @@ def db_seed():
 @manager.command
 def cron_update_qsos_countries():
     """Update QSOs with empty country"""
-    update_qsos_without_countries(db)
+    update_qsos_without_countries()
 
 
 @manager.command
 def cron_update_dxcc_from_cty_xml():
     """Update DXCC tables from cty.xml"""
-    update_dxcc_from_cty_xml(db)
+    update_dxcc_from_cty_xml()
 
 
 manager.add_command('db', MigrateCommand)

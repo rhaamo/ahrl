@@ -1,17 +1,16 @@
 from __future__ import print_function
-from models import Log
 from utils import get_dxcc_from_clublog
 import urllib.request
 import shutil
 import os
 import gzip
 from flask import current_app
-import xml.etree.ElementTree as ET
-from models import db, DxccEntities, DxccExceptions, DxccPrefixes
+import xml.etree.ElementTree as ElementTree
+from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log
 from dateutil import parser
 
 
-def update_qsos_without_countries(db):
+def update_qsos_without_countries():
     updated = 0
     logs = Log.query.filter(Log.country.is_(None) | Log.dxcc.is_(None) | Log.cqz.is_(None)).all()
     for log in logs:
@@ -27,7 +26,7 @@ def update_qsos_without_countries(db):
     print("Updated {0} QSOs".format(updated))
 
 
-def update_dxcc_from_cty_xml(db):
+def update_dxcc_from_cty_xml():
     print("--- Updating DXCC tables (prefixes, entities, exceptions) from cty.xml")
     fname = os.path.join(current_app.config['TEMP_DOWNLOAD_FOLDER'], 'cty.xml')
 
@@ -50,11 +49,11 @@ def update_dxcc_from_cty_xml(db):
     # Now parse XML file
     tree = None
     try:
-        tree = ET.parse(fname)
+        tree = ElementTree.parse(fname)
     except FileNotFoundError as err:
         print("!! Error: {0}".format(err))
         exit(-1)
-    except ET.ParseError as err:
+    except ElementTree.ParseError as err:
         print("!! Error: {0}".format(err))
         exit(-1)
 
@@ -89,14 +88,11 @@ def parse_element(element):
         skip = False
 
         if element.tag == '{http://www.clublog.org/cty/v1.0}entities':
-            _type = 'entity'
             _obj = DxccEntities()
             _obj.ituz = 999  # We don't have ITUZ in cty.xml so we put 999 in it
         elif element.tag == '{http://www.clublog.org/cty/v1.0}exceptions':
-            _type = 'exception'
             _obj = DxccExceptions()
         elif element.tag == '{http://www.clublog.org/cty/v1.0}prefixes':
-            _type = 'prefix'
             _obj = DxccPrefixes()
         else:
             return

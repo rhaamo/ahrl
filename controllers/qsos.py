@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, Response, json, abort, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, Response, json, flash, current_app
 from flask_security import login_required, current_user
 from flask_uploads import UploadSet, IMAGES
 from models import db, User, Log, Band, Mode, Logbook, Picture
@@ -34,16 +34,16 @@ def logbook(username, logbook_id):
 
     uqth = user.qth_to_coords()
 
-    logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
-    if not logbook:
+    _logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
+    if not _logbook:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
-    if not logbook.public and not current_user.is_authenticated:
+    if not _logbook.public and not current_user.is_authenticated:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
-    if not logbook.public and logbook.user_id != current_user.id:
+    if not _logbook.public and _logbook.user_id != current_user.id:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
@@ -56,7 +56,7 @@ def logbook(username, logbook_id):
     d_year_start = datetime.datetime(d.year, 0o1, 0o1, 00, 00, 00, tzinfo=pytz.timezone('UTC'))
     d_year_end = datetime.datetime(d.year, 12, mr_y[1], 23, 59, 59, tzinfo=pytz.timezone('UTC'))
     cntry_worked = db.session.query(Log.country).filter(Log.user_id == user.id,
-                                                        Log.logbook_id == logbook.id).distinct(Log.country).count()
+                                                        Log.logbook_id == _logbook.id).distinct(Log.country).count()
 
     # Form filter display thing and QSOs filtering
     filter_form = FilterLogbookBandMode()
@@ -79,12 +79,16 @@ def logbook(username, logbook_id):
             q_band = None
 
     # Form choices building
-    _modes = [[a.mode.submode, '{0} - {1}'.format(a.mode.mode, a.mode.submode)] for a in Log.query.filter(Log.user_id == user.id,
-                                                                   Log.logbook_id == logbook.id
-                                                                   ).group_by(Log.mode_id).all()]
-    _bands = [[a.band.name, a.band.name] for a in Log.query.filter(Log.user_id == user.id,
-                                                                   Log.logbook_id == logbook.id
-                                                                   ).group_by(Log.band_id).all()]
+    _modes = []
+    for a in Log.query.filter(Log.user_id == user.id,
+                              Log.logbook_id == _logbook.id
+                              ).group_by(Log.mode_id).all():
+        _modes.append([a.mode.submode, '{0} - {1}'.format(a.mode.mode, a.mode.submode)])
+    _bands = []
+    for a in Log.query.filter(Log.user_id == user.id,
+                              Log.logbook_id == _logbook.id
+                              ).group_by(Log.band_id).all():
+        _bands.append([a.band.name, a.band.name])
     _modes.insert(0, ['all', 'All modes'])
     _bands.insert(0, ['all', 'All bands'])
     filter_form.mode.choices = _modes
@@ -92,7 +96,7 @@ def logbook(username, logbook_id):
     filter_form.band.choices = _bands
     filter_form.band.data = rq_band or 'all'
 
-    bq = Log.query.filter(User.id == user.id, Log.logbook_id == logbook.id)
+    bq = Log.query.filter(User.id == user.id, Log.logbook_id == _logbook.id)
 
     if q_mode and not q_band:
         fquery = bq.filter(Log.mode_id == q_mode.id)
@@ -108,13 +112,13 @@ def logbook(username, logbook_id):
     # Column of stats
     stats = {
         'qsos': {
-            'total': db.session.query(Log.id).filter(Log.user_id == user.id, Log.logbook_id == logbook.id).count(),
+            'total': db.session.query(Log.id).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).count(),
             'month': db.session.query(Log.id).filter(Log.user_id == user.id,
                                                      Log.time_on.between(d_month_start, d_month_end),
-                                                     Log.logbook_id == logbook.id).count(),
+                                                     Log.logbook_id == _logbook.id).count(),
             'year': db.session.query(Log.id).filter(Log.user_id == user.id,
                                                     Log.time_on.between(d_year_start, d_year_end),
-                                                    Log.logbook_id == logbook.id).count()
+                                                    Log.logbook_id == _logbook.id).count()
         },
         'countries': {
             'worked': cntry_worked,
@@ -122,11 +126,11 @@ def logbook(username, logbook_id):
         },
         'qsl': {
             'sent': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_sent == 'Y',
-                                                    Log.logbook_id == logbook.id).count(),
+                                                    Log.logbook_id == _logbook.id).count(),
             'received': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_rcvd == 'Y',
-                                                        Log.logbook_id == logbook.id).count(),
+                                                        Log.logbook_id == _logbook.id).count(),
             'requested': db.session.query(Log.id).filter(Log.user_id == user.id, Log.qsl_sent == 'R',
-                                                         Log.logbook_id == logbook.id).count()
+                                                         Log.logbook_id == _logbook.id).count()
         }
     }
 
@@ -136,7 +140,7 @@ def logbook(username, logbook_id):
         logbooks = Logbook.query.filter(Logbook.user_id == user.id,
                                         Logbook.public.is_(True)).all()
 
-    return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user, logbook=logbook,
+    return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user, logbook=_logbook,
                            uqth=uqth, stats=stats, filter_form=filter_form, band=rq_band, mode=rq_mode,
                            logbooks=logbooks)
 
@@ -152,9 +156,9 @@ def new(logbook_id, method):
 
     form = QsoForm()
 
-    logbook = Logbook.query.filter(Logbook.id == logbook_id,
-                                   Logbook.user_id == current_user.id).first()
-    if not logbook or logbook.user_id != current_user.id:
+    _logbook = Logbook.query.filter(Logbook.id == logbook_id,
+                                    Logbook.user_id == current_user.id).first()
+    if not _logbook or _logbook.user_id != current_user.id:
         flash("Logbook not found !", 'error')
         return redirect(url_for('bp_logbooks.logbooks', username=current_user.name))
 
@@ -209,18 +213,18 @@ def new(logbook_id, method):
         a.band_id = form.band.raw_data[0]
         a.mode_id = form.mode.raw_data[0]
 
-        a.logbook_id = logbook.id
+        a.logbook_id = _logbook.id
 
         db.session.add(a)
         db.session.commit()
         flash("Success saving QSO with {0} on {1} using {2}".format(
             a.call, a.band.name, a.mode.mode
         ), 'success')
-        return redirect(url_for('bp_qsos.new', method=method, logbook_id=logbook.id))
+        return redirect(url_for('bp_qsos.new', method=method, logbook_id=_logbook.id))
 
     qsos = Log.query.filter(User.id == current_user.id).limit(16).all()
 
-    return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, qsos=qsos, method=method, logbook=logbook,
+    return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, qsos=qsos, method=method, logbook=_logbook,
                            logbooks=logbooks)
 
 
@@ -235,9 +239,9 @@ def edit(logbook_id, qso_id):
         flash("Qso not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
 
-    logbook = Logbook.query.filter(Logbook.id == logbook_id,
-                                   Logbook.user_id == current_user.id).first()
-    if not logbook or logbook.user_id != current_user.id:
+    _logbook = Logbook.query.filter(Logbook.id == logbook_id,
+                                    Logbook.user_id == current_user.id).first()
+    if not _logbook or _logbook.user_id != current_user.id:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
 
@@ -287,7 +291,7 @@ def edit(logbook_id, qso_id):
         a.lotw_qsl_rcvd = form.lotw_qsl_rcvd.data
         a.lotw_qsl_sent = form.lotw_qsl_sent.data
 
-        a.logbook_id = logbook.id
+        a.logbook_id = _logbook.id
 
         ton_as_usr = pytz.timezone(current_user.timezone).localize(form.time_on.data)
         toff_as_usr = pytz.timezone(current_user.timezone).localize(form.time_off.data)
@@ -301,7 +305,7 @@ def edit(logbook_id, qso_id):
         flash("Success updating QSO with {0} on {1} using {2}".format(
             a.call, a.band.name, a.mode.mode
         ), 'success')
-        return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=logbook.id))
+        return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=_logbook.id))
 
     # DateTimes in database are stored in UTC format
     # Before displaying them, we convert them to a timezone-aware of UTC
@@ -311,7 +315,7 @@ def edit(logbook_id, qso_id):
     form.time_on.data = ton_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
     form.time_off.data = toff_wo_tz.astimezone(pytz.timezone(current_user.timezone)).replace(tzinfo=None)
 
-    return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a, logbook=logbook, logbooks=logbooks)
+    return render_template('qsos/edit.jinja2', pcfg=pcfg, form=form, log=a, logbook=_logbook, logbooks=logbooks)
 
 
 @bp_qsos.route('/qsos/<int:qso_id>/delete', methods=['GET', 'DELETE', 'PUT'])
@@ -401,17 +405,17 @@ def logbook_geojson(username, logbook_id):
     if not user:
         raise InvalidUsage('User not found', status_code=404)
 
-    logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
-    if not logbook :
+    _logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
+    if not _logbook:
         raise InvalidUsage('Logbook not found', status_code=404)
 
-    if not logbook.public and not current_user.is_authenticated:
+    if not _logbook.public and not current_user.is_authenticated:
         raise InvalidUsage('Logbook not found', status_code=404)
 
-    if logbook.user_id != user.id:
+    if _logbook.user_id != user.id:
         raise InvalidUsage('Logbook not found', status_code=404)
 
-    if not logbook.public and logbook.user_id != current_user.id:
+    if not _logbook.public and _logbook.user_id != current_user.id:
         raise InvalidUsage('Logbook not found', status_code=404)
 
     # QSO filter thing
@@ -433,7 +437,7 @@ def logbook_geojson(username, logbook_id):
         else:
             q_band = None
 
-    bq = Log.query.filter(User.id == user.id, Log.logbook_id == logbook.id)
+    bq = Log.query.filter(User.id == user.id, Log.logbook_id == _logbook.id)
 
     if q_mode and not q_band:
         fquery = bq.filter(Log.mode_id == q_mode.id)
@@ -563,7 +567,8 @@ def logbook_qso_geojson(qso_id):
 
 
 @bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>', methods=['GET'])
-@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>/pictures/new', endpoint='view_post', methods=['POST'])
+@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>/pictures/new', endpoint='view_post',
+               methods=['POST'])
 @check_default_profile
 def view(username, logbook_id, qso_id):
     user = User.query.filter(User.name == username).first()
@@ -571,23 +576,23 @@ def view(username, logbook_id, qso_id):
         flash("User not found", 'error')
         return redirect(url_for("bp_main.home"))
 
-    logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
-    if not logbook:
+    _logbook = Logbook.query.filter(Logbook.id == logbook_id, Logbook.user_id == user.id).first()
+    if not _logbook:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
     qso = Log.query.filter(Log.id == qso_id, Log.user_id == user.id).first()
     if not qso:
         flash("Qso not found", 'error')
-        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=_logbook.id))
 
-    if qso.logbook != logbook:
+    if qso.logbook != _logbook:
         flash("Qso not found", 'error')
-        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=_logbook.id))
 
     if not qso.logbook.public and not current_user.is_authenticated:
         flash("Qso not found", 'error')
-        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=_logbook.id))
 
     if not qso.logbook.public and qso.user_id != current_user.id:
         flash("Qso not found", 'error')
@@ -602,11 +607,11 @@ def view(username, logbook_id, qso_id):
 
     if not qso_gs or not qso.user.locator:
         flash('Missing qso.gridsquare or qso.user.locator')
-        return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_id=logbook.id))
+        return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_id=_logbook.id))
 
     if not is_valid_qth(qso.user.locator, 6) or not is_valid_qth(qso_gs, 6):
         flash('One of the supplied QTH is not valid')
-        return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_id=logbook.id))
+        return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_id=_logbook.id))
 
     _f = qth_to_coords(qso.user.locator, 6)  # precision, latitude, longitude
     _t = qth_to_coords(qso_gs, 6)  # precision, latitude, longitude
@@ -639,10 +644,11 @@ def view(username, logbook_id, qso_id):
 
     return render_template('qsos/view.jinja2', qso=qso, qso_distance=qso_distance, qso_bearing=qso_bearing,
                            qso_bearing_star=qso_bearing_star, qso_distance_unit='Km', new_pic=form,
-                           pcfg=pcfg, logbook=logbook)
+                           pcfg=pcfg, logbook=_logbook)
 
 
-@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>/pictures/<int:picture_id>/delete', methods=['GET', 'POST'])
+@bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>/pictures/<int:picture_id>/delete',
+               methods=['GET', 'POST'])
 @check_default_profile
 @login_required
 def delete_picture(username, logbook_id, qso_id, picture_id):
@@ -651,20 +657,20 @@ def delete_picture(username, logbook_id, qso_id, picture_id):
         flash("User not found")
         return redirect(url_for("bp_main.home"))
 
-    logbook = Logbook.query.filter(Logbook.id == logbook_id).first()
-    if not logbook:
+    _logbook = Logbook.query.filter(Logbook.id == logbook_id).first()
+    if not _logbook:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
-    qso = Log.query.filter(Log.id == qso_id, Log.logbook_id == Logbook.id).first()
+    qso = Log.query.filter(Log.id == qso_id, Log.logbook_id == _logbook.id).first()
     if not qso:
         flash("Qso not found", 'error')
-        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=_logbook.id))
 
     picture = Picture.query.filter(Picture.id == picture_id, Picture.log_id == qso.id).first()
     if not picture:
         flash("Picture not found", 'error')
-        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=logbook.id))
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_id=_logbook.id))
 
     db.session.delete(picture)
     db.session.commit()
@@ -672,7 +678,7 @@ def delete_picture(username, logbook_id, qso_id, picture_id):
     f = os.path.join(current_app.config['UPLOADED_PICTURES_DEST'], picture.filename)
     os.remove(f)
 
-    return redirect(url_for('bp_qsos.view', username=user.name, logbook_id=logbook.id, qso_id=qso.id))
+    return redirect(url_for('bp_qsos.view', username=user.name, logbook_id=_logbook.id, qso_id=qso.id))
 
 
 @bp_qsos.route('/logbook/qso/<int:qso_id>/modal', methods=['GET'])
@@ -720,16 +726,16 @@ def logbook_stats(username, logbook_id):
         flash("User not found", "error")
         return redirect(url_for("bp_main.home"))
 
-    logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.id == logbook_id).first()
-    if not logbook:
+    _logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.id == logbook_id).first()
+    if not _logbook:
         flash("Logbook not found", "error")
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
-    if not logbook.public and not current_user.is_authenticated:
+    if not _logbook.public and not current_user.is_authenticated:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
-    if not logbook.public and logbook.user_id != current_user.id:
+    if not _logbook.public and _logbook.user_id != current_user.id:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
@@ -739,7 +745,7 @@ def logbook_stats(username, logbook_id):
         logbooks = Logbook.query.filter(Logbook.user_id == user.id,
                                         Logbook.public.is_(True)).all()
 
-    pcfg = {'title': 'Stats for {0}'.format(logbook.name)}
+    pcfg = {'title': 'Stats for {0}'.format(_logbook.name)}
 
     # Bargraph by year (previous and current)
     stats_months = []
@@ -785,7 +791,7 @@ def logbook_stats(username, logbook_id):
         stats_bands.append({
             'data': db.session.query(Log.id).filter(Log.user_id == user.id,
                                                     Log.band_id == band['id'],
-                                                    Log.logbook_id == logbook.id).count(),
+                                                    Log.logbook_id == _logbook.id).count(),
             'label': band['band']
         })
 
@@ -795,7 +801,7 @@ def logbook_stats(username, logbook_id):
                   '6mm', '4mm', '2,4mm', '2mm', '1,2mm']
     dxcc_worked = []
     for country in db.session.query(Log.country).filter(Log.user_id == user.id,
-                                                        Log.logbook_id == logbook.id).distinct(Log.country):
+                                                        Log.logbook_id == _logbook.id).distinct(Log.country):
         dxcc_entry = {'country': country.country, 'bands': []}
         for band in dxcc_bands:
             band_id = Band.query.filter(Band.name == band,
@@ -804,7 +810,7 @@ def logbook_stats(username, logbook_id):
             count = db.session.query(Log.id).filter(Log.user_id == user.id,
                                                     Log.band_id == band_id.id,
                                                     Log.country == country.country,
-                                                    Log.logbook_id == logbook.id).count()
+                                                    Log.logbook_id == _logbook.id).count()
             dxcc_entry['bands'].append({'count': count})
         dxcc_worked.append(dxcc_entry)
 
@@ -821,4 +827,4 @@ def logbook_stats(username, logbook_id):
     }
 
     return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_json=json.dumps(stats), stats=stats, user=user,
-                           logbooks=logbooks, logbook=logbook)
+                           logbooks=logbooks, logbook=_logbook)
