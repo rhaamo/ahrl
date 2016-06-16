@@ -11,6 +11,8 @@ from geohelper import distance, bearing
 from libqth import is_valid_qth, qth_to_coords
 from calendar import monthrange
 import os
+from sqlalchemy.orm import Bundle
+from sqlalchemy import func
 
 bp_qsos = Blueprint('bp_qsos', __name__)
 
@@ -763,29 +765,19 @@ def logbook_stats(username, logbook_id):
 
     # Pie with modes
     stats_modes = []
-    modes_used = [{'mode': a.mode.submode, 'id': a.mode.id} for a in
-                  Log.query.filter(Log.user_id == user.id,
-                                   Log.logbook_id == _logbook.id).group_by(Log.mode_id).all()]
-    for mode in modes_used:
-        stats_modes.append({
-            'data': db.session.query(Log.id).filter(Log.user_id == user.id,
-                                                    Log.mode_id == mode['id'],
-                                                    Log.logbook_id == _logbook.id).count(),
-            'label': mode['mode']
-        })
+    _a_logs = Bundle('log', Log.mode_id, func.count(Log.id))
+    _b_modes = Bundle('modes', Mode.id, Mode.submode)
+    for _modes, _logs in db.session.query(_b_modes, _a_logs).join(
+            Mode.logs).filter(Log.user_id == _logbook.id, Log.logbook_id == _logbook.id).group_by(Log.mode_id).all():
+        stats_modes.append({'label': _modes[1], 'data': _logs[1]})
 
     # Pie with bands
     stats_bands = []
-    bands_used = [{'band': a.band.name, 'id': a.band.id} for a in
-                  Log.query.filter(Log.user_id == user.id,
-                                   Log.logbook_id == _logbook.id).group_by(Log.band_id).all()]
-    for band in bands_used:
-        stats_bands.append({
-            'data': db.session.query(Log.id).filter(Log.user_id == user.id,
-                                                    Log.band_id == band['id'],
-                                                    Log.logbook_id == _logbook.id).count(),
-            'label': band['band']
-        })
+    _a_logs = Bundle('log', Log.band_id, func.count(Log.id))
+    _b_bands = Bundle('bands', Band.id, Band.name)
+    for _bands, _logs in db.session.query(_b_bands, _a_logs).join(
+            Band.logs).filter(Log.user_id == _logbook.id, Log.logbook_id == _logbook.id).group_by(Log.band_id).all():
+        stats_bands.append({'label': _bands[1], 'data': _logs[1]})
 
     # DXCC Awards worked
     dxcc_bands = ['2222m', '160m', '80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m', '2m',
@@ -794,8 +786,10 @@ def logbook_stats(username, logbook_id):
     dxcc_worked = []
     for country in db.session.query(Log.country).filter(Log.user_id == user.id,
                                                         Log.logbook_id == _logbook.id).distinct(Log.country):
+        print("START DXCC")
         dxcc_entry = {'country': country.country, 'bands': []}
         for band in dxcc_bands:
+            print("start band")
             band_id = db.session.query(Band.id).filter(Band.name == band,
                                                        Band.start.is_(None),
                                                        Band.modes.is_(None)).one()
@@ -804,6 +798,8 @@ def logbook_stats(username, logbook_id):
                                                     Log.country == country.country,
                                                     Log.logbook_id == _logbook.id).count()
             dxcc_entry['bands'].append({'count': count})
+            print("end band")
+        print("END DXCC")
         dxcc_worked.append(dxcc_entry)
 
     stats = {
