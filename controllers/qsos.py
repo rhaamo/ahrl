@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, Respon
 from flask_security import login_required, current_user
 from flask_uploads import UploadSet, IMAGES
 from models import db, User, Log, Band, Mode, Logbook, Picture
+from models import ham_country_grid_coords, cutename
 from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm
 import pytz
 import datetime
@@ -196,7 +197,14 @@ def new(logbook_id, method):
         a.comment = form.comment.data
         a.sat_name = form.sat_name.data.upper()
         a.sat_mode = form.sat_mode.data.upper()
-        a.gridsquare = form.gridsquare.data.upper()
+
+        if not form.gridsquare.data or form.gridsquare.data == '':
+            cmp_qth = ham_country_grid_coords(a.call)
+            a.cache_gridsquare = cmp_qth['qth']
+        else:
+            a.gridsquare = form.gridsquare.data.upper()
+            a.cache_gridsquare = a.gridsquare
+
         a.country = form.country.data
         a.qsl_sent = form.qsl_sent.raw_data[0]
         a.qsl_sent_via = form.qsl_sent_via.raw_data[0]
@@ -260,7 +268,14 @@ def edit(logbook_id, qso_id):
         a.comment = form.comment.data
         a.sat_name = form.sat_name.data.upper()
         a.sat_mode = form.sat_mode.data.upper()
-        a.gridsquare = form.gridsquare.data.upper()
+
+        if not form.gridsquare.data or form.gridsquare.data == '':
+            cmp_qth = ham_country_grid_coords(a.call)
+            a.cache_gridsquare = cmp_qth['qth']
+        else:
+            a.gridsquare = form.gridsquare.data.upper()
+            a.cache_gridsquare = a.gridsquare
+
         a.country = form.country.data
         a.qsl_sent = form.qsl_sent.raw_data[0]
         a.qsl_sent_via = form.qsl_sent_via.raw_data[0]
@@ -476,7 +491,7 @@ def logbook_geojson(username, logbook_id):
         f = {
             "type": "Feature",
             "properties": {
-                "name": Log.ext_cutename(log[2]),
+                "name": cutename(log[2]),
                 "callsign": log[2],
                 "date": dt_utc_to_user_tz(log[3], user=user),
                 "band": log[6],

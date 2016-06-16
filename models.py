@@ -333,41 +333,23 @@ class Log(db.Model):
 
     # Give a cute name <3 More like "name - callsign" or "callsign"
     def cutename(self):
-        self.ext_cutename(self.call, self.name)
-
-    def ext_cutename(call, name=None):
-        cute = ""
-        if name:
-            cute += name
-            cute += " - "
-        cute += call
-        return cute
+        cutename(self.call, self.name)
 
     def country_grid_coords(self):
-        if 'sqlite' in db.engine.driver:
-            q = DxccPrefixes.query.filter(
-                DxccPrefixes.call == func.substr(self.call, 1, func.LENGTH(DxccPrefixes.call))
-            ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
-        else:
-            q = DxccPrefixes.query.filter(
-                DxccPrefixes.call == func.substring(self.call, 1, func.LENGTH(DxccPrefixes.call))
-            ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
-        if q.count() <= 0:
-            return None
-        else:
-            qth = coords_to_qth(q[0].lat, q[0].long, 6)
-            return {'qth': qth['qth'], 'latitude': q[0].lat, 'longitude': q[0].long}
+        return ham_country_grid_coords(self.call)
 
     def country_grid(self):
-        q = self.country_grid_coords()
+        q = ham_country_grid_coords(self.call)
         if q:
             return coords_to_qth(q['latitude'], q['longitude'], 6)['qth']
         else:
             return None
 
     def distance_from_user(self):
-        if not self.gridsquare:
+        if not self.gridsquare and not self.cache_gridsquare:
             qso_gs = self.country_grid()
+        elif not self.gridsquare:
+            qso_gs = self.cache_gridsquare
         else:
             qso_gs = self.gridsquare
 
@@ -478,3 +460,30 @@ class DxccPrefixes(db.Model):
     lat = db.Column(db.Float, default=None)
     start = db.Column(db.DateTime(timezone=False), default=None)
     end = db.Column(db.DateTime(timezone=False), default=None)
+
+
+# Utils functions
+def ham_country_grid_coords(call):
+    if 'sqlite' in db.engine.driver:
+        q = DxccPrefixes.query.filter(
+            DxccPrefixes.call == func.substr(call, 1, func.LENGTH(DxccPrefixes.call))
+        ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
+    else:
+        q = DxccPrefixes.query.filter(
+            DxccPrefixes.call == func.substring(call, 1, func.LENGTH(DxccPrefixes.call))
+        ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
+    if q.count() <= 0:
+        return None
+    else:
+        qth = coords_to_qth(q[0].lat, q[0].long, 6)
+        return {'qth': qth['qth'], 'latitude': q[0].lat, 'longitude': q[0].long}
+
+
+# Give a cute name <3 More like "name - callsign" or "callsign"
+def cutename(call, name=None):
+    cute = ""
+    if name:
+        cute += name
+        cute += " - "
+    cute += call
+    return cute

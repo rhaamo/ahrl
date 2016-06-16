@@ -2,7 +2,6 @@ import math
 from models import Band, Mode
 from sqlalchemy import or_
 
-
 def band_to_frequency(band, mode):
     if not isinstance(band, int) or not isinstance(mode, int):
         raise TypeError('Sorry but only integer')
