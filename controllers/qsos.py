@@ -779,7 +779,8 @@ def logbook_stats(username, logbook_id):
     dxcc_worked = {}
     d_b_w = db.session.query(
         Log.country, Band.name, func.count(Log.id)).join(Band).group_by(
-        Band.name, Log.country).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).order_by(Log.country.asc()).all()
+        Band.name, Log.country).filter(Log.user_id == user.id,
+                                       Log.logbook_id == _logbook.id).order_by(Log.country.asc()).all()
     # Format: [(country, band_name, count), ...]
     for c in d_b_w:
         if c[0] not in dxcc_worked:
