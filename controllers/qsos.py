@@ -238,7 +238,8 @@ def new(logbook_id, method):
         ), 'success')
         return redirect(url_for('bp_qsos.new', method=method, logbook_id=_logbook.id))
 
-    qsos = Log.query.filter(Log.user_id == current_user.id, Log.logbook_id == _logbook.id).limit(16).all()
+    qsos = db.session.query(Log.time_on, Log.call, Mode.submode, Log.rst_sent, Log.rst_rcvd, Band.name).join(
+        Mode, Band).filter(Log.user_id == current_user.id, Log.logbook_id == _logbook.id).limit(16).all()
 
     return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, qsos=qsos, method=method, logbook=_logbook,
                            logbooks=logbooks)

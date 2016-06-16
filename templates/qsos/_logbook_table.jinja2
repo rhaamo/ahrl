@@ -11,10 +11,10 @@
         <tr>
         <td>{{ log.time_on | localize | show_date_no_offset }}</td>
         <td>{{ log.call }}</td>
-        <td>{{ log.mode.submode }}</td>
+        <td>{{ log.submode }}</td>
         <td>{{ log.rst_sent }}</td>
         <td>{{ log.rst_rcvd }}</td>
-        <td>{{ log.band.name }}</td>
+        <td>{{ log.name }}</td>
         </tr>
     {% endfor %}
 </table>
