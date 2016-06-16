@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
-from models import db, Logbook, User
+from models import db, Logbook, User, Log
 from forms import LogbookForm
 from utils import check_default_profile
+from sqlalchemy import func
 
 bp_logbooks = Blueprint('bp_logbooks', __name__)
 
@@ -18,10 +19,11 @@ def logbooks(user):
     pcfg = {"title": "{0}'s logbooks".format(user.name)}
 
     if current_user.is_authenticated:
-        _logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+        _logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
     else:
-        _logbooks = Logbook.query.filter(Logbook.user_id == user.id,
-                                         Logbook.public.is_(True)).all()
+        _logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == user.id, Logbook.public.is_(True)).group_by(Logbook.id).all()
 
     return render_template('logbooks/logbooks.jinja2', pcfg=pcfg, user=user, logbooks=_logbooks)
 
