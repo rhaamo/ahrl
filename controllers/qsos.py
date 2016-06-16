@@ -786,10 +786,8 @@ def logbook_stats(username, logbook_id):
     dxcc_worked = []
     for country in db.session.query(Log.country).filter(Log.user_id == user.id,
                                                         Log.logbook_id == _logbook.id).distinct(Log.country):
-        print("START DXCC")
         dxcc_entry = {'country': country.country, 'bands': []}
         for band in dxcc_bands:
-            print("start band")
             band_id = db.session.query(Band.id).filter(Band.name == band,
                                                        Band.start.is_(None),
                                                        Band.modes.is_(None)).one()
@@ -798,8 +796,6 @@ def logbook_stats(username, logbook_id):
                                                     Log.country == country.country,
                                                     Log.logbook_id == _logbook.id).count()
             dxcc_entry['bands'].append({'count': count})
-            print("end band")
-        print("END DXCC")
         dxcc_worked.append(dxcc_entry)
 
     stats = {
