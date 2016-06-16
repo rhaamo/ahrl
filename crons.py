@@ -26,6 +26,20 @@ def update_qsos_without_countries():
     print("Updated {0} QSOs".format(updated))
 
 
+def populate_logs_gridsquare_cache():
+    updated = 0
+    logs = Log.query.filter(Log.cache_gridsquare.is_(None)).all()
+    for log in logs:
+        qth = log.country_grid_coords()
+        if not qth:
+            print("!! country_grid_coords() for log {0} returned None, please check !!".format(log.id))
+            continue
+        log.cache_gridsquare = qth['qth']
+        updated += 1
+    db.session.commit()
+    print("-- Updated {0} QSOs".format(updated))
+
+
 def update_dxcc_from_cty_xml():
     print("--- Updating DXCC tables (prefixes, entities, exceptions) from cty.xml")
     fname = os.path.join(current_app.config['TEMP_DOWNLOAD_FOLDER'], 'cty.xml')

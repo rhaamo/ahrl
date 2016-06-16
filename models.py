@@ -237,6 +237,7 @@ class Log(db.Model):
     freq = db.Column(db.Integer, default=None)
     freq_rx = db.Column(db.Integer, default=None)
     gridsquare = db.Column(db.String(12), default=None)
+    cache_gridsquare = db.Column(db.String(12), default=None)
     heading = db.Column(db.Float, default=None)
     iota = db.Column(db.String(10), default=None, index=True)
     ituz = db.Column(db.Integer, default=None)
@@ -332,11 +333,14 @@ class Log(db.Model):
 
     # Give a cute name <3 More like "name - callsign" or "callsign"
     def cutename(self):
+        self.ext_cutename(self.call, self.name)
+
+    def ext_cutename(call, name=None):
         cute = ""
-        if self.name:
-            cute += self.name
+        if name:
+            cute += name
             cute += " - "
-        cute += self.call
+        cute += call
         return cute
 
     def country_grid_coords(self):
@@ -351,7 +355,8 @@ class Log(db.Model):
         if q.count() <= 0:
             return None
         else:
-            return {'latitude': q[0].lat, 'longitude': q[0].long}
+            qth = coords_to_qth(q[0].lat, q[0].long, 6)
+            return {'qth': qth['qth'], 'latitude': q[0].lat, 'longitude': q[0].long}
 
     def country_grid(self):
         q = self.country_grid_coords()

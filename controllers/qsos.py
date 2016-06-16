@@ -13,6 +13,7 @@ from calendar import monthrange
 import os
 from sqlalchemy.orm import Bundle
 from sqlalchemy import func
+from sqlalchemy.sql.expression import case
 
 bp_qsos = Blueprint('bp_qsos', __name__)
 
@@ -424,19 +425,15 @@ def logbook_geojson(username, logbook_id):
     rq_band = request.args.get('band', None)
 
     if rq_mode or rq_mode != 'all':
-        q_mode = Mode.query.filter(Mode.mode == rq_mode)
-        if q_mode.count() == 1:
-            q_mode = q_mode.first()
-        else:
-            q_mode = None
+        q_mode = Mode.query.filter(Mode.mode == rq_mode).first()
     if rq_band or rq_band != 'all':
-        q_band = Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.name == rq_band)
-        if q_band.count() == 1:
-            q_band = q_band.first()
-        else:
-            q_band = None
+        q_band = Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.name == rq_band).first()
 
-    bq = Log.query.filter(User.id == user.id, Log.logbook_id == _logbook.id)
+    # Log.id, Log.gridsquare, Log.call, Log.time_on, Log.band.name, Log.mode.mode, Log.mode.submode, Log.band.name
+    xpr = case([(Log.gridsquare != '', Log.gridsquare), ], else_=Log.cache_gridsquare)
+    bq = db.session.query(Log.id, xpr, Log.call, Log.time_on,
+                          Band.name, Mode.mode, Mode.submode).join(Band).join(Mode).filter(
+        Log.user_id == user.id, Log.logbook_id == _logbook.id)
 
     if q_mode and not q_band:
         fquery = bq.filter(Log.mode_id == q_mode.id)
@@ -468,24 +465,23 @@ def logbook_geojson(username, logbook_id):
     }]
 
     for log in logs:
-        if log.gridsquare:
-            if not is_valid_qth(log.gridsquare, 6):
+        # (0, None, 'EA3EW0', datetime.datetime(2016, 6, 10, 19, 53, 29), 'SSTV', 'SSTV', '4mm')
+        if log[1]:
+            if not is_valid_qth(log[1], 6):
                 raise InvalidUsage('QTH is not valid', status_code=400)
-            _f = qth_to_coords(log.gridsquare, 6)  # precision, latitude, longitude
+            _f = qth_to_coords(log[1], 6)  # precision, latitude, longitude
         else:
-            _f = log.country_grid_coords()
-            if not _f:
-                continue  # No grid at all ? Skit ip
+            continue  # No grid at all ? Skit ip
 
         f = {
             "type": "Feature",
             "properties": {
-                "name": log.cutename(),
-                "callsign": log.call,
-                "date": dt_utc_to_user_tz(log.time_on, user=user),
-                "band": log.band.name,
-                "mode": log.mode.mode,
-                "submode": log.mode.submode,
+                "name": Log.ext_cutename(log[2]),
+                "callsign": log[2],
+                "date": dt_utc_to_user_tz(log[3], user=user),
+                "band": log[6],
+                "mode": log[4],
+                "submode": log[5],
                 "icon": "qso"
             },
             "geometry": {

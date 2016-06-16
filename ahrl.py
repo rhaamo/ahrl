@@ -18,7 +18,7 @@ from controllers.qsos import bp_qsos
 from controllers.tools import bp_tools
 from controllers.contacts import bp_contacts
 from controllers.logbooks import bp_logbooks
-from crons import update_qsos_without_countries, update_dxcc_from_cty_xml
+from crons import update_qsos_without_countries, update_dxcc_from_cty_xml, populate_logs_gridsquare_cache
 
 import texttable
 from dbseed import make_db_seed
@@ -175,6 +175,12 @@ def cron_update_qsos_countries():
 def cron_update_dxcc_from_cty_xml():
     """Update DXCC tables from cty.xml"""
     update_dxcc_from_cty_xml()
+
+
+@manager.command
+def cache_populate_logs_gridsquare():
+    """Update QSOs with empty gridsquare cache"""
+    populate_logs_gridsquare_cache()
 
 
 manager.add_command('db', MigrateCommand)
