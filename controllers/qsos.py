@@ -143,12 +143,12 @@ def logbook(username, logbook_id):
         }
     }
 
-    # TODO SQL
     if current_user.is_authenticated:
-        logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+        logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
     else:
-        logbooks = Logbook.query.filter(Logbook.user_id == user.id,
-                                        Logbook.public.is_(True)).all()
+        logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == user.id, Logbook.public.is_(True)).group_by(Logbook.id).all()
 
     return render_template('qsos/logbook.jinja2', pcfg=pcfg, qsos=qsos, user=user, logbook=_logbook,
                            uqth=uqth, stats=stats, filter_form=filter_form, band=rq_band, mode=rq_mode,
@@ -753,12 +753,12 @@ def logbook_stats(username, logbook_id):
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
-    # TODO SQL
     if current_user.is_authenticated:
-        logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+        logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
     else:
-        logbooks = Logbook.query.filter(Logbook.user_id == user.id,
-                                        Logbook.public.is_(True)).all()
+        logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == user.id, Logbook.public.is_(True)).group_by(Logbook.id).all()
 
     pcfg = {'title': 'Stats for {0}'.format(_logbook.name)}
 
