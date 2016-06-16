@@ -236,7 +236,7 @@ def new(logbook_id, method):
         db.session.add(a)
         db.session.commit()
         flash("Success saving QSO with {0} on {1} using {2}".format(
-            a.call, a.band.name, a.mode.mode
+            a.call, a.band.name, a.mode.submode
         ), 'success')
         return redirect(url_for('bp_qsos.new', method=method, logbook_id=_logbook.id))
 
@@ -322,7 +322,7 @@ def edit(logbook_id, qso_id):
 
         db.session.commit()
         flash("Success updating QSO with {0} on {1} using {2}".format(
-            a.call, a.band.name, a.mode.mode
+            a.call, a.band.name, a.mode.submode
         ), 'success')
         return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=a.logbook.id))
 
