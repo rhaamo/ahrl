@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
-from models import db, User, Logbook
+from models import db, User, Logbook, Log
 from forms import UserProfileForm
 from utils import check_default_profile
 import pytz
+from sqlalchemy import func
+
 
 bp_users = Blueprint('bp_users', __name__)
 
@@ -19,7 +21,8 @@ def profile():
         flash("User not found", 'error')
         return redirect(url_for("bp_main.home"))
 
-    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
     return render_template('users/profile.jinja2', pcfg=pcfg, user=user, logbooks=logbooks)
 
 
@@ -52,5 +55,6 @@ def edit():
         db.session.commit()
         return redirect(url_for('bp_users.profile'))
 
-    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
     return render_template('users/edit.jinja2', pcfg=pcfg, form=form, user=user, logbooks=logbooks)

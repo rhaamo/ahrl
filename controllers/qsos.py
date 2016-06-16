@@ -143,6 +143,7 @@ def logbook(username, logbook_id):
         }
     }
 
+    # TODO SQL
     if current_user.is_authenticated:
         logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
     else:
@@ -171,7 +172,8 @@ def new(logbook_id, method):
         flash("Logbook not found !", 'error')
         return redirect(url_for('bp_logbooks.logbooks', username=current_user.name))
 
-    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
 
     if form.validate_on_submit():
         a = Log()
@@ -256,7 +258,8 @@ def edit(logbook_id, qso_id):
         flash("Qso not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
 
-    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
 
     form = EditQsoForm(request.form, a)
 
@@ -750,6 +753,7 @@ def logbook_stats(username, logbook_id):
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
+    # TODO SQL
     if current_user.is_authenticated:
         logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
     else:

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
-from models import User, Logbook
+from models import db, User, Logbook, Log
 from flask_security import current_user
+from sqlalchemy import func
 
 bp_main = Blueprint('bp_main', __name__)
 
@@ -13,7 +14,8 @@ def home():
 
     logbooks = None
     if current_user.is_authenticated:
-        logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+        logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
 
     return render_template('home.jinja2', pcfg=pcfg, users=users, logbooks=logbooks)
 

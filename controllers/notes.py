@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
-from models import db, Note, Logbook
+from models import db, Note, Logbook, Log
 from forms import NoteForm
 from utils import check_default_profile
+from sqlalchemy import func
 
 bp_notes = Blueprint('bp_notes', __name__)
 
@@ -14,7 +15,8 @@ def notes():
     pcfg = {"title": "My notes"}
 
     _notes = Note.query.filter(Note.user_id == current_user.id).all()
-    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
 
     return render_template('notes/view.jinja2', pcfg=pcfg, notes=_notes, logbooks=logbooks)
 
@@ -68,7 +70,8 @@ def new():
         flash("Success updating note: {0}".format(a.title), 'success')
         return redirect(url_for('bp_notes.notes'))
 
-    logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
+    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
     return render_template('notes/new.jinja2', pcfg=pcfg, form=form, logbooks=logbooks)
 
 

@@ -78,7 +78,7 @@
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Statistics <span class="caret"></span></a>
                   <ul class="dropdown-menu">
                       {% for l in logbooks %}
-                        <li><a href="{{ url_for('bp_qsos.logbook_stats', username=current_user.name, logbook_id=l.id) }}">For {{ l.name }} <small>({{ l.logs.count() }} qsos)</small></a></li>
+                        <li><a href="{{ url_for('bp_qsos.logbook_stats', username=current_user.name, logbook_id=l.id) }}">For {{ l.name }} <small>({{ l[2] }} qsos)</small></a></li>
                       {% endfor %}
                   </ul>
                 </li>
@@ -91,7 +91,7 @@
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Statistics <span class="caret"></span></a>
                       <ul class="dropdown-menu">
                           {% for l in logbooks %}
-                            <li><a href="{{ url_for('bp_qsos.logbook_stats', username=user.name, logbook_id=l.id) }}">For {{ l.name }} <small>({{ l.logs.count() }} qsos)</small></a></li>
+                            <li><a href="{{ url_for('bp_qsos.logbook_stats', username=user.name, logbook_id=l.id) }}">For {{ l.name }} <small>({{ l[2] }} qsos)</small></a></li>
                           {% endfor %}
                       </ul>
                     </li>
