@@ -776,29 +776,19 @@ def logbook_stats(username, logbook_id):
         stats_bands.append({'label': _bands[1], 'data': _logs[1]})
 
     # DXCC Awards worked
+    dxcc_worked = {}
+    d_b_w = db.session.query(
+        Log.country, Band.name, func.count(Log.id)).join(Band).group_by(
+        Band.name, Log.country).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).order_by(Log.country.asc()).all()
+    # Format: [(country, band_name, count), ...]
+    for c in d_b_w:
+        if c[0] not in dxcc_worked:
+            dxcc_worked[c[0]] = {}
+        dxcc_worked[c[0]][c[1]] = c[2]
+
     dxcc_bands = ['2222m', '160m', '80m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m', '2m',
                   '70cm', '23cm', '13cm', '5cm', '3cm', '1,2cm',
                   '6mm', '4mm', '2,4mm', '2mm', '1,2mm']
-    dxcc_worked = []
-    for country in db.session.query(Log.country).filter(Log.user_id == user.id,
-                                                        Log.logbook_id == _logbook.id).distinct(Log.country):
-        dxcc_entry = {'country': country.country, 'bands': []}
-        for band in dxcc_bands:
-            # _a_logs = Bundle('log', Log.band_id, func.count(Log.id))
-            # _b_bands = Bundle('bands', Band.id, Band.name)
-            # q = db.session.query(_b_bands, _a_logs).join(Band.logs).filter(
-            #     Log.user_id == user.id, Band.name == band, Band.start.is_(None), Band.modes.is_(None),
-            #     Log.country == country.country, Log.logbook_id == _logbook.id
-            # ).first()
-            band_id = db.session.query(Band.id).filter(Band.name == band,
-                                                       Band.start.is_(None),
-                                                       Band.modes.is_(None)).one()
-            count = db.session.query(Log.id).filter(Log.user_id == user.id,
-                                                    Log.band_id == band_id.id,
-                                                    Log.country == country.country,
-                                                    Log.logbook_id == _logbook.id).count()
-            dxcc_entry['bands'].append({'count': count})
-        dxcc_worked.append(dxcc_entry)
 
     stats = {
         'current_year': stats_months[0],
