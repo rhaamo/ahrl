@@ -230,7 +230,7 @@ def new(logbook_id, method):
         ), 'success')
         return redirect(url_for('bp_qsos.new', method=method, logbook_id=_logbook.id))
 
-    qsos = Log.query.filter(User.id == current_user.id).limit(16).all()
+    qsos = Log.query.filter(Log.user_id == current_user.id, Log.logbook_id == _logbook.id).limit(16).all()
 
     return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, qsos=qsos, method=method, logbook=_logbook,
                            logbooks=logbooks)
