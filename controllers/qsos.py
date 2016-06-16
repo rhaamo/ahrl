@@ -743,6 +743,7 @@ def logbook_stats(username, logbook_id):
 
     # Bargraph by year (previous and current)
     stats_months = []
+    total_qsos = 0
     dt = datetime.datetime.utcnow()
 
     for y in [dt.year, dt.year - 1]:
@@ -751,17 +752,12 @@ def logbook_stats(username, logbook_id):
             mr = monthrange(y, i)
             d_month_start = datetime.datetime(y, i, 0o1, 00, 00, 00, tzinfo=pytz.timezone('UTC'))
             d_month_end = datetime.datetime(y, i, mr[1], 23, 59, 59, tzinfo=pytz.timezone('UTC'))
-            stats_y.append([
-                i,
-                db.session.query(Log.id).filter(Log.user_id == user.id,
-                                                Log.time_on.between(d_month_start, d_month_end),
-                                                Log.logbook_id == _logbook.id).count()
-            ])
+            month_count = db.session.query(Log.id).filter(Log.user_id == user.id,
+                                                          Log.time_on.between(d_month_start, d_month_end),
+                                                          Log.logbook_id == _logbook.id).count()
+            stats_y.append([i, month_count])
+            total_qsos += month_count
         stats_months.append(stats_y)
-
-    # Total this year
-    total_qso_year = db.session.query(Log.id).filter(Log.user_id == user.id,
-                                                     Log.logbook_id == _logbook.id).count()
 
     # Pie with modes
     stats_modes = []
@@ -788,6 +784,12 @@ def logbook_stats(username, logbook_id):
                                                         Log.logbook_id == _logbook.id).distinct(Log.country):
         dxcc_entry = {'country': country.country, 'bands': []}
         for band in dxcc_bands:
+            # _a_logs = Bundle('log', Log.band_id, func.count(Log.id))
+            # _b_bands = Bundle('bands', Band.id, Band.name)
+            # q = db.session.query(_b_bands, _a_logs).join(Band.logs).filter(
+            #     Log.user_id == user.id, Band.name == band, Band.start.is_(None), Band.modes.is_(None),
+            #     Log.country == country.country, Log.logbook_id == _logbook.id
+            # ).first()
             band_id = db.session.query(Band.id).filter(Band.name == band,
                                                        Band.start.is_(None),
                                                        Band.modes.is_(None)).one()
@@ -805,7 +807,7 @@ def logbook_stats(username, logbook_id):
         'l_py': dt.year - 1,
         'modes_used': stats_modes,
         'bands_used': stats_bands,
-        'total_qsos_year': total_qso_year,
+        'total_qsos_year': total_qsos,
         'bands_list': dxcc_bands,
         'dxcc_worked': dxcc_worked
     }
