@@ -88,14 +88,14 @@ def logbook(username, logbook_id):
     _b_modes = Bundle('modes', Mode.id, Mode.mode, Mode.submode)
     for _modes, _logs in db.session.query(_b_modes, _a_logs).join(
             Mode.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.mode_id).all():
-        filter_modes.append([_modes[2], '{0} - {1}'.format(_modes[1], _modes[2])])
+        filter_modes.append([_modes.id, '{0} - {1}'.format(_modes.mode, _modes.submode)])
 
     filter_bands = []
     _a_logs = Bundle('log', Log.band_id)
     _b_bands = Bundle('bands', Band.id, Band.name)
     for _bands, _logs in db.session.query(_b_bands, _a_logs).join(
             Band.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.band_id).all():
-        filter_bands.append([_bands[1], _bands[1]])
+        filter_bands.append([_bands.name, _bands.name])
 
     filter_modes.insert(0, ['all', 'All modes'])
     filter_bands.insert(0, ['all', 'All bands'])
@@ -495,12 +495,12 @@ def logbook_geojson(username, logbook_id):
         f = {
             "type": "Feature",
             "properties": {
-                "name": cutename(log[2]),
-                "callsign": log[2],
-                "date": dt_utc_to_user_tz(log[3], user=user),
-                "band": log[6],
-                "mode": log[4],
-                "submode": log[5],
+                "name": cutename(log.call),
+                "callsign": log.call,
+                "date": dt_utc_to_user_tz(log.time_on, user=user),
+                "band": log.name,
+                "mode": log.mode,
+                "submode": log.submode,
                 "icon": "qso"
             },
             "geometry": {
