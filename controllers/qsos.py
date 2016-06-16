@@ -81,21 +81,26 @@ def logbook(username, logbook_id):
             q_band = None
 
     # Form choices building
-    _modes = []
-    for a in Log.query.filter(Log.user_id == user.id,
-                              Log.logbook_id == _logbook.id
-                              ).group_by(Log.mode_id).all():
-        _modes.append([a.mode.submode, '{0} - {1}'.format(a.mode.mode, a.mode.submode)])
-    _bands = []
-    for a in Log.query.filter(Log.user_id == user.id,
-                              Log.logbook_id == _logbook.id
-                              ).group_by(Log.band_id).all():
-        _bands.append([a.band.name, a.band.name])
-    _modes.insert(0, ['all', 'All modes'])
-    _bands.insert(0, ['all', 'All bands'])
-    filter_form.mode.choices = _modes
+    filter_modes = []
+    _a_logs = Bundle('log', Log.mode_id)
+    _b_modes = Bundle('modes', Mode.id, Mode.mode, Mode.submode)
+    for _modes, _logs in db.session.query(_b_modes, _a_logs).join(
+            Mode.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.mode_id).all():
+        filter_modes.append([_modes[2], '{0} - {1}'.format(_modes[1], _modes[2])])
+
+    filter_bands = []
+    _a_logs = Bundle('log', Log.band_id)
+    _b_bands = Bundle('bands', Band.id, Band.name)
+    for _bands, _logs in db.session.query(_b_bands, _a_logs).join(
+            Band.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.band_id).all():
+        filter_bands.append([_bands[1], _bands[1]])
+
+    filter_modes.insert(0, ['all', 'All modes'])
+    filter_bands.insert(0, ['all', 'All bands'])
+
+    filter_form.mode.choices = filter_modes
     filter_form.mode.data = rq_mode or 'all'
-    filter_form.band.choices = _bands
+    filter_form.band.choices = filter_bands
     filter_form.band.data = rq_band or 'all'
 
     bq = Log.query.filter(User.id == user.id, Log.logbook_id == _logbook.id)
@@ -764,7 +769,7 @@ def logbook_stats(username, logbook_id):
     _a_logs = Bundle('log', Log.mode_id, func.count(Log.id))
     _b_modes = Bundle('modes', Mode.id, Mode.submode)
     for _modes, _logs in db.session.query(_b_modes, _a_logs).join(
-            Mode.logs).filter(Log.user_id == _logbook.id, Log.logbook_id == _logbook.id).group_by(Log.mode_id).all():
+            Mode.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.mode_id).all():
         stats_modes.append({'label': _modes[1], 'data': _logs[1]})
 
     # Pie with bands
@@ -772,7 +777,7 @@ def logbook_stats(username, logbook_id):
     _a_logs = Bundle('log', Log.band_id, func.count(Log.id))
     _b_bands = Bundle('bands', Band.id, Band.name)
     for _bands, _logs in db.session.query(_b_bands, _a_logs).join(
-            Band.logs).filter(Log.user_id == _logbook.id, Log.logbook_id == _logbook.id).group_by(Log.band_id).all():
+            Band.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.band_id).all():
         stats_bands.append({'label': _bands[1], 'data': _logs[1]})
 
     # DXCC Awards worked
