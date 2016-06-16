@@ -80,12 +80,11 @@ class NoteForm(ModelForm):
 
 def get_modes():
     modes = {}
-    for mode in Mode.query.order_by(Mode.mode.asc()).all():
-        sm = Mode.query.filter(Mode.mode == mode.mode).order_by(Mode.mode.asc()).all()
-        m = []
-        for i in sm:
-            m.append((i.id, i.submode))
-        modes[mode.mode] = m
+    q_modes = db.session.query(Mode.id, Mode.mode, Mode.submode).order_by(Mode.mode.asc()).all()
+    for mode in q_modes:
+        if mode.mode not in modes:
+            modes[mode.mode] = []
+        modes[mode.mode].append((mode.id, mode.submode))
 
     return list(sorted(modes.items()))
 
