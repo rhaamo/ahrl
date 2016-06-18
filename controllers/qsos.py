@@ -220,7 +220,7 @@ def new(logbook_id, method):
         a.my_gridsquare = current_user.locator.upper()
         a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
-        a.swl = current_user.swl
+        a.swl = 1 if _logbook.swl else 0
         a.web = form.web.data
 
         a.distance = 0  # ??
@@ -293,7 +293,7 @@ def edit(logbook_id, qso_id):
         a.my_gridsquare = current_user.locator.upper()
         a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
-        a.swl = current_user.swl
+        a.swl = 1 if a.logbook.swl else 0
         a.web = form.web.data
 
         a.distance = 0  # ??
