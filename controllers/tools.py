@@ -55,7 +55,13 @@ def adif_import_file():
                 if key not in log:
                     continue
 
-                setattr(l, key, log[key])
+                if key == 'swl':
+                    val = 1 if log[key] == 'Y' else 0
+                else:
+                    val = log[key]
+
+                setattr(l, key, val)
+            
             # other fields to manage specifically
             if 'class' in log:
                 l.klass = log['class']
@@ -84,19 +90,29 @@ def adif_import_file():
                     l.notes += "\r\nMode automatically set to SSB because not found in ADIF"
                 l.mode_id = mode.id
             # Reminder : ADIF is in UTC, we store in UTC, no TZ conversion necessary
+            # TIME_ON
             if 'qso_date' in log and 'time_on':
                 date = "{0} {1}".format(log['qso_date'], log['time_on'])
                 date_wo_tz = datetime.datetime.strptime(date, "%Y%m%d %H%M%S")
                 l.time_on = date_wo_tz
-                l.time_off = date_wo_tz
             else:
                 date_w_tz = datetime.datetime.utcnow()
                 l.time_on = date_w_tz.astimezone(pytz.timezone('UTC'))
+                if not l.notes:
+                    l.notes = ""
+                l.notes = "\r\nDate and time_on set to the import date because not found in ADIF"
+            # TIME_OFF
+            if 'qso_date' in log and 'time_off':
+                date = "{0} {1}".format(log['qso_date'], log['time_off'])
+                date_wo_tz = datetime.datetime.strptime(date, "%Y%m%d %H%M%S")
+                l.time_off = date_wo_tz
+            else:
+                date_w_tz = datetime.datetime.utcnow()
                 l.time_off = date_w_tz.astimezone(pytz.timezone('UTC'))
                 if not l.notes:
                     l.notes = ""
-                l.notes = "\r\nDate set to the import date because not found in ADIF"
-            # FIXME manage time_off as time too
+                l.notes = "\r\nDate and time_off set to the import date because not found in ADIF"
+
             if 'comment' in log:
                 l.comment = log['comment']
             if 'comment_intl' in log:
