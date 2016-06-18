@@ -28,7 +28,7 @@ ADIF_FIELDS = ['address', 'age', 'a_index', 'ant_az', 'ant_el', 'ant_path', 'arr
                'qsl_rcvd', 'qsl_rcvd_via', 'qsl_sent', 'qsl_sent_via', 'qsl_via', 'qso_complete',
                'qso_random', 'qth', 'rig', 'rst_rcvd', 'rst_sent', 'rx_pwr', 'sat_mode', 'sat_name',
                'sfi', 'sig', 'sig_info', 'srx', 'srx_string', 'state', 'station_callsign', 'stx',
-               'stx_info', 'swl', 'ten_ten', 'time_off', 'tx_pwr', 'web', 'credit_granted',
+               'stx_info', 'swl', 'ten_ten', 'tx_pwr', 'web', 'credit_granted',
                'credit_submitted']
 
 

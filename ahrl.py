@@ -77,6 +77,8 @@ if os.path.isdir(gitpath):
 @app.before_request
 def before_request():
     g.cfg = {
+        'AHRL_VERSION_VER': __VERSION__,
+        'AHRL_VERSION_GIT': git_version,
         'AHRL_VERSION': "{0} ({1})".format(__VERSION__, git_version),
     }
 

@@ -1,5 +1,5 @@
 # coding: utf8
-from flask import Blueprint, render_template, redirect, url_for, stream_with_context, Response, flash
+from flask import Blueprint, render_template, redirect, url_for, stream_with_context, Response, flash, g
 from flask_security import login_required, current_user
 from models import db, Log, Mode, User, Logbook, Band
 from utils import check_default_profile, ADIF_FIELDS, InvalidUsage
@@ -96,6 +96,7 @@ def adif_import_file():
                 if not l.notes:
                     l.notes = ""
                 l.notes = "\r\nDate set to the import date because not found in ADIF"
+            # FIXME manage time_off as time too
             if 'comment' in log:
                 l.comment = log['comment']
             if 'comment_intl' in log:
@@ -136,8 +137,12 @@ def adif_export_dl(username, logbook_id):
         yield '\r\n'
         yield '<adif_ver:5>3.0.4\r\n'
         yield '<programid:4>AHRL\r\n'
-        yield a('station_callsign', user.callsign) + '\r\n'
-        yield a('operator', user.callsign) + '\r\n'
+        vers = '{0} git {1}'.format(g.cfg['AHRL_VERSION_VER'], g.cfg['AHRL_VERSION_GIT'])
+        yield a('programversion', vers) + '\r\n'
+        ct = datetime.datetime.utcnow().strftime('%Y%m%d %H%M%S')
+        yield a('created_timestamp', ct) + '\r\n'
+        # yield a('station_callsign', user.callsign) + '\r\n'
+        # yield a('operator', user.callsign) + '\r\n'
         yield '\r\n'
         yield '<eoh>\r\n\r\n'
 
@@ -150,7 +155,16 @@ def adif_export_dl(username, logbook_id):
 
                 value = getattr(log, key)
                 if value:
-                    yield a(key, value)
+                    if key == 'swl' or key == 'force_init':
+                        if value == 1:
+                            val = 'Y'
+                        elif value == 2:
+                            val = 'N'
+                        else:
+                            val = 'Y'
+                    else:
+                        val = value
+                    yield a(key, val)
                     counter += 1
 
             yield '\r\n'
@@ -164,6 +178,8 @@ def adif_export_dl(username, logbook_id):
             if log.time_on:
                 yield a('qso_date', log.time_on.strftime('%Y%m%d'))
                 yield a('time_on', log.time_on.strftime('%H%M%S'))
+            if log.time_off:
+                yield a('time_off', log.time_off.strftime('%H%M%S'))
             if log.klass:
                 yield a('class', log.klass)
             if log.band:
