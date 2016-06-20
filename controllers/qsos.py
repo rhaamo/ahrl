@@ -287,16 +287,11 @@ def edit(logbook_id, qso_id):
         a.qsl_sent = form.qsl_sent.raw_data[0]
         a.qsl_sent_via = form.qsl_sent_via.raw_data[0]
         a.qsl_via = form.qsl_via.data
-        a.operator = current_user.callsign
-        a.owner_callsign = current_user.callsign
-        a.station_callsign = current_user.callsign
         a.qth = form.qth.data
         a.prop_mode = form.prop_mode.raw_data[0]
         a.iota = form.iota.data.upper()
-        a.my_gridsquare = current_user.locator.upper()
         a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
-        a.swl = 1 if a.logbook.swl else 0
         a.web = form.web.data
 
         a.distance = 0  # ??
