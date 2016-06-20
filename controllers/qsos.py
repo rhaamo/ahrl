@@ -263,6 +263,9 @@ def edit(logbook_id, qso_id):
 
     form = EditQsoForm(request.form, a)
 
+    # Fix bug with SelectField not managing relations properly
+    form.mode.data = a.mode.id
+
     if form.validate_on_submit():
         a.call = form.call.data.upper()
         a.freq = form.freq.data
