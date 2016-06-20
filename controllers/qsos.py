@@ -276,14 +276,13 @@ def edit(logbook_id, qso_id):
         a.sat_name = form.sat_name.data.upper()
         a.sat_mode = form.sat_mode.data.upper()
 
-        # If cache already present and not valid, do the logic
-        if not is_valid_qth(a.cache_gridsquare, 6):
-            if not form.gridsquare.data or form.gridsquare.data == '':
-                cmp_qth = ham_country_grid_coords(a.call)
-                a.cache_gridsquare = cmp_qth['qth']
-            else:
-                a.gridsquare = form.gridsquare.data.upper()
-                a.cache_gridsquare = a.gridsquare
+        if not form.gridsquare.data or form.gridsquare.data == '':
+            cmp_qth = ham_country_grid_coords(a.call)
+            a.cache_gridsquare = cmp_qth['qth']
+            a.gridsquare = form.gridsquare.data.upper()
+        else:
+            a.gridsquare = form.gridsquare.data.upper()
+            a.cache_gridsquare = a.gridsquare
 
         a.country = form.country.data
         a.qsl_sent = form.qsl_sent.raw_data[0]
