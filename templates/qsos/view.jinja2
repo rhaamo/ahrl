@@ -43,6 +43,10 @@
                 <td>Sent: {{ qso.eqsl_qsl_sent }}, Rcvd: {{ qso.eqsl_qsl_rcvd }}</td>
             </tr>
             <tr>
+                <td>QSL Comment</td>
+                <td>{{ qso.qsl_comment or "No comment" }}</td>
+            </tr>
+            <tr>
                 <td>Comment</td>
                 <td>{{ qso.comment or "No comment" }}</td>
             </tr>

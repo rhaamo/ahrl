@@ -35,6 +35,10 @@
                 <td>{{ qso_bearing | round }}&deg; {{ qso_bearing_star }} - {{ qso_distance | round }} {{ qso_distance_unit }}</td>
             </tr>
             <tr>
+                <td>QSL Comment</td>
+                <td>{{ qso.qsl_comment or "No comment" }}</td>
+            </tr>
+            <tr>
                 <td>Comment</td>
                 <td>{{ qso.comment or "No comment" }}</td>
             </tr>

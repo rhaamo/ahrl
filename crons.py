@@ -171,12 +171,7 @@ def cron_sync_eqsl():
     config = Config.query.first()
     if not config:
         print("!!! Error: config not found")
-        a = Logging()
-        a.category = 'CONFIG'
-        a.level = 'ERROR'
-        a.message = 'Config not found'
-        db.session.add(a)
-        db.session.commit()
+        add_log(category='CONFIG', level='ERROR', message='Config not found')
         return
 
     for log in logs:
