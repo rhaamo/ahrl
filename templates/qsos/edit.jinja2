@@ -67,16 +67,16 @@
 
                             <div class="row">
                                 <ul class="nav nav-tabs" role="tablist">
-                                    <li role="presentation" class="active"><a href="#qsl" aria-controls="qsl"
+                                    <li role="presentation"><a href="#qsl" aria-controls="qsl"
                                                                               role="tab" data-toggle="tab">QSL</a></li>
-                                    <li role="presentation"><a href="#eqsl" aria-controls="eqsl" role="tab"
+                                    <li role="presentation" class="active"><a href="#eqsl" aria-controls="eqsl" role="tab"
                                                                data-toggle="tab">eQSL</a></li>
                                     <li role="presentation"><a href="#lotw" aria-controls="lotw" role="tab"
                                                                data-toggle="tab">LOTW QSL</a></li>
                                 </ul>
 
                                 <div class="tab-content">
-                                    <div role="tabpanel" class="tab-pane active" id="qsl">
+                                    <div role="tabpanel" class="tab-pane" id="qsl">
                                         <div class="row">
                                             <div class="col-lg-6">{{ wtf.form_field(form.qsl_sent, 'vertical') }}</div>
                                             <div class="col-lg-6">{{ wtf.form_field(form.qsl_rcvd, 'vertical') }}</div>
@@ -91,7 +91,7 @@
                                         </div>
                                     </div>
 
-                                    <div role="tabpanel" class="tab-pane" id="eqsl">
+                                    <div role="tabpanel" class="tab-pane active" id="eqsl">
                                         <div class="row">
                                             <div class="col-lg-6">{{ wtf.form_field(form.eqsl_qsl_sent, 'vertical') }}</div>
                                             <div class="col-lg-6">{{ wtf.form_field(form.eqsl_qsl_rcvd, 'vertical') }}</div>
