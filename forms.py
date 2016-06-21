@@ -294,4 +294,4 @@ class ConfigForm(Form):
     eqsl_download_url = StringField('eQSL Download URL', [DataRequired()])
     eqsl_upload_url = StringField('eQSL Upload URL', [DataRequired()])
     eqsl_rcvd_mark = StringField('eQSL Rcvd Mark', [DataRequired()])
-    clublog_api_key = StringField('ClubLog API Key', [DataRequired()])
+    clublog_api_key = StringField('ClubLog API Key')
