@@ -18,6 +18,7 @@ from controllers.qsos import bp_qsos
 from controllers.tools import bp_tools
 from controllers.contacts import bp_contacts
 from controllers.logbooks import bp_logbooks
+from controllers.admin import bp_admin
 from crons import update_qsos_without_countries, update_dxcc_from_cty_xml, \
     populate_logs_gridsquare_cache, cron_sync_eqsl
 
@@ -28,7 +29,7 @@ from forms import ExtendedRegisterForm
 import os
 import subprocess
 
-from utils import dt_utc_to_user_tz, InvalidUsage, show_date_no_offset
+from utils import dt_utc_to_user_tz, InvalidUsage, show_date_no_offset, is_admin
 
 import logging
 from logging.handlers import RotatingFileHandler
@@ -43,6 +44,7 @@ app.jinja_env.add_extension('jinja2.ext.with_')
 app.jinja_env.add_extension('jinja2.ext.do')
 app.jinja_env.filters['localize'] = dt_utc_to_user_tz
 app.jinja_env.filters['show_date_no_offset'] = show_date_no_offset
+app.jinja_env.globals.update(is_admin=is_admin)
 
 app.config.from_pyfile("config.py")
 
@@ -100,6 +102,7 @@ app.register_blueprint(bp_qsos)
 app.register_blueprint(bp_tools)
 app.register_blueprint(bp_contacts)
 app.register_blueprint(bp_logbooks)
+app.register_blueprint(bp_admin)
 
 
 # Used in development

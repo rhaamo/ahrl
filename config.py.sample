@@ -30,8 +30,6 @@ DEBUG_TB_INTERCEPT_REDIRECTS = False
 
 # Paginations
 
-CLUBLOG_API_KEY = ""
-
 LOOKUP_METHOD = "hamqth"
 
 QRZ_USERNAME = ""

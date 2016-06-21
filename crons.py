@@ -1,12 +1,12 @@
 from __future__ import print_function
-from utils import get_dxcc_from_clublog
+from utils import get_dxcc_from_clublog, add_log
 import urllib.request
 import shutil
 import os
 import gzip
 from flask import current_app
 import xml.etree.ElementTree as ElementTree
-from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging
+from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging, Logging
 from dateutil import parser
 from libjambon import eqsl_upload_log
 
@@ -45,12 +45,22 @@ def update_dxcc_from_cty_xml():
     print("--- Updating DXCC tables (prefixes, entities, exceptions) from cty.xml")
     fname = os.path.join(current_app.config['TEMP_DOWNLOAD_FOLDER'], 'cty.xml')
 
+    config = Config.query.first()
+    if not config:
+        print("!!! Error: config not found")
+        add_log(category='CONFIG', level='ERROR', message='Config not found')
+        return
+
     if os.path.isfile(fname):
         os.remove(fname)
         print("-- Removed old file {0}".format(fname))
 
     print("-- Downloading...")
-    url = "https://secure.clublog.org/cty.php?api={0}".format(current_app.config['CLUBLOG_API_KEY'])
+    if not config.clublog_api_key:
+        print("!! Clublog API Key not defined")
+        add_log(category='CRONS', level='ERROR', message='Clublog API Key not defined')
+        return
+    url = "https://secure.clublog.org/cty.php?api={0}".format(config.clublog_api_key)
 
     try:
         with urllib.request.urlopen(url) as response, open(fname, 'wb') as out_file:
@@ -159,6 +169,16 @@ def cron_sync_eqsl():
     print("--- Sending logs to eQSL when requested")
     logs = Log.query.filter(Log.eqsl_qsl_sent == 'R').all()
     config = Config.query.first()
+    if not config:
+        print("!!! Error: config not found")
+        a = Logging()
+        a.category = 'CONFIG'
+        a.level = 'ERROR'
+        a.message = 'Config not found'
+        db.session.add(a)
+        db.session.commit()
+        return
+
     for log in logs:
         status = eqsl_upload_log(log, config)
         err = UserLogging()

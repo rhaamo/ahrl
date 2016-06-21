@@ -39,8 +39,8 @@ def seed_config(db):
                           lotw_upload_url='https://p1k.arrl.org/lotwuser/upload',
                           lotw_rcvd_mark='Y',
                           lotw_login_url='https://p1k.arrl.org/lotwuser/default',
-                          eqsl_download_url='http://www.eqsl.cc/qslcard/DownloadInBox.cfm',
-                          eqsl_upload_url='http://www.eqsl.cc/qslcard/ImportADIF.cfm',
+                          eqsl_download_url='https://www.eqsl.cc/qslcard/DownloadInBox.cfm',
+                          eqsl_upload_url='https://www.eqsl.cc/qslcard/ImportADIF.cfm',
                           eqsl_rcvd_mark='Y')
     db.session.add(a)
     db.session.commit()

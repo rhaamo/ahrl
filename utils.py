@@ -1,6 +1,6 @@
 import re
 from unidecode import unidecode
-from models import db, Apitoken, Band
+from models import db, Apitoken, Band, Role, Logging
 import random
 import string
 import os
@@ -163,3 +163,21 @@ def get_dxcc_from_clublog(callsign):
         raise InvalidUsage('Error getting DXCC from ClubLog', status_code=r.status_code)
 
     return json.loads(r.content)
+
+
+def is_admin():
+    adm = Role.query.filter(Role.name == 'admin').first()
+    if not current_user or not current_user.is_authenticated or not adm:
+        return False
+    if adm in current_user.roles:
+        return True
+    return False
+
+
+def add_log(category, level, message):
+    if not category or not level or not message:
+        print("!! Fatal error in add_log() one of three variables not set")
+    print("[LOG][{0}][{1}] {2}".format(level, category, message))
+    a = Logging(category=category, level=level, message=message)
+    db.session.add(a)
+    db.session.commit()
