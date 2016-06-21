@@ -48,6 +48,7 @@ def config():
         config.lotw_rcvd_mark = form.lotw_rcvd_mark.data
 
         db.session.commit()
+        flash("Configuration updated", "info")
         return redirect(url_for('bp_admin.config'))
 
     return render_template('admin/config.jinja2', pcfg=pcfg, form=form)
