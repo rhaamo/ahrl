@@ -329,6 +329,8 @@ class Log(db.Model):
     credit_granted = db.Column(db.String(64), default=None)
     credit_submitted = db.Column(db.String(64), default=None)
 
+    qso_comment = db.Column(db.UnicodeText(), default=None)
+
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
     logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=False)
     pictures = db.relationship('Picture', backref='log', lazy='dynamic')
