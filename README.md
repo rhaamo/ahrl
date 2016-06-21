@@ -18,9 +18,20 @@ Another Ham Radio Log
     python3 ahrl.py db seed
     python3 ahrl.py cron update_dxcc_from_cty
     python3 ahrl.py runserver # or whatever gunicorn whatever stuff
+    Don't forget to update default Config by getting to "Your user" (top right) then "Config"
 
 # Gunicorn
     gunicorn -w 2 -b 127.0.0.1:8000 --error-logfile=errors.log --access-logfile=access.log --chdir=$PWD ahrl:app
+
+# Default config
+ - LOTW Download URL: https://p1k.arrl.org/lotwuser/lotwreport.adi
+ - LOTW Upload URL: https://p1k.arrl.org/lotwuser/upload
+ - LOTW Rcvd Mark: 'Y'
+ - LOTW Login URL: https://p1k.arrl.org/lotwuser/default
+ - eQSL Download URL: https://www.eqsl.cc/qslcard/DownloadInBox.cfm
+ - eQSL Upload URL: https://www.eqsl.cc/qslcard/ImportADIF.cfm
+ - eQSL Rcvd Mark: 'Y'
+ - Cloudlog API Key: You needs to get one (for the moment)
 
 # Crontabs and cache actions
   List of cron target availables.
