@@ -6,7 +6,7 @@ def make_db_seed(db):
     db.session.begin(subtransactions=True)
     try:
         seed_config(db)
-        seed_users(db)  # after timezones because not null relation
+        # seed_users(db)  # after timezones because not null relation
         # also seeds roles admin/user
     except:
         db.session.rollback()
@@ -35,10 +35,14 @@ def seed_users(db):
 
 def seed_config(db):
     print("++ Seeding config")
-    db.session.add(Config(lotw_download_url='https://p1k.arrl.org/lotwuser/lotwreport.adi',
+    a = Config(lotw_download_url='https://p1k.arrl.org/lotwuser/lotwreport.adi',
                           lotw_upload_url='https://p1k.arrl.org/lotwuser/upload',
                           lotw_rcvd_mark='Y',
                           lotw_login_url='https://p1k.arrl.org/lotwuser/default',
                           eqsl_download_url='http://www.eqsl.cc/qslcard/DownloadInBox.cfm',
-                          eqsl_rcvd_mark='Y'))
+                          eqsl_upload_url='http://www.eqsl.cc/qslcard/ImportADIF.cfm',
+                          eqsl_rcvd_mark='Y')
+    db.session.add(a)
     db.session.commit()
+    db.session.commit()
+    # Bug, two commit necessary

@@ -18,7 +18,8 @@ from controllers.qsos import bp_qsos
 from controllers.tools import bp_tools
 from controllers.contacts import bp_contacts
 from controllers.logbooks import bp_logbooks
-from crons import update_qsos_without_countries, update_dxcc_from_cty_xml, populate_logs_gridsquare_cache
+from crons import update_qsos_without_countries, update_dxcc_from_cty_xml, \
+    populate_logs_gridsquare_cache, cron_sync_eqsl
 
 import texttable
 from dbseed import make_db_seed
@@ -180,6 +181,12 @@ def update_dxcc_from_cty():
 def update_qsos_countries():
     """Update QSOs with empty country"""
     update_qsos_without_countries()
+
+
+@CronCommand.command
+def sync_eqsl():
+    """Push to eQSL logs with requested eQSL sync"""
+    cron_sync_eqsl()
 
 
 @CacheCommand.command

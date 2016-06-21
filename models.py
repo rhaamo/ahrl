@@ -114,8 +114,14 @@ class Config(db.Model):
     __tablename__ = "config"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), default=None, unique=True)
-    value = db.Column(db.String(255), default=None, nullable=False)
+    lotw_download_url = db.Column(db.String(255), default=None)
+    lotw_upload_url = db.Column(db.String(255), default=None)
+    lotw_rcvd_mark = db.Column(db.String(255), default=None)
+    lotw_login_url = db.Column(db.String(255), default=None)
+    eqsl_download_url = db.Column(db.String(255), default=None)
+    eqsl_upload_url = db.Column(db.String(255), default=None)
+    eqsl_rcvd_mark = db.Column(db.String(255), default=None)
+    clublog_api_key = db.Column(db.String(255), default=None)
 
 
 class ContestTemplate(db.Model):
