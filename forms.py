@@ -149,6 +149,7 @@ class BaseQsoForm(Form):
             raise ValidationError("QTH is invalid, validation failed")
 
     comment = StringField('Comment')
+    qsl_comment = StringField('QSL Comment')
     country = StringField('Country', [DataRequired()])
 
     web = StringField('URL')
@@ -283,3 +284,8 @@ class PictureForm(Form):
     name = StringField('Name', [DataRequired()])
     picture = FileField('Image', [FileRequired(), FileAllowed(pictures, 'Images only!')])
     submit = SubmitField('Add picture')
+
+
+class ConfigForm(Form):
+    name = StringField('Name', [DataRequired()])
+    value = StringField('Value', [DataRequired()])

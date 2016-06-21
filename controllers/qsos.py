@@ -197,6 +197,7 @@ def new(logbook_id, method):
         a.rst_sent = form.rst_sent.data
         a.name = form.name.data
         a.comment = form.comment.data
+        a.qsl_comment = form.qsl_comment.data
         a.sat_name = form.sat_name.data.upper()
         a.sat_mode = form.sat_mode.data.upper()
 
@@ -273,6 +274,7 @@ def edit(logbook_id, qso_id):
         a.rst_sent = form.rst_sent.data
         a.name = form.name.data
         a.comment = form.comment.data
+        a.qsl_comment = form.qsl_comment.data
         a.sat_name = form.sat_name.data.upper()
         a.sat_mode = form.sat_mode.data.upper()
 
