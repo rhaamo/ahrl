@@ -1,6 +1,6 @@
 import re
 from unidecode import unidecode
-from models import db, Apitoken, Band, Role, Logging
+from models import db, Apitoken, Band, Role, Logging, Config
 import random
 import string
 import os
@@ -151,7 +151,13 @@ def check_default_profile(f):
 
 
 def get_dxcc_from_clublog(callsign):
-    clublog_api_key = current_app.config['CLUBLOG_API_KEY']
+    config = Config.query.first()
+    if not config:
+        print("!!! Error: config not found")
+        add_log(category='CONFIG', level='ERROR', message='Config not found')
+        return
+
+    clublog_api_key = config.clublog_api_key
     clublog_uri = "https://secure.clublog.org/dxcc?call={0}&api={1}&full=1".format(callsign, clublog_api_key)
 
     try:

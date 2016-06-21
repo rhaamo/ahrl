@@ -212,6 +212,7 @@ def new(logbook_id, method):
         a.qsl_sent = form.qsl_sent.raw_data[0]
         a.qsl_sent_via = form.qsl_sent_via.raw_data[0]
         a.qsl_via = form.qsl_via.data
+        a.eqsl_qsl_sent = form.eqsl_qsl_sent.data
         a.operator = current_user.callsign
         a.owner_callsign = current_user.callsign
         a.station_callsign = current_user.callsign

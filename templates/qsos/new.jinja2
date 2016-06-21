@@ -46,6 +46,7 @@
                     <li role="presentation"><a href="#station" aria-controls="station" role="tab" data-toggle="tab">Station</a></li>
                     <li role="presentation"><a href="#satellite" aria-controls="satellite" role="tab" data-toggle="tab">Satellite</a></li>
                     <li role="presentation"><a href="#qsl" aria-controls="qsl" role="tab" data-toggle="tab">QSL</a></li>
+                    <li role="presentation"><a href="#eqsl" aria-controls="eqsl" role="tab" data-toggle="tab">eQSL</a></li>
                   </ul>
 
                   <!-- Tab panes -->
@@ -66,6 +67,11 @@
                         {{ wtf.form_field(form.qsl_sent, 'vertical') }}
                         {{ wtf.form_field(form.qsl_sent_via, 'vertical') }}
                         {{ wtf.form_field(form.qsl_via, 'vertical') }}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="eqsl">
+                        <div class="row">
+                            <div class="col-lg-6">{{ wtf.form_field(form.eqsl_qsl_sent, 'vertical') }}</div>
+                        </div>
                     </div>
                   </div>
 

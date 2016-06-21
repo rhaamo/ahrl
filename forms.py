@@ -181,6 +181,11 @@ class BaseQsoForm(Form):
                                                     ['B', 'Bureau'],
                                                     ['E', 'Electronic'],
                                                     ['M', 'Manager']])
+    eqsl_qsl_sent = SelectField('eQSL Sent', choices=[['N', 'No'],
+                                                      ['Y', 'Yes'],
+                                                      ['R', 'Requested'],
+                                                      ['Q', 'Queued'],
+                                                      ['I', 'Invalid (Ignore)']])
     qsl_via = StringField('Via')
 
     submit = SubmitField('Save')
@@ -213,12 +218,6 @@ class EditQsoForm(BaseQsoForm):
                                                           ['R', 'Requested'],
                                                           ['I', 'Invalid (Ignore)'],
                                                           ['V', 'Verified (Match)']])
-
-    eqsl_qsl_sent = SelectField('eQSL Sent', choices=[['N', 'No'],
-                                                      ['Y', 'Yes'],
-                                                      ['R', 'Requested'],
-                                                      ['Q', 'Queued'],
-                                                      ['I', 'Invalid (Ignore)']])
 
     lotw_qsl_rcvd = SelectField('LOTW QSL Received', choices=[['N', 'No'],
                                                               ['Y', 'Yes'],
