@@ -479,6 +479,7 @@ class Logging(db.Model):
     category = db.Column(db.String(255), nullable=False, default="General")
     level = db.Column(db.String(255), nullable=False, default="INFO")
     message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime(timezone=False), server_default=func.now(), onupdate=func.now())
 
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=True)
 
@@ -490,6 +491,7 @@ class UserLogging(db.Model):
     category = db.Column(db.String(255), nullable=False, default="General")
     level = db.Column(db.String(255), nullable=False, default="INFO")
     message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime(timezone=False), server_default=func.now(), onupdate=func.now())
 
     log_id = db.Column(db.Integer(), db.ForeignKey('log.id'), nullable=True)
     logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=True)
