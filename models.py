@@ -181,6 +181,7 @@ class Logbook(db.Model):
     swl = db.Column(db.Boolean, default=False)
     default = db.Column(db.Boolean, default=False)
     public = db.Column(db.Boolean, default=True)
+    eqsl_qth_nickname = db.Column(db.String(255))
 
     logs = db.relationship('Log', backref='logbook', lazy='dynamic')
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)

@@ -44,6 +44,7 @@ def edit(logbook_id):
         a.name = form.name.data
         a.callsign = form.callsign.data
         a.locator = form.locator.data
+        a.eqsl_qth_nickname = form.eqsl_qth_nickname.data
         a.public = form.public.data
         a.swl = form.swl.data
         a.user_id = current_user.id
@@ -85,6 +86,7 @@ def new():
         a.name = form.name.data
         a.callsign = form.callsign.data
         a.locator = form.locator.data
+        a.eqsl_qth_nickname = form.eqsl_qth_nickname.data
         a.public = form.public.data
         a.swl = form.swl.data
         a.user_id = current_user.id

@@ -274,6 +274,8 @@ class LogbookForm(Form):
     default = BooleanField('Do you want this logbook to be the default one ?')
     public = BooleanField('Make this logbook public ?')
 
+    eqsl_qth_nickname = StringField('eQSL QTH Nickname')
+
     submit = SubmitField('Save logbook')
 
 
