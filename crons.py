@@ -6,7 +6,7 @@ import os
 import gzip
 from flask import current_app
 import xml.etree.ElementTree as ElementTree
-from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log
+from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config
 from dateutil import parser
 
 
@@ -152,3 +152,7 @@ def parse_element(element):
         elements += 1
     db.session.commit()
     print('-- Committed {0} new elements'.format(elements))
+
+
+def cron_sync_eqsl():
+    print("--- Sending logs to eQSL when requested")
