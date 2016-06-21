@@ -6,8 +6,9 @@ import os
 import gzip
 from flask import current_app
 import xml.etree.ElementTree as ElementTree
-from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config
+from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging
 from dateutil import parser
+from libjambon import eqsl_upload_log
 
 
 def update_qsos_without_countries():
@@ -156,3 +157,36 @@ def parse_element(element):
 
 def cron_sync_eqsl():
     print("--- Sending logs to eQSL when requested")
+    logs = Log.query.filter(Log.eqsl_qsl_sent == 'R').all()
+    config = Config.query.first()
+    for log in logs:
+        status = eqsl_upload_log(log, config)
+        err = UserLogging()
+        err.user_id = log.user.id
+        err.log_id = log.id
+        err.logbook_id = log.logbook.id
+        err.category = 'EQSL'
+
+        if status['state'] == 'error':
+            err.level = 'ERROR'
+            print("!! Error uploading QSO {0} to eQSL: {1}".format(log.id, status['message']))
+        elif status['state'] == 'rejected':
+            log.eqsl_qsl_sent = 'I'
+            print("!! Rejected uploading QSO {0} to eQSL: {1}".format(log.id, status['message']))
+        else:
+            err.level = 'INFO'
+
+        err.message = status['message'] + '\r\n'
+
+        if 'msgs' in status:
+            for i in status['msgs']:
+                print("!! {0}: {1}".format(i[0], i[1]))
+                err.message += '{0}: {1}\r\n'.format(i[0], i[1])
+
+        if status['state'] == 'success':
+            log.eqsl_qsl_sent = 'Y'
+
+        print(status)
+
+        db.session.add(err)
+        db.session.commit()
