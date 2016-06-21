@@ -77,6 +77,8 @@ def eqsl_upload_log(log, config, dry_run):
         return {'state': 'error', 'message': 'log.time_on empty'}
     if not log.rst_sent:
         return {'state': 'error', 'message': 'log.rst_sent empty'}
+    if not log.logbook.eqsl_qth_nickname:
+        return {'state': 'error', 'message': 'log.logbook.eqsl_qth_nickname empty'}
     # End of checks
     # Build URL
     url = config.eqsl_upload_url
@@ -90,7 +92,10 @@ def eqsl_upload_log(log, config, dry_run):
     log_adif += adif('eqsl_pswd', log.user.eqsl_password) + ' '
     log_adif += '<EOH> '
     log_adif += adif('band', log.band.name.upper()) + ' \r\n'
-    log_adif += adif('call', 'TEST-SWL') + ' '
+    # Test
+    #log_adif += adif('call', 'TEST-SWL') + ' '
+    # Real one
+    log_adif += adif('call', log.call.upper()) + ' '
 
     # eQSL Mode standardization (http://www.eqsl.cc/qslcard/ADIFContentSpecs.cfm)
     if log.mode.mode == 'OLIVIA':
@@ -128,6 +133,7 @@ def eqsl_upload_log(log, config, dry_run):
     log_adif += adif('qso_date', log.time_on.strftime('%Y%m%d')) + ' '
     log_adif += adif('rst_sent', log.rst_sent) + ' '
     log_adif += adif('time_on', log.time_on.strftime('%H%M%S')) + ' \r\n'
+    log_adif += adif('APP_EQSL_QTH_NICKNAME', log.logbook.eqsl_qth_nickname) + ' '
     if log.qsl_comment:
         log_adif += adif('qslmsg', log.qsl_comment) + ' '
     log_adif += '<EOR>'
@@ -155,14 +161,12 @@ def eqsl_upload_log(log, config, dry_run):
 
     # Possible: 'Result', 'Warning', 'Error'
     rejected = False
-    keys = []
     results = []
     for result in body.split('\r\n'):
         if result.strip() == '' or not result.strip():
             continue  # Ignore empty lines
-        obj = re.match(r'^(.*): (.*)?', result.strip())
+        obj = re.match(r'^(\w+): (.+)', result.strip())
         results.append([obj.group(1), obj.group(2)])
-        keys.append(obj.group(1))
         if obj.group(2) == '0 out of 1 records added' or obj.group(1) == 'Error':
             rejected = True
 
