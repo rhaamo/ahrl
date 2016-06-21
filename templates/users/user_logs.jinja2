@@ -1,0 +1,37 @@
+{% extends "layout.jinja2" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <h3>{{ current_user.name }}'s logs (latest 100)</h3>
+
+        <table class="table table-condensed table-stripped">
+            <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Level</th>
+                <th>Logbook</th>
+                <th>QSO</th>
+                <th>Message</th>
+                <th>Actions</th>
+            </tr>
+            {% for log in logs %}
+                <tr>
+                <td></td>
+                <td>{{ log.category }}</td>
+                <td>{{ log.level }}</td>
+                <td>
+                    <a href="{{ url_for('bp_qsos.logbook', username=log.user.name, logbook_id=log.logbook.id) }}">{{ log.logbook.id }}</a>
+                </td>
+                <td>
+                    <a href="{{ url_for('bp_qsos.view', username=log.user.name, logbook_id=log.logbook.id, qso_id=log.log.id) }}">{{ log.log.id }}</a>
+                </td>
+                <td>{{ log.message | replace('\r\n', '<br>') }}</td>
+                <td></td>
+                </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+</div>
+{% endblock %}

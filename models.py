@@ -189,6 +189,7 @@ class Logbook(db.Model):
     eqsl_qth_nickname = db.Column(db.String(255))
 
     logs = db.relationship('Log', backref='logbook', lazy='dynamic')
+    user_loggings = db.relationship('UserLogging', backref='logbook', lazy='dynamic')
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
 
 
@@ -336,6 +337,7 @@ class Log(db.Model):
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
     logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=False)
     pictures = db.relationship('Picture', backref='log', lazy='dynamic')
+    user_loggings = db.relationship('UserLogging', backref='log', lazy='dynamic')
 
     __mapper_args__ = {"order_by": time_on.desc()}
 
