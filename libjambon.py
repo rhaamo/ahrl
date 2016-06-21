@@ -57,7 +57,7 @@ def adif(k, v):
     return u"<{0}:{1}>{2} ".format(k.upper(), len(v), v)
 
 
-def eqsl_upload_log(log, config):
+def eqsl_upload_log(log, config, dry_run):
     """ Doc: https://www.eqsl.cc/qslcard/ImportADIF.txt """
     reject = False
     # Sanity check
@@ -131,6 +131,11 @@ def eqsl_upload_log(log, config):
     if log.qsl_comment:
         log_adif += adif('qslmsg', log.qsl_comment) + ' '
     log_adif += '<EOR>'
+
+    if dry_run:
+        print("--- [DRY RUN] what would be commited for {0}:".format(log.id))
+        print(log_adif)
+        return
 
     try:
         data = urllib.parse.urlencode({'ADIFData': log_adif})

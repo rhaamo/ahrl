@@ -165,8 +165,11 @@ def parse_element(element):
     print('-- Committed {0} new elements'.format(elements))
 
 
-def cron_sync_eqsl():
-    print("--- Sending logs to eQSL when requested")
+def cron_sync_eqsl(dry_run=False):
+    if dry_run:
+        print("--- [DRY RUN] Sending logs to eQSL when requested")
+    else:
+        print("--- Sending logs to eQSL when requested")
     logs = Log.query.filter(Log.eqsl_qsl_sent == 'R').all()
     config = Config.query.first()
     if not config:
@@ -175,7 +178,9 @@ def cron_sync_eqsl():
         return
 
     for log in logs:
-        status = eqsl_upload_log(log, config)
+        status = eqsl_upload_log(log, config, dry_run)
+        if dry_run:
+            continue
         err = UserLogging()
         err.user_id = log.user.id
         err.log_id = log.id
