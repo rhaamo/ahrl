@@ -53,6 +53,9 @@ class User(db.Model, UserMixin):
     apitokens = db.relationship('Apitoken', backref='user', lazy='dynamic')
     contacts = db.relationship('Contact', backref='user', lazy='dynamic')
 
+    user_loggings = db.relationship('UserLogging', backref='user', lazy='dynamic')
+    loggings = db.relationship('Logging', backref='user', lazy='dynamic')
+
     __mapper_args__ = {"order_by": name}
 
     def join_roles(self, string):
@@ -461,6 +464,30 @@ class DxccPrefixes(db.Model):
     lat = db.Column(db.Float, default=None)
     start = db.Column(db.DateTime(timezone=False), default=None)
     end = db.Column(db.DateTime(timezone=False), default=None)
+
+
+class Logging(db.Model):
+    __tablename__ = "logging"
+
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(255), nullable=False, default="General")
+    level = db.Column(db.String(255), nullable=False, default="INFO")
+    message = db.Column(db.Text, nullable=False)
+
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=True)
+
+
+class UserLogging(db.Model):
+    __tablename__ = "user_logging"
+
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(255), nullable=False, default="General")
+    level = db.Column(db.String(255), nullable=False, default="INFO")
+    message = db.Column(db.Text, nullable=False)
+
+    log_id = db.Column(db.Integer(), db.ForeignKey('log.id'), nullable=True)
+    logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
 
 
 # Utils functions
