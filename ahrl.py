@@ -161,31 +161,36 @@ def config():
     pp(app.config)
 
 
-@manager.command
-def db_seed():
+@MigrateCommand.command
+def seed():
     """Seed database with default content"""
     make_db_seed(db)
 
-
-@manager.command
-def cron_update_qsos_countries():
-    """Update QSOs with empty country"""
-    update_qsos_without_countries()
+CacheCommand = Manager(usage='Perform cache actions')
+CronCommand = Manager(usage='Perform crons actions')
 
 
-@manager.command
-def cron_update_dxcc_from_cty_xml():
+@CronCommand.command
+def update_dxcc_from_cty():
     """Update DXCC tables from cty.xml"""
     update_dxcc_from_cty_xml()
 
 
-@manager.command
-def cache_populate_logs_gridsquare():
+@CronCommand.command
+def update_qsos_countries():
+    """Update QSOs with empty country"""
+    update_qsos_without_countries()
+
+
+@CacheCommand.command
+def populate_logs_gridsquare():
     """Update QSOs with empty gridsquare cache"""
     populate_logs_gridsquare_cache()
 
 
 manager.add_command('db', MigrateCommand)
+manager.add_command('cache', CacheCommand)
+manager.add_command('cron', CronCommand)
 
 if __name__ == '__main__':
     try:

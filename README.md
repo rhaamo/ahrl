@@ -15,18 +15,20 @@ Another Ham Radio Log
     cp config.py.sample config.py
     $EDITOR config.py
     python3 ahrl.py db upgrade
-    python3 ahrl.py db_seed
-    python3 ahrl.py cron_update_dxcc_from_cty_xml
+    python3 ahrl.py db seed
+    python3 ahrl.py cron update_dxcc_from_cty
     python3 ahrl.py runserver # or whatever gunicorn whatever stuff
 
 # Gunicorn
     gunicorn -w 2 -b 127.0.0.1:8000 --error-logfile=errors.log --access-logfile=access.log --chdir=$PWD ahrl:app
 
-# Crontabs
+# Crontabs and cache actions
   List of cron target availables.
   Makes sure to run them under the user which runs ahrl and virtualenv if you use it.
   Commands:
-  - python ahrl.py cron_update_qsos_countries  # Update all QSOs if missing a Country/DXCC entry by using ClubLog
+  - python ahrl.py cron update_qsos_countries  # Update all QSOs if missing a Country/DXCC entry by using ClubLog
+  - python ahrl.py cron  # List all available crons
+  - python ahrl.py cache  # Same for cache actions
 
 # Licensing
  - MIT License
