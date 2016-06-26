@@ -175,7 +175,7 @@ def get_dxcc_from_clublog(callsign):
 def get_dxcc_from_clublog_or_database(callsign):
     response = {}
     dxcc_database = None
-    dxcc_clublog = False # get_dxcc_from_clublog(callsign)
+    dxcc_clublog = get_dxcc_from_clublog(callsign)
 
     if not dxcc_clublog:
         # Trying fallback from database
