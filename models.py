@@ -503,11 +503,11 @@ def ham_country_grid_coords(call):
     if 'sqlite' in db.engine.driver:
         q = DxccPrefixes.query.filter(
             DxccPrefixes.call == func.substr(call, 1, func.LENGTH(DxccPrefixes.call))
-        ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
+        ).order_by(func.length(DxccPrefixes.call).asc()).limit(1)
     else:
         q = DxccPrefixes.query.filter(
             DxccPrefixes.call == func.substring(call, 1, func.LENGTH(DxccPrefixes.call))
-        ).order_by(func.length(DxccPrefixes.call).desc()).limit(1)
+        ).order_by(func.length(DxccPrefixes.call).asc()).limit(1)
     if q.count() <= 0:
         return None
     else:
