@@ -28,6 +28,14 @@ class ModelForm(BaseModelForm):
 class ExtendedRegisterForm(RegisterForm):
     name = StringField('Name', [DataRequired()])
 
+    def validate_name(form, field):
+        if len(field.data) <= 0:
+            raise ValidationError("Username required")
+
+        u = User.query.filter(User.name == field.data).first()
+        if u:
+            raise ValidationError("Username already taken")
+
 
 class UserProfileForm(ModelForm):
     class Meta:
