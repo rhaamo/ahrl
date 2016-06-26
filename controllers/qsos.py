@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, Response, json, flash, current_app
 from flask_security import login_required, current_user
 from flask_uploads import UploadSet, IMAGES
-from models import db, User, Log, Band, Mode, Logbook, Picture
+from models import db, User, Log, Band, Mode, Logbook, Picture, DxccPrefixes
 from models import ham_country_grid_coords, cutename
 from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm
 import pytz
@@ -403,16 +403,42 @@ def lib_geo_bearing():
 @login_required
 def lib_clublog_dxcc():
     callsign = request.args.get('callsign')
-
     if not callsign:
         raise InvalidUsage('Missing callsign', status_code=400)
+    response = {}
 
-    dxcc = get_dxcc_from_clublog(callsign)
-    if not dxcc:
+    # Returns: CQZ, Continent, DXCC, Lat, Lon, Name, PermKomi (unused at all)
+    dxcc_clublog = get_dxcc_from_clublog(callsign)
+
+    if not dxcc_clublog:
+        # Trying fallback from database
+        dxcc_database = None
+        q = DxccPrefixes.query.filter(
+            DxccPrefixes.call == func.substring(callsign, 1, func.LENGTH(DxccPrefixes.call))
+        ).order_by(func.length(DxccPrefixes.call).asc()).limit(1).first()
+        if q:
+            dxcc_database = {
+                'CQZ': q.cqz,
+                'Continent': q.cont,
+                'DXCC': q.adif,
+                'Lat': q.lat,
+                'Lon': q.long,
+                'Name': q.entity,
+                'PermKomi': False
+            }
+
+    if not dxcc_clublog and not dxcc_database:
+        # We have nothing at all :(
         raise InvalidUsage('Error while getting infos from clublog', status_code=500)
 
-    response = {'status': 'ok'}
-    response.update(dxcc)
+    if dxcc_clublog or dxcc_database:
+        response['status'] = 'ok'
+        if dxcc_clublog:
+            response.update(dxcc_clublog)
+            response['source'] = 'clublog'
+        else:
+            response.update(dxcc_database)
+            response['source'] = 'database'
 
     return Response(json.dumps(response), mimetype='application/json')
 
