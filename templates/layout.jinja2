@@ -130,6 +130,9 @@
                         </ul>
                     </li>
                 {% else %}
+                    {% if security.registerable %}
+                        <li class="{% if request.endpoint.startswith('security.register') %}active{% endif %}"><a href="{{ url_for_security('register') }}">Register</a></li>
+                    {% endif %}
                     <li class="{% if request.endpoint.startswith('security.login') %}active{% endif %}"><a href="{{ url_for_security('login') }}">Login</a></li>
                 {% endif %}
             {% endif %}
