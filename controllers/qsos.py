@@ -7,7 +7,7 @@ from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm
 import pytz
 import datetime
 from libjambon import band_to_frequency, geo_bearing_star
-from utils import InvalidUsage, dt_utc_to_user_tz, check_default_profile, get_dxcc_from_clublog
+from utils import InvalidUsage, dt_utc_to_user_tz, check_default_profile, get_dxcc_from_clublog_or_database
 from geohelper import distance, bearing
 from libqth import is_valid_qth, qth_to_coords
 from calendar import monthrange
@@ -405,40 +405,14 @@ def lib_clublog_dxcc():
     callsign = request.args.get('callsign')
     if not callsign:
         raise InvalidUsage('Missing callsign', status_code=400)
-    response = {}
 
-    # Returns: CQZ, Continent, DXCC, Lat, Lon, Name, PermKomi (unused at all)
-    dxcc_clublog = get_dxcc_from_clublog(callsign)
-
-    if not dxcc_clublog:
-        # Trying fallback from database
-        dxcc_database = None
-        q = DxccPrefixes.query.filter(
-            DxccPrefixes.call == func.substring(callsign, 1, func.LENGTH(DxccPrefixes.call))
-        ).order_by(func.length(DxccPrefixes.call).asc()).limit(1).first()
-        if q:
-            dxcc_database = {
-                'CQZ': q.cqz,
-                'Continent': q.cont,
-                'DXCC': q.adif,
-                'Lat': q.lat,
-                'Lon': q.long,
-                'Name': q.entity,
-                'PermKomi': False
-            }
-
-    if not dxcc_clublog and not dxcc_database:
+    dxcc = get_dxcc_from_clublog_or_database(callsign)
+    if not dxcc:
         # We have nothing at all :(
-        raise InvalidUsage('Error while getting infos from clublog', status_code=500)
+        raise InvalidUsage('Error while getting infos from clublog or database', status_code=500)
 
-    if dxcc_clublog or dxcc_database:
-        response['status'] = 'ok'
-        if dxcc_clublog:
-            response.update(dxcc_clublog)
-            response['source'] = 'clublog'
-        else:
-            response.update(dxcc_database)
-            response['source'] = 'database'
+    response = {'status': 'ok'}
+    response.update(dxcc)
 
     return Response(json.dumps(response), mimetype='application/json')
 

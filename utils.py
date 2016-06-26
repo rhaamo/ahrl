@@ -1,6 +1,6 @@
 import re
 from unidecode import unidecode
-from models import db, Apitoken, Band, Role, Logging, Config
+from models import db, Apitoken, Band, Role, Logging, Config, DxccPrefixes
 import random
 import string
 import os
@@ -10,6 +10,7 @@ from flask import flash, current_app, json
 from markupsafe import Markup
 from functools import wraps
 import requests
+from sqlalchemy.sql import func
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
@@ -169,6 +170,43 @@ def get_dxcc_from_clublog(callsign):
         raise InvalidUsage('Error getting DXCC from ClubLog', status_code=r.status_code)
 
     return json.loads(r.content)
+
+
+def get_dxcc_from_clublog_or_database(callsign):
+    response = {}
+    dxcc_database = None
+    dxcc_clublog = False # get_dxcc_from_clublog(callsign)
+
+    if not dxcc_clublog:
+        # Trying fallback from database
+        q = DxccPrefixes.query.filter(
+            DxccPrefixes.call == func.substring(callsign, 1, func.LENGTH(DxccPrefixes.call))
+        ).order_by(func.length(DxccPrefixes.call).asc()).limit(1).first()
+        if q:
+            dxcc_database = {
+                'CQZ': int(q.cqz),
+                'Continent': q.cont,
+                'DXCC': q.adif,
+                'Lat': q.lat,
+                'Lon': q.long,
+                'Name': q.entity,
+                'PermKomi': False
+            }
+
+    if not dxcc_clublog and not dxcc_database:
+        # We have nothing at all :(
+        raise InvalidUsage('Error while getting infos from clublog', status_code=500)
+
+    if dxcc_clublog or dxcc_database:
+        response['status'] = 'ok'
+        if dxcc_clublog:
+            response.update(dxcc_clublog)
+            response['source'] = 'clublog'
+        else:
+            response.update(dxcc_database)
+            response['source'] = 'database'
+
+    return response
 
 
 def is_admin():

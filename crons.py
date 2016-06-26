@@ -1,5 +1,5 @@
 from __future__ import print_function
-from utils import get_dxcc_from_clublog, add_log
+from utils import get_dxcc_from_clublog_or_database, add_log
 import urllib.request
 import shutil
 import os
@@ -17,7 +17,7 @@ def update_qsos_without_countries():
     for log in logs:
         if not log.call:
             continue
-        dxcc = get_dxcc_from_clublog(log.call)
+        dxcc = get_dxcc_from_clublog_or_database(log.call)
         log.dxcc = dxcc['DXCC']
         log.cqz = dxcc['CQZ']
         log.country = dxcc['Name']
