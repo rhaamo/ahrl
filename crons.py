@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ElementTree
 from dateutil import parser
 from flask import current_app
 
-from libjambon import eqsl_upload_log
+from libjambon import eqsl_upload_log, get_dxcc_from_clublog_or_database
 from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging
 from utils import get_dxcc_from_clublog_or_database, add_log
 

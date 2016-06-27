@@ -13,10 +13,10 @@ from sqlalchemy.orm import Bundle
 from sqlalchemy.sql.expression import case
 
 from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm
-from libjambon import band_to_frequency, geo_bearing_star
+from libjambon import band_to_frequency, geo_bearing_star, get_dxcc_from_clublog_or_database
 from models import db, User, Log, Band, Mode, Logbook, Picture
 from models import ham_country_grid_coords, cutename
-from utils import InvalidUsage, dt_utc_to_user_tz, check_default_profile, get_dxcc_from_clublog_or_database
+from utils import InvalidUsage, dt_utc_to_user_tz, check_default_profile
 
 bp_qsos = Blueprint('bp_qsos', __name__)
 

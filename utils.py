@@ -5,34 +5,14 @@ import string
 from functools import wraps
 
 import pytz
-import requests
-from flask import flash, json
+from flask import flash
 from flask_security import current_user
 from markupsafe import Markup
-from sqlalchemy.sql import func
 from unidecode import unidecode
 
-from models import db, Apitoken, Band, Role, Logging, Config, DxccPrefixes
+from models import db, Apitoken, Band, Role, Logging
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
-
-# To be managed a-part: band, klass (class), freq, freq_rx, mode, time_on, qso_date, comment
-ADIF_FIELDS = ['address', 'age', 'a_index', 'ant_az', 'ant_el', 'ant_path', 'arrl_sect', 'biography',
-               'band_rx', 'call', 'check', 'cnty', 'cont', 'contacted_op', 'contest_id',
-               'country', 'cqz', 'distance', 'dxcc', 'email', 'eq_call', 'eqsl_qslrdate',
-               'eqsl_qslsdate', 'eqsl_qsl_rcvd', 'eqsl_qsl_sent', 'eqsl_status', 'force_init',
-               'gridsquare', 'heading', 'iota', 'ituz', 'k_index', 'lat', 'lon',
-               'lotw_qslrdate', 'lotw_qslsdate', 'lotw_qsl_rcvd', 'lotw_qsl_sent', 'lotw_status',
-               'max_bursts', 'ms_shower', 'my_city', 'my_cnty', 'my_country', 'my_cq_zone',
-               'my_gridsquare', 'my_iota', 'my_itu_zone', 'my_lat', 'my_lon', 'my_name',
-               'my_postal_code', 'my_rig', 'my_sig', 'my_sig_info', 'my_state', 'my_street',
-               'name', 'notes', 'nr_bursts', 'nr_pings', 'operator', 'owner_callsign', 'pfx',
-               'precedence', 'prop_mode', 'public_key', 'qslmsg', 'qslrdate', 'qslsdate',
-               'qsl_rcvd', 'qsl_rcvd_via', 'qsl_sent', 'qsl_sent_via', 'qsl_via', 'qso_complete',
-               'qso_random', 'qth', 'rig', 'rst_rcvd', 'rst_sent', 'rx_pwr', 'sat_mode', 'sat_name',
-               'sfi', 'sig', 'sig_info', 'srx', 'srx_string', 'state', 'station_callsign', 'stx',
-               'stx_info', 'swl', 'ten_ten', 'tx_pwr', 'web', 'credit_granted',
-               'credit_submitted']
 
 
 def slugify(text, delim=u'_'):
@@ -151,64 +131,6 @@ def check_default_profile(f):
             flash(Markup("Errors:<br />{0}".format("<br />".join(errs))), 'error')
         return f(*args, **kwargs)
     return wrap
-
-
-def get_dxcc_from_clublog(callsign):
-    config = Config.query.first()
-    if not config:
-        print("!!! Error: config not found")
-        add_log(category='CONFIG', level='ERROR', message='Config not found')
-        return
-
-    clublog_api_key = config.clublog_api_key
-    clublog_uri = "https://secure.clublog.org/dxcc?call={0}&api={1}&full=1".format(callsign, clublog_api_key)
-
-    try:
-        r = requests.get(clublog_uri)
-    except:
-        raise InvalidUsage('Error getting DXCC from ClubLog', status_code=500)
-
-    if r.status_code != 200:
-        raise InvalidUsage('Error getting DXCC from ClubLog', status_code=r.status_code)
-
-    return json.loads(r.content)
-
-
-def get_dxcc_from_clublog_or_database(callsign):
-    response = {}
-    dxcc_database = None
-    dxcc_clublog = get_dxcc_from_clublog(callsign)
-
-    if not dxcc_clublog:
-        # Trying fallback from database
-        q = DxccPrefixes.query.filter(
-            DxccPrefixes.call == func.substring(callsign, 1, func.LENGTH(DxccPrefixes.call))
-        ).order_by(func.length(DxccPrefixes.call).asc()).limit(1).first()
-        if q:
-            dxcc_database = {
-                'CQZ': int(q.cqz),
-                'Continent': q.cont,
-                'DXCC': q.adif,
-                'Lat': q.lat,
-                'Lon': q.long,
-                'Name': q.entity,
-                'PermKomi': False
-            }
-
-    if not dxcc_clublog and not dxcc_database:
-        # We have nothing at all :(
-        raise InvalidUsage('Error while getting infos from clublog', status_code=500)
-
-    if dxcc_clublog or dxcc_database:
-        response['status'] = 'ok'
-        if dxcc_clublog:
-            response.update(dxcc_clublog)
-            response['source'] = 'clublog'
-        else:
-            response.update(dxcc_database)
-            response['source'] = 'database'
-
-    return response
 
 
 def is_admin():

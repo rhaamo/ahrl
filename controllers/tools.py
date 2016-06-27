@@ -9,7 +9,8 @@ from werkzeug.utils import secure_filename
 from adif import parse as adif_parser
 from forms import AdifParse
 from models import db, Log, Mode, User, Logbook, Band
-from utils import check_default_profile, ADIF_FIELDS, InvalidUsage
+from utils import check_default_profile, InvalidUsage
+from libjambon import ADIF_FIELDS
 
 bp_tools = Blueprint('bp_tools', __name__)
 
