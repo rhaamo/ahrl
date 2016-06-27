@@ -851,4 +851,4 @@ def last_16_qsos(logbook_id):
                                Log.logbook_id == _logbook.id,
                                Log.call.contains(call)).order_by(Log.time_on.desc()).limit(16).all()
 
-    return render_template('qsos/_logbook_table.jinja2', qsos=qsos)
+    return render_template('qsos/_logbook_table.jinja2', qsos=qsos, call=call)
