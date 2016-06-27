@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
-from models import db, Note, Logbook, Log
-from forms import NoteForm
-from utils import check_default_profile
 from sqlalchemy import func
+
+from forms import NoteForm
+from models import db, Note, Logbook, Log
+from utils import check_default_profile
 
 bp_notes = Blueprint('bp_notes', __name__)
 

@@ -2,7 +2,7 @@ Another Ham Radio Log
 =====================
 
 # Versions requirement
- - Python 3
+ - Python >= 3.3 (3.0, 3.1, 3.2 not supported)
 
 # Installation
     Install a BDD (sqlite, mysql, postgresql)

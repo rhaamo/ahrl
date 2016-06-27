@@ -1,11 +1,11 @@
+import pytz
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
-from models import db, User, Logbook, Log, UserLogging
-from forms import UserProfileForm
-from utils import check_default_profile
-import pytz
 from sqlalchemy import func
 
+from forms import UserProfileForm
+from models import db, User, Logbook, Log, UserLogging
+from utils import check_default_profile
 
 bp_users = Blueprint('bp_users', __name__)
 
@@ -15,8 +15,8 @@ bp_users = Blueprint('bp_users', __name__)
 @check_default_profile
 def logs():
     pcfg = {"title": "User Logs"}
-    logs = UserLogging.query.order_by(UserLogging.timestamp).limit(100).all()
-    return render_template('users/user_logs.jinja2', pcfg=pcfg, logs=logs)
+    _logs = UserLogging.query.order_by(UserLogging.timestamp).limit(100).all()
+    return render_template('users/user_logs.jinja2', pcfg=pcfg, logs=_logs)
 
 
 @bp_users.route('/user', methods=['GET'])

@@ -1,13 +1,11 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
+import datetime
+from libqth import is_valid_qth, qth_to_coords, coords_to_qth
 
+from flask_security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
+from flask_sqlalchemy import SQLAlchemy
+from geohelper import distance
 from sqlalchemy.sql import func
 from sqlalchemy_searchable import make_searchable
-
-from libqth import is_valid_qth, qth_to_coords, coords_to_qth
-from geohelper import distance
-
-import datetime
 
 db = SQLAlchemy()
 make_searchable()

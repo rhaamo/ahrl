@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, url_for, abort, flash
 from flask_security import login_required, current_user
+
 from models import db, Apitoken
 from utils import generate_uniques_apitoken
 

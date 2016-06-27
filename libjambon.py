@@ -1,9 +1,13 @@
 import math
-from models import Band, Mode
-from sqlalchemy import or_
-import urllib.request
-import bs4 as BeautifulSoup
 import re
+import urllib.request
+import urllib.parse
+import urllib.error
+
+import bs4 as beautiful_soup
+from sqlalchemy import or_
+
+from models import Band, Mode
 
 
 def band_to_frequency(band, mode):
@@ -85,19 +89,20 @@ def eqsl_upload_log(log, config, dry_run):
     log_adif = "AHRL Upload"
     log_adif += adif('adif_ver', '1.00') + ' \r\n'
     # Test
-    #log_adif += adif('eqsl_user', 'TEST-SWL') + ' '
-    #log_adif += adif('eqsl_pswd', 'Testpswd') + ' '
+    # log_adif += adif('eqsl_user', 'TEST-SWL') + ' '
+    # log_adif += adif('eqsl_pswd', 'Testpswd') + ' '
     # Real ones
     log_adif += adif('eqsl_user', log.user.eqsl_name) + ' '
     log_adif += adif('eqsl_pswd', log.user.eqsl_password) + ' '
     log_adif += '<EOH> '
     log_adif += adif('band', log.band.name.upper()) + ' \r\n'
     # Test
-    #log_adif += adif('call', 'TEST-SWL') + ' '
+    # log_adif += adif('call', 'TEST-SWL') + ' '
     # Real one
     log_adif += adif('call', log.call.upper()) + ' '
 
     # eQSL Mode standardization (http://www.eqsl.cc/qslcard/ADIFContentSpecs.cfm)
+    mode = log.mode.submode
     if log.mode.mode == 'OLIVIA':
         mode = 'OLIVIA'
     elif log.mode.submode == 'PAC4':
@@ -120,13 +125,11 @@ def eqsl_upload_log(log, config, dry_run):
         mode = 'OPERA'
     elif log.mode.submode in ['MFSK4', 'MFSK11', 'MFSK22', 'MFSK31', 'MFSK32', 'MFSK64', 'MFSK128']:
         reject = True
-    else:
-        mode = log.mode.submode
 
     if reject:
         # Theses are modes not managed by eQSL, sorry
         return {'state': 'rejected',
-                'message':'rejected because mode {0} not managed by eQSL'.format(log.mode.submode)}
+                'message': 'rejected because mode {0} not managed by eQSL'.format(log.mode.submode)}
 
     log_adif += adif('mode', mode.upper()) + ' '
 
@@ -153,7 +156,7 @@ def eqsl_upload_log(log, config, dry_run):
     except urllib.error.URLError as e:
         return {'state': 'error', 'message': str(e)}
 
-    soup = BeautifulSoup.BeautifulSoup(resp.read(), 'html.parser')
+    soup = beautiful_soup.BeautifulSoup(resp.read(), 'html.parser')
 
     body = soup.body.get_text().strip()
 

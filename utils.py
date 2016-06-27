@@ -1,16 +1,18 @@
-import re
-from unidecode import unidecode
-from models import db, Apitoken, Band, Role, Logging, Config, DxccPrefixes
-import random
-import string
 import os
-from flask_security import current_user
-import pytz
-from flask import flash, current_app, json
-from markupsafe import Markup
+import random
+import re
+import string
 from functools import wraps
+
+import pytz
 import requests
+from flask import flash, json
+from flask_security import current_user
+from markupsafe import Markup
 from sqlalchemy.sql import func
+from unidecode import unidecode
+
+from models import db, Apitoken, Band, Role, Logging, Config, DxccPrefixes
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 

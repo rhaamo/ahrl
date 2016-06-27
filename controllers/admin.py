@@ -1,11 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_security import login_required, current_user
-from models import db, User, Logbook, Log, Logging, Config
-from forms import ConfigForm
-from utils import check_default_profile, is_admin
-import pytz
-from sqlalchemy import func
+from flask_security import login_required
 
+from forms import ConfigForm
+from models import db, Logging, Config
+from utils import check_default_profile, is_admin
 
 bp_admin = Blueprint('bp_admin', __name__)
 
@@ -17,8 +15,8 @@ def logs():
     if not is_admin():
         return redirect(url_for('bp_home.home'))
     pcfg = {"title": "Application Logs"}
-    logs = Logging.query.order_by(Logging.timestamp).limit(100).all()
-    return render_template('users/user_logs.jinja2', pcfg=pcfg, logs=logs)
+    _logs = Logging.query.order_by(Logging.timestamp).limit(100).all()
+    return render_template('users/user_logs.jinja2', pcfg=pcfg, logs=_logs)
 
 
 @bp_admin.route('/admin/config', methods=['GET', 'POST'])
@@ -30,22 +28,22 @@ def config():
 
     pcfg = {"title": "Application Config"}
 
-    config = Config.query.one()
-    if not config:
+    _config = Config.query.one()
+    if not _config:
         flash("Config not found", 'error')
         return redirect(url_for("bp_main.home"))
 
-    form = ConfigForm(request.form, config)
+    form = ConfigForm(request.form, _config)
 
     if form.validate_on_submit():
-        config.clublog_api_key = form.clublog_api_key.data
-        config.eqsl_download_url = form.eqsl_download_url.data
-        config.eqsl_rcvd_mark = form.eqsl_rcvd_mark.data
-        config.eqsl_upload_url = form.eqsl_upload_url.data
-        config.lotw_download_url = form.lotw_download_url.data
-        config.lotw_upload_url = form.lotw_upload_url.data
-        config.lotw_login_url = form.lotw_login_url.data
-        config.lotw_rcvd_mark = form.lotw_rcvd_mark.data
+        _config.clublog_api_key = form.clublog_api_key.data
+        _config.eqsl_download_url = form.eqsl_download_url.data
+        _config.eqsl_rcvd_mark = form.eqsl_rcvd_mark.data
+        _config.eqsl_upload_url = form.eqsl_upload_url.data
+        _config.lotw_download_url = form.lotw_download_url.data
+        _config.lotw_upload_url = form.lotw_upload_url.data
+        _config.lotw_login_url = form.lotw_login_url.data
+        _config.lotw_rcvd_mark = form.lotw_rcvd_mark.data
 
         db.session.commit()
         flash("Configuration updated", "info")

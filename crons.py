@@ -1,14 +1,18 @@
 from __future__ import print_function
-from utils import get_dxcc_from_clublog_or_database, add_log
-import urllib.request
-import shutil
-import os
+
 import gzip
-from flask import current_app
+import os
+import shutil
+import urllib.error
+import urllib.request
 import xml.etree.ElementTree as ElementTree
-from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging, Logging
+
 from dateutil import parser
+from flask import current_app
+
 from libjambon import eqsl_upload_log
+from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging
+from utils import get_dxcc_from_clublog_or_database, add_log
 
 
 def update_qsos_without_countries():

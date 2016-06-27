@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
-from models import db, Logbook, User, Log
-from forms import LogbookForm
-from utils import check_default_profile
 from sqlalchemy import func
+
+from forms import LogbookForm
+from models import db, Logbook, User, Log
+from utils import check_default_profile
 
 bp_logbooks = Blueprint('bp_logbooks', __name__)
 

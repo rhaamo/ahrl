@@ -1,38 +1,34 @@
 # encoding: utf-8
+import logging
+import os
+import subprocess
+from logging.handlers import RotatingFileHandler
 from pprint import pprint as pp
 
+import texttable
 from flask import Flask, render_template, g, send_from_directory, jsonify
-from flask_security import Security, current_user
-from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand
-from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_mail import Mail
+from flask_migrate import Migrate, MigrateCommand
+from flask_script import Manager
+from flask_security import Security
 from flask_uploads import configure_uploads, UploadSet, IMAGES
-from models import db, user_datastore
 
+from controllers.admin import bp_admin
+from controllers.contacts import bp_contacts
+from controllers.logbooks import bp_logbooks
 from controllers.main import bp_main
-from controllers.users import bp_users
 from controllers.notes import bp_notes
 from controllers.qsos import bp_qsos
 from controllers.tools import bp_tools
-from controllers.contacts import bp_contacts
-from controllers.logbooks import bp_logbooks
-from controllers.admin import bp_admin
+from controllers.users import bp_users
 from crons import update_qsos_without_countries, update_dxcc_from_cty_xml, \
     populate_logs_gridsquare_cache, cron_sync_eqsl
-
-import texttable
 from dbseed import make_db_seed
 from forms import ExtendedRegisterForm
-
-import os
-import subprocess
-
+from models import db, user_datastore
 from utils import dt_utc_to_user_tz, InvalidUsage, show_date_no_offset, is_admin
-
-import logging
-from logging.handlers import RotatingFileHandler
 
 __VERSION__ = "0.0.1"
 
@@ -187,7 +183,8 @@ def update_qsos_countries():
 
 
 @CronCommand.command
-@CronCommand.option('--dryrun', dest='dry_run', action='store_true', default=False, help="Dry run, doesn't commit anything")
+@CronCommand.option('--dryrun', dest='dry_run', action='store_true', default=False,
+                    help="Dry run, doesn't commit anything")
 def sync_eqsl(dry_run=False):
     """Push to eQSL logs with requested eQSL sync"""
     cron_sync_eqsl(dry_run)

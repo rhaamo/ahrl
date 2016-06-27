@@ -1,13 +1,15 @@
 # coding: utf8
+import datetime
+
+import pytz
 from flask import Blueprint, render_template, redirect, url_for, stream_with_context, Response, flash, g
 from flask_security import login_required, current_user
-from models import db, Log, Mode, User, Logbook, Band
-from utils import check_default_profile, ADIF_FIELDS, InvalidUsage
+from werkzeug.utils import secure_filename
+
 from adif import parse as adif_parser
 from forms import AdifParse
-from werkzeug.utils import secure_filename
-import datetime
-import pytz
+from models import db, Log, Mode, User, Logbook, Band
+from utils import check_default_profile, ADIF_FIELDS, InvalidUsage
 
 bp_tools = Blueprint('bp_tools', __name__)
 

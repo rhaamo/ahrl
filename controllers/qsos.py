@@ -1,20 +1,22 @@
+import datetime
+import os
+from calendar import monthrange
+from libqth import is_valid_qth, qth_to_coords
+
+import pytz
 from flask import Blueprint, render_template, request, redirect, url_for, Response, json, flash, current_app
 from flask_security import login_required, current_user
 from flask_uploads import UploadSet, IMAGES
-from models import db, User, Log, Band, Mode, Logbook, Picture, DxccPrefixes
-from models import ham_country_grid_coords, cutename
-from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm
-import pytz
-import datetime
-from libjambon import band_to_frequency, geo_bearing_star
-from utils import InvalidUsage, dt_utc_to_user_tz, check_default_profile, get_dxcc_from_clublog_or_database
 from geohelper import distance, bearing
-from libqth import is_valid_qth, qth_to_coords
-from calendar import monthrange
-import os
-from sqlalchemy.orm import Bundle
 from sqlalchemy import func
+from sqlalchemy.orm import Bundle
 from sqlalchemy.sql.expression import case
+
+from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm
+from libjambon import band_to_frequency, geo_bearing_star
+from models import db, User, Log, Band, Mode, Logbook, Picture
+from models import ham_country_grid_coords, cutename
+from utils import InvalidUsage, dt_utc_to_user_tz, check_default_profile, get_dxcc_from_clublog_or_database
 
 bp_qsos = Blueprint('bp_qsos', __name__)
 

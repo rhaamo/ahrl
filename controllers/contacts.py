@@ -1,12 +1,14 @@
+from libqth import is_valid_qth, qth_to_coords
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash, Response, json
 from flask_security import login_required, current_user
-from models import db, Contact, User, Logbook, Log
-from forms import ContactsForm
-from utils import check_default_profile, InvalidUsage
-from libqth import is_valid_qth, qth_to_coords
 from geohelper import distance, bearing
-from libjambon import geo_bearing_star
 from sqlalchemy import func
+
+from forms import ContactsForm
+from libjambon import geo_bearing_star
+from models import db, Contact, User, Logbook, Log
+from utils import check_default_profile, InvalidUsage
 
 bp_contacts = Blueprint('bp_contacts', __name__)
 

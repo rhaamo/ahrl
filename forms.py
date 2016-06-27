@@ -1,18 +1,20 @@
+import datetime
+from libqth import is_valid_qth
+
+from flask_security import RegisterForm, current_user
+from flask_uploads import UploadSet, IMAGES
 from flask_wtf import Form
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, \
     HiddenField, BooleanField
-from wtforms_components.fields import SelectField as WTFComponentsSelectField
-from flask_wtf.file import FileField, FileAllowed, FileRequired
-from flask_uploads import UploadSet, IMAGES
-from wtforms.validators import DataRequired, ValidationError
-from flask_security import RegisterForm, current_user
-from models import db, User, Note, Cat, Mode, Band, Logbook
-from wtforms_alchemy import model_form_factory
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.ext.dateutil.fields import DateTimeField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.validators import DataRequired, ValidationError
+from wtforms_alchemy import model_form_factory
+from wtforms_components.fields import SelectField as WTFComponentsSelectField
+
+from models import db, User, Note, Cat, Mode, Band, Logbook
 from utils import dt_utc_to_user_tz
-from libqth import is_valid_qth
-import datetime
 
 BaseModelForm = model_form_factory(Form)
 
