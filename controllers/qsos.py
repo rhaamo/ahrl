@@ -215,9 +215,9 @@ def new(logbook_id, method):
         a.qsl_sent_via = form.qsl_sent_via.raw_data[0]
         a.qsl_via = form.qsl_via.data
         a.eqsl_qsl_sent = form.eqsl_qsl_sent.data
-        a.operator = current_user.callsign
-        a.owner_callsign = current_user.callsign
-        a.station_callsign = current_user.callsign
+        a.operator = current_user.callsign.upper()
+        a.owner_callsign = current_user.callsign.upper()
+        a.station_callsign = current_user.callsign.upper()
         a.qth = form.qth.data
         a.prop_mode = form.prop_mode.raw_data[0]
         a.iota = form.iota.data.upper()
@@ -405,7 +405,7 @@ def lib_clublog_dxcc():
     if not callsign:
         raise InvalidUsage('Missing callsign', status_code=400)
 
-    dxcc = get_dxcc_from_clublog_or_database(callsign)
+    dxcc = get_dxcc_from_clublog_or_database(callsign.upper())
     if not dxcc:
         # We have nothing at all :(
         raise InvalidUsage('Error while getting infos from clublog or database', status_code=500)
