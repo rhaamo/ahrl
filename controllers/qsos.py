@@ -244,11 +244,7 @@ def new(logbook_id, method):
         ), 'success')
         return redirect(url_for('bp_qsos.new', method=method, logbook_id=_logbook.id))
 
-    qsos = db.session.query(Log.time_on, Log.call, Mode.submode, Log.rst_sent, Log.rst_rcvd, Band.name).join(
-        Mode, Band).filter(Log.user_id == current_user.id,
-                           Log.logbook_id == _logbook.id).order_by(Log.time_on.desc()).limit(16).all()
-
-    return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, qsos=qsos, method=method, logbook=_logbook,
+    return render_template('qsos/new.jinja2', pcfg=pcfg, form=form, method=method, logbook=_logbook,
                            logbooks=logbooks)
 
 
@@ -831,3 +827,28 @@ def logbook_stats(username, logbook_id):
 
     return render_template('qsos/stats.jinja2', pcfg=pcfg, stats_json=json.dumps(stats), stats=stats, user=user,
                            logbooks=logbooks, logbook=_logbook)
+
+
+@bp_qsos.route('/logbook/<int:logbook_id>/qsos/last16', methods=['GET'])
+@login_required
+def last_16_qsos(logbook_id):
+    call = request.args.get('callsign', None)
+
+    _logbook = Logbook.query.filter(Logbook.id == logbook_id,
+                                    Logbook.user_id == current_user.id).first()
+
+    if not _logbook or _logbook.user_id != current_user.id:
+        return None
+
+    if not call:
+        qsos = db.session.query(Log.time_on, Log.call, Mode.submode, Log.rst_sent, Log.rst_rcvd, Band.name).join(
+            Mode, Band).filter(Log.user_id == current_user.id,
+                               Log.logbook_id == _logbook.id).order_by(Log.time_on.desc()).limit(16).all()
+    else:
+        call = call.upper()
+        qsos = db.session.query(Log.time_on, Log.call, Mode.submode, Log.rst_sent, Log.rst_rcvd, Band.name).join(
+            Mode, Band).filter(Log.user_id == current_user.id,
+                               Log.logbook_id == _logbook.id,
+                               Log.call.contains(call)).order_by(Log.time_on.desc()).limit(16).all()
+
+    return render_template('qsos/_logbook_table.jinja2', qsos=qsos)

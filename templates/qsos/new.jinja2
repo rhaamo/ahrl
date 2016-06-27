@@ -83,9 +83,8 @@
         </div>
         <div class="col-lg-6 col-lg-offset-1">
             <h3>Last 16 QSO</h3>
-            {% with qsos=qsos %}
-                {% include 'qsos/_logbook_table.jinja2' %}
-            {% endwith %}
+            <div class="new_qso_logs_table">
+            </div>
         </div>
     </div>
 </div>
@@ -148,7 +147,6 @@
         });
 
         $('#call').focusout(function() {
-           // TODO matching logs on right
             var callsign = $('input#call').val();
             if (callsign) {
                 $.ajax({
@@ -164,14 +162,32 @@
                 });
             }
         });
+        $('input#call').keyup(function() {
+            var callsign = $('input#call').val();
+            if (callsign) {
+                $.ajax({
+                    url: "/logbook/{{ logbook.id }}/qsos/last16",
+                    data: 'callsign=' + callsign,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('div.new_qso_logs_table').html(result);
+                        return true;
+                    }
+                });
+            }
+        })
+
 
         $('input#freq').keyup(function() {
             var freq = $('input#freq').val();
             $('small.freq_mhz').html("(" + freq / 1000000.0 + "MHz) ");
         });
 
-
         // in last, call functions to be updated on load
         reload_frequency(); // first call on page load
+
+        // Load right page table
+        var last16_url = "/logbook/{{ logbook.id }}/qsos/last16";
+        $('div.new_qso_logs_table').load(last16_url);
     </script>
 {% endblock %}
