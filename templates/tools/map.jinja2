@@ -3,7 +3,7 @@
 {% block content %}
     <div class="row">
         <div class="col-lg-12">
-            <h3>Realtime Day/Night map</h3>
+            <h3>Realtime Day/Night map <small class="pull-right" id="curDate"></small></h3>
         </div>
     </div>
 
@@ -65,12 +65,13 @@
         var t = L.terminator();
         t.addTo(map);
 
-        setInterval(function(){updateTerminator(t)}, 500);
+        setInterval(function(){updateTerminator(t)}, 1000);
 
         function updateTerminator(t) {
             var t2 = L.terminator();
             t.setLatLngs(t2.getLatLngs());
             t.redraw();
+            $("#curDate").html(Date());
         }
     </script>
 {% endblock %}
