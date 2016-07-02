@@ -236,3 +236,10 @@ def bands_plan():
         }
     }
     return render_template('tools/bands_plan.jinja2', pcfg=pcfg, bands=bands)
+
+
+@bp_tools.route('/tools/map', methods=['GET'])
+@check_default_profile
+def map():
+    pcfg = {"title": "It's a map"}
+    return render_template('tools/map.jinja2', pcfg=pcfg)

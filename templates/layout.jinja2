@@ -102,6 +102,7 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tools <span class="caret"></span></a>
               <ul class="dropdown-menu">
                   <li><a href="{{ url_for('bp_tools.bands_plan') }}">IARU Band Plans</a></li>
+                  <li><a href="{{ url_for('bp_tools.map') }}">World Map w/day-night</a></li>
                   {% if current_user.is_authenticated %}
                     <li><a href="{{ url_for('bp_tools.adif_import') }}">ADIF Import</a></li>
                   {% endif %}
