@@ -15,7 +15,7 @@ bp_users = Blueprint('bp_users', __name__)
 @check_default_profile
 def logs():
     pcfg = {"title": "User Logs"}
-    _logs = UserLogging.query.order_by(UserLogging.timestamp).limit(100).all()
+    _logs = UserLogging.query.order_by(UserLogging.timestamp.desc()).limit(100).all()
     return render_template('users/user_logs.jinja2', pcfg=pcfg, logs=_logs)
 
 
