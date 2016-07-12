@@ -54,10 +54,16 @@ def edit():
         user.firstname = form.firstname.data
         user.timezone = form.timezone.data
         user.locator = form.locator.data.upper()
+
         user.lotw_name = form.lotw_name.data
         user.lotw_password = form.lotw_password.data
+
         user.eqsl_name = form.eqsl_name.data
         user.eqsl_password = form.eqsl_password.data
+
+        user.hamqth_name = form.hamqth_name.data
+        user.hamqth_password = form.hamqth_password.data
+
         user.swl = form.swl.data
         user.zone = form.zone.data
 

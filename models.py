@@ -36,10 +36,16 @@ class User(db.Model, UserMixin):
     locator = db.Column(db.String(16))
     firstname = db.Column(db.String(32))
     lastname = db.Column(db.String(32))
+
     lotw_name = db.Column(db.String(32))
     lotw_password = db.Column(db.String(255))
+
     eqsl_name = db.Column(db.String(32))
     eqsl_password = db.Column(db.String(255))
+
+    hamqth_name = db.Column(db.String(32))
+    hamqth_password = db.Column(db.String(255))
+
     timezone = db.Column(db.String(255), nullable=False, default='UTC')  # Managed and fed by pytz
     swl = db.Column(db.Boolean(), nullable=False, default=False)
     zone = db.Column(db.String(10), nullable=False, default='iaru1')

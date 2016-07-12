@@ -12,6 +12,8 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, ValidationError
 from wtforms_alchemy import model_form_factory
 from wtforms_components.fields import SelectField as WTFComponentsSelectField
+from wtforms import widgets
+from wtforms.fields.core import StringField
 
 from models import db, User, Note, Cat, Mode, Band, Logbook
 from utils import dt_utc_to_user_tz
@@ -19,6 +21,17 @@ from utils import dt_utc_to_user_tz
 BaseModelForm = model_form_factory(Form)
 
 pictures = UploadSet('pictures', IMAGES)
+
+
+class PasswordFieldNotHidden(StringField):
+    """
+    Original source: https://github.com/wtforms/wtforms/blob/2.0.2/wtforms/fields/simple.py#L35-L42
+
+    A StringField, except renders an ``<input type="password">``.
+    Also, whatever value is accepted by this field is not rendered back
+    to the browser like normal fields.
+    """
+    widget = widgets.PasswordInput(hide_value=False)
 
 
 class ModelForm(BaseModelForm):
@@ -61,9 +74,11 @@ class UserProfileForm(ModelForm):
     lastname = StringField('Lastname')
     timezone = SelectField(coerce=str, label='Timezone', default='UTC')
     lotw_name = StringField('LoTW Username')
-    lotw_password = PasswordField('LoTW Password')
+    lotw_password = PasswordFieldNotHidden('LoTW Password')
     eqsl_name = StringField('eQSL.cc Username')
-    eqsl_password = PasswordField('eQSL.cc Password')
+    eqsl_password = PasswordFieldNotHidden('eQSL.cc Password')
+    hamqth_name = StringField('HamQTH Username')
+    hamqth_password = PasswordFieldNotHidden('HamQTH Password')
 
     swl = BooleanField('Are you a SWL HAM ?')
 
