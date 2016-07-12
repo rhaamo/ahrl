@@ -8,11 +8,61 @@ import urllib.request
 import xml.etree.ElementTree as ElementTree
 
 from dateutil import parser
-from flask import current_app
+from flask import current_app, g
 
 from libjambon import eqsl_upload_log, get_dxcc_from_clublog_or_database
-from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging
+from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging, User
 from utils import add_log
+
+from pyhamqth import HamQTH, HamQTHQueryFailed
+
+
+def update_qsos_from_hamqth():
+    users = User.query.filter(User.hamqth_name.isnot(None), User.hamqth_password.isnot(None)).all()
+    for user in users:
+        updated = 0
+
+        logs = Log.query.filter(Log.consolidated_hamqth.is_(False), Log.user_id == user.id).all()
+        _v = "AHRL"
+        _hq = HamQTH(user=user.hamqth_name, password=user.hamqth_password, user_agent_suffix=_v)
+
+        for log in logs:
+            if not log.call:
+                pass
+            try:
+                _csd = _hq.lookup_callsign_data(log.call)
+            except HamQTHQueryFailed as e:
+                print("Failed for {0}".format(log.call))
+                err = UserLogging()
+                err.user_id = log.user.id
+                err.log_id = log.id
+                err.logbook_id = log.logbook.id
+                err.category = 'HamQTH'
+                err.level = 'ERROR'
+                err.message = 'Query failed or call not found: {0}'.format(e)
+                db.session.add(err)
+                log.consolidated_hamqth = True
+                continue
+
+            if 'nick' in _csd:
+                log.name = _csd['nick']
+            if 'qth' in _csd:
+                log.qth = _csd['qth']
+            if 'grid' in _csd:
+                log.gridsquare = _csd['grid']
+            if 'country' in _csd:
+                log.country = _csd['country']
+            if 'latitude' in _csd:
+                log.lat = _csd['latitude']
+            if 'longitude' in _csd:
+                log.lon = _csd['longitude']
+
+            log.consolidated_hamqth = True
+            updated += 1
+
+        db.session.commit()
+
+        print("Updated {0} QSOs for {1}".format(updated, user.name))
 
 
 def update_qsos_without_countries():

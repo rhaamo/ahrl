@@ -24,7 +24,7 @@ from controllers.qsos import bp_qsos
 from controllers.tools import bp_tools
 from controllers.users import bp_users
 from crons import update_qsos_without_countries, update_dxcc_from_cty_xml, \
-    populate_logs_gridsquare_cache, cron_sync_eqsl
+    populate_logs_gridsquare_cache, cron_sync_eqsl, update_qsos_from_hamqth
 from dbseed import make_db_seed
 from forms import ExtendedRegisterForm
 from models import db, user_datastore
@@ -188,6 +188,12 @@ def update_qsos_countries():
 def sync_eqsl(dry_run=False):
     """Push to eQSL logs with requested eQSL sync"""
     cron_sync_eqsl(dry_run)
+
+
+@CronCommand.command
+def update_qsos_hamqth():
+    """Update QSOs with datas from HamQTH"""
+    update_qsos_from_hamqth()
 
 
 @CacheCommand.command
