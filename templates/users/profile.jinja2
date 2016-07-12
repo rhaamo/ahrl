@@ -1,10 +1,13 @@
 {% extends "layout.jinja2" %}
 
 {% block content %}
+    <div class="row">
+        <div class="col-lg-6">
+            <h3>{{ current_user.name }}'s profile</h3>
+        </div>
+    </div>
 <div class="row">
     <div class="col-lg-6">
-        <h3>{{ current_user.name }}'s profile</h3>
-
         <table class="table table-condensed">
             <tr>
                 <td>Username</td>
@@ -51,5 +54,32 @@
             </tr>
         </table>
     </div>
+
+    <div class="col-lg-6">
+        <table class="table table-condensed">
+            <tr>
+                <td>LoTW</td>
+                <td>
+                    {% if current_user.lotw_name %}{{ current_user.lotw_name }}{% endif %}
+                    {% if current_user.lotw_password %}<span title='Password defined' class="glyphicon glyphicon-lock" aria-hidden="true"></span>{% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>eQSL</td>
+                <td>
+                    {% if current_user.eqsl_name %}{{ current_user.eqsl_name }}{% endif %}
+                    {% if current_user.eqsl_password %}<span title='Password defined' class="glyphicon glyphicon-lock" aria-hidden="true"></span>{% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>HamQTH</td>
+                <td>
+                    {% if current_user.hamqth_name %}{{ current_user.hamqth_name }}{% endif %}
+                    {% if current_user.hamqth_password %}<span title='Password defined' class="glyphicon glyphicon-lock" aria-hidden="true"></span>{% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
 </div>
 {% endblock %}
