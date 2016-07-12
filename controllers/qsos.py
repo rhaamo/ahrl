@@ -18,6 +18,8 @@ from models import db, User, Log, Band, Mode, Logbook, Picture
 from models import ham_country_grid_coords, cutename
 from utils import InvalidUsage, dt_utc_to_user_tz, check_default_profile
 
+from pyhamqth import HamQTH, HamQTHQueryFailed
+
 bp_qsos = Blueprint('bp_qsos', __name__)
 
 pictures = UploadSet('pictures', IMAGES)
@@ -412,6 +414,30 @@ def lib_clublog_dxcc():
 
     response = {'status': 'ok'}
     response.update(dxcc)
+
+    return Response(json.dumps(response), mimetype='application/json')
+
+
+@bp_qsos.route('/qsos/lib/hamqth/call', methods=['GET'])
+@login_required
+def lib_hamqth_call():
+    callsign = request.args.get('callsign')
+    if not callsign:
+        raise InvalidUsage('Missing callsign', status_code=400)
+
+    _v = "AHRL"
+    _hq = HamQTH(user=current_user.hamqth_name, password=current_user.hamqth_password, user_agent_suffix=_v)
+    _csd = None
+
+    try:
+        _csd = _hq.lookup_callsign_data(callsign)
+    except HamQTHQueryFailed as e:
+        if str(e) != 'Got error from API: Callsign not found':
+            raise InvalidUsage('API Error: {0}'.format(e), status_code=400)
+
+    response = {'status': 'ok'}
+    if _csd:
+        response.update(_csd)
 
     return Response(json.dumps(response), mimetype='application/json')
 

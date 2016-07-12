@@ -50,12 +50,15 @@ def update_qsos_from_hamqth():
                 log.qth = _csd['qth']
             if 'grid' in _csd and not log.gridsquare:
                 log.gridsquare = _csd['grid']
-            if 'country' in _csd and not log.country:
-                log.country = _csd['country']
+            # if 'country' in _csd and not log.country:
+            #    log.country = _csd['country']
+            # We must leave country filled by DXCC Clublog or Database I think finally
             if 'latitude' in _csd and not log.lat:
                 log.lat = _csd['latitude']
             if 'longitude' in _csd and not log.lon:
                 log.lon = _csd['longitude']
+            if 'web' in _csd and not log.web:
+                log.web = _csd['web']
 
             log.consolidated_hamqth = True
             updated += 1

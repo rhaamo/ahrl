@@ -148,6 +148,8 @@
         $('#call').focusout(function() {
             var callsign = $('input#call').val();
             if (callsign) {
+                document.getElementById("submit").disabled = true;
+                // DXCC
                 $.ajax({
                     url: '/qsos/lib/clublog/dxcc',
                     data: 'callsign=' + callsign,
@@ -159,6 +161,21 @@
                         return true;
                     }
                 });
+
+                // HamQTH
+                $.ajax({
+                    url: '/qsos/lib/hamqth/call',
+                    data: 'callsign=' + callsign,
+                    dataType: 'json',
+                    success: function (result) {
+                        $('input#name').val(result.nick);
+                        $('input#gridsquare').val(result.grid);
+                        $('input#qth').val(result.qth);
+                        $('input#web').val(result.web);
+                        return true;
+                    }
+                });
+                $('input#submit').removeAttr("disabled");
             }
         });
         $('input#call').keyup(function() {
