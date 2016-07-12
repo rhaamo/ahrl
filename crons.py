@@ -59,6 +59,8 @@ def update_qsos_from_hamqth():
                 log.lon = _csd['longitude']
             if 'web' in _csd and not log.web:
                 log.web = _csd['web']
+            if 'iota' in _csd and not log.iota:
+                log.iota = _csd['iota']
 
             log.consolidated_hamqth = True
             updated += 1
