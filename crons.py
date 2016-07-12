@@ -44,17 +44,17 @@ def update_qsos_from_hamqth():
                 log.consolidated_hamqth = True
                 continue
 
-            if 'nick' in _csd:
+            if 'nick' in _csd and not log.name:
                 log.name = _csd['nick']
-            if 'qth' in _csd:
+            if 'qth' in _csd and not log.qth:
                 log.qth = _csd['qth']
-            if 'grid' in _csd:
+            if 'grid' in _csd and not log.gridsquare:
                 log.gridsquare = _csd['grid']
-            if 'country' in _csd:
+            if 'country' in _csd and not log.country:
                 log.country = _csd['country']
-            if 'latitude' in _csd:
+            if 'latitude' in _csd and not log.lat:
                 log.lat = _csd['latitude']
-            if 'longitude' in _csd:
+            if 'longitude' in _csd and not log.lon:
                 log.lon = _csd['longitude']
 
             log.consolidated_hamqth = True
