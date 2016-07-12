@@ -338,7 +338,7 @@ class Log(db.Model):
 
     qsl_comment = db.Column(db.UnicodeText(), default=None)
 
-    consolidated_hamqth = db.Column(db.Boolean(), default=False)
+    consolidated_hamqth = db.Column(db.Boolean(), default=False, nullable=False)
 
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
     logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=False)
