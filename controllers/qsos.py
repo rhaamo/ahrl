@@ -480,9 +480,10 @@ def logbook_geojson(username, logbook_id):
         q_band = Band.query.filter(Band.modes.is_(None), Band.start.is_(None), Band.name == rq_band).first()
 
     # Log.id, Log.gridsquare, Log.call, Log.time_on, Log.band.name, Log.mode.mode, Log.mode.submode, Log.band.name
+    # .. country, qth
     xpr = case([(Log.gridsquare != '', Log.gridsquare), ], else_=Log.cache_gridsquare)
     bq = db.session.query(Log.id, xpr, Log.call, Log.time_on,
-                          Band.name, Mode.mode, Mode.submode).join(Band).join(Mode).filter(
+                          Band.name, Mode.mode, Mode.submode, Log.country, Log.qth).join(Band).join(Mode).filter(
         Log.user_id == user.id, Log.logbook_id == _logbook.id)
 
     if q_mode and not q_band:
@@ -517,7 +518,7 @@ def logbook_geojson(username, logbook_id):
     qsos = {}
     # First dict, one key per call, with a list of all QSOs, etc.
     for log in logs:
-        # (0, None, 'EA3EW0', datetime.datetime(2016, 6, 10, 19, 53, 29), 'SSTV', 'SSTV', '4mm')
+        # (0, None, 'EA3EW0', datetime.datetime(2016, 6, 10, 19, 53, 29), 'SSTV', 'SSTV', '4mm', 'country', 'qth')
         if log[1]:
             if not is_valid_qth(log[1], 6):
                 raise InvalidUsage('QTH is not valid', status_code=400)
@@ -526,7 +527,8 @@ def logbook_geojson(username, logbook_id):
             continue  # No grid at all ? Skit ip
 
         if not log[2] in qsos:
-            qsos[log[2]] = {"call": cutename(log.call), "coordinates": [_f['longitude'], _f['latitude']], "qsos": []}
+            qsos[log[2]] = {"call": cutename(log.call), "coordinates": [_f['longitude'], _f['latitude']],
+                            "qsos": [], "country": log.country, "qth": log.qth}
 
         qsos[log[2]]["qsos"].append({"date": dt_utc_to_user_tz(log.time_on, user=user),
                              "band": log.name,
@@ -541,6 +543,8 @@ def logbook_geojson(username, logbook_id):
                 "name": qsos[qso]["call"],
                 "callsign": qsos[qso]["call"],
                 "qsos": qsos[qso]["qsos"],
+                "country": qsos[qso]["country"],
+                "qth": qsos[qso]["qth"],
                 "icon": "qso"
             },
             "geometry": {

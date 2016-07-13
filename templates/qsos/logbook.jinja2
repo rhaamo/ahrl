@@ -170,7 +170,8 @@
                         l.bindPopup("<div class='popupMap'>This user: " + f.properties['callsign'] + "</div>")
                     } else {
                         var string = "Callsign: " + f.properties['callsign'];
-                        // string += "<br />Date: " + f.properties['date'];
+                        string += "<br />QTH: " + f.properties['qth'];
+                        string += "<br />Country: " + f.properties['country'];
 
                         var bands = [];
                         var modes = [];
