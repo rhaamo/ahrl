@@ -14,8 +14,15 @@ bp_users = Blueprint('bp_users', __name__)
 @login_required
 @check_default_profile
 def logs():
+    level = request.args.get('level')
     pcfg = {"title": "User Logs"}
-    _logs = UserLogging.query.order_by(UserLogging.timestamp.desc()).limit(100).all()
+    if level:
+        _logs = UserLogging.query.filter(UserLogging.level == level.upper(),
+                                         UserLogging.user_id == current_user.id
+                                         ).order_by(UserLogging.timestamp.desc()).limit(100).all()
+    else:
+        _logs = UserLogging.query.filter(UserLogging.user_id == current_user.id
+                                         ).order_by(UserLogging.timestamp.desc()).limit(100).all()
     return render_template('users/user_logs.jinja2', pcfg=pcfg, logs=_logs)
 
 
