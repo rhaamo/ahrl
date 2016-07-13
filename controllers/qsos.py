@@ -514,6 +514,8 @@ def logbook_geojson(username, logbook_id):
         }
     }]
 
+    qsos = {}
+    # First dict, one key per call, with a list of all QSOs, etc.
     for log in logs:
         # (0, None, 'EA3EW0', datetime.datetime(2016, 6, 10, 19, 53, 29), 'SSTV', 'SSTV', '4mm')
         if log[1]:
@@ -523,20 +525,27 @@ def logbook_geojson(username, logbook_id):
         else:
             continue  # No grid at all ? Skit ip
 
+        if not log[2] in qsos:
+            qsos[log[2]] = {"call": cutename(log.call), "coordinates": [_f['longitude'], _f['latitude']], "qsos": []}
+
+        qsos[log[2]]["qsos"].append({"date": dt_utc_to_user_tz(log.time_on, user=user),
+                             "band": log.name,
+                             "mode": log.mode,
+                             "submode": log.submode})
+
+    # Second dict, transform to GeoJSON
+    for qso in qsos.keys():
         f = {
             "type": "Feature",
             "properties": {
-                "name": cutename(log.call),
-                "callsign": log.call,
-                "date": dt_utc_to_user_tz(log.time_on, user=user),
-                "band": log.name,
-                "mode": log.mode,
-                "submode": log.submode,
+                "name": qsos[qso]["call"],
+                "callsign": qsos[qso]["call"],
+                "qsos": qsos[qso]["qsos"],
                 "icon": "qso"
             },
             "geometry": {
                 "type": "Point",
-                "coordinates": [_f['longitude'], _f['latitude']]
+                "coordinates": qsos[qso]["coordinates"]
             }
         }
         j.append(f)

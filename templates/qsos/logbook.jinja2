@@ -170,10 +170,20 @@
                         l.bindPopup("<div class='popupMap'>This user: " + f.properties['callsign'] + "</div>")
                     } else {
                         var string = "Callsign: " + f.properties['callsign'];
-                        string += "<br />Date: " + f.properties['date'];
-                        string += "<br />Band: " + f.properties['band'];
-                        string += "<br />Mode: " + f.properties['mode'];
-                        string += "<br />Submode: " + f.properties['submode'];
+                        // string += "<br />Date: " + f.properties['date'];
+
+                        var bands = [];
+                        var modes = [];
+                        var submodes = [];
+                        for (key in f.properties.qsos) {
+                            bands.push(f.properties.qsos[key].band);
+                            modes.push(f.properties.qsos[key].mode);
+                            submodes.push(f.properties.qsos[key].submode);
+                        }
+
+                        string += "<br />Bands: " + bands.join(", ");
+                        string += "<br />Modes: " + modes.join(", ");
+                        string += "<br />Submodes: " + submodes.join(", ");
                         l.bindPopup("<div class='popupMap'>" + string + '</div>');
                     }
 
