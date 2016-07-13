@@ -32,7 +32,7 @@ def update_qsos_from_hamqth():
             try:
                 _csd = _hq.lookup_callsign_data(log.call)
             except HamQTHQueryFailed as e:
-                print("Failed for {0}".format(log.call))
+                print("Failed for {0}: {1}".format(log.call, e))
                 err = UserLogging()
                 err.user_id = log.user.id
                 err.log_id = log.id
