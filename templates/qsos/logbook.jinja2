@@ -168,6 +168,21 @@
 
     <script>
         {% if uqth %}
+            function getCookie(cname) {
+                var name = cname + "=";
+                var ca = document.cookie.split(';');
+                for(var i = 0; i <ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0)==' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length,c.length);
+                    }
+                }
+                return "";
+            }
+
             var map = L.map('map').setView([52, 4], 3);
             map.addLayer(L.tileLayer.provider('OpenStreetMap.Mapnik'));
 
@@ -227,8 +242,11 @@
             var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_geojson', username=user.name, band=band, mode=mode, logbook_id=logbook.id) }}"],{onEachFeature:popUp}).addTo(map);
 
             var t = L.terminator();
-            if ($('input#toggleGreyline').is(':checked')) {
+
+            var nomnom = (getCookie("greyLine") == "True");
+            if ($('input#toggleGreyline').is(':checked') || nomnom) {
                 t.addTo(map);
+                document.getElementById("toggleGreyline").checked = true;
             }
 
             setInterval(function(){updateTerminator(t)}, 1000);
@@ -248,10 +266,12 @@
                 var checked = this.checked;
                 if (checked) {
                     t.addTo(map);
+                    document.cookie = "greyLine=True";
                     console.log("Added greyline");
                 } else {
                     map.removeLayer(t);
                     $("#curDate").html("");
+                    document.cookie = "greyLine=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
                     console.log("Removed greyline");
                 }
             })
