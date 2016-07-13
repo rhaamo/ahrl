@@ -51,14 +51,14 @@ class User(db.Model, UserMixin):
     zone = db.Column(db.String(10), nullable=False, default='iaru1')
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
-    logbooks = db.relationship('Logbook', backref='user', lazy='dynamic')
-    logs = db.relationship('Log', backref='user', lazy='dynamic')
-    notes = db.relationship('Note', backref='user', lazy='dynamic')
-    apitokens = db.relationship('Apitoken', backref='user', lazy='dynamic')
-    contacts = db.relationship('Contact', backref='user', lazy='dynamic')
+    logbooks = db.relationship('Logbook', backref='user', lazy='dynamic', cascade="delete")
+    logs = db.relationship('Log', backref='user', lazy='dynamic', cascade="delete")
+    notes = db.relationship('Note', backref='user', lazy='dynamic', cascade="delete")
+    apitokens = db.relationship('Apitoken', backref='user', lazy='dynamic', cascade="delete")
+    contacts = db.relationship('Contact', backref='user', lazy='dynamic', cascade="delete")
 
-    user_loggings = db.relationship('UserLogging', backref='user', lazy='dynamic')
-    loggings = db.relationship('Logging', backref='user', lazy='dynamic')
+    user_loggings = db.relationship('UserLogging', backref='user', lazy='dynamic', cascade="delete")
+    loggings = db.relationship('Logging', backref='user', lazy='dynamic', cascade="delete")
 
     __mapper_args__ = {"order_by": name}
 
@@ -192,8 +192,8 @@ class Logbook(db.Model):
     public = db.Column(db.Boolean, default=True)
     eqsl_qth_nickname = db.Column(db.String(255))
 
-    logs = db.relationship('Log', backref='logbook', lazy='dynamic')
-    user_loggings = db.relationship('UserLogging', backref='logbook', lazy='dynamic')
+    logs = db.relationship('Log', backref='logbook', lazy='dynamic', cascade="delete")
+    user_loggings = db.relationship('UserLogging', backref='logbook', lazy='dynamic', cascade="delete")
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
 
 
@@ -343,7 +343,7 @@ class Log(db.Model):
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
     logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=False)
     pictures = db.relationship('Picture', backref='log', lazy='dynamic')
-    user_loggings = db.relationship('UserLogging', backref='log', lazy='dynamic')
+    user_loggings = db.relationship('UserLogging', backref='log', lazy='dynamic', cascade="delete")
 
     __mapper_args__ = {"order_by": time_on.desc()}
 
