@@ -181,6 +181,11 @@
                             submodes.push(f.properties.qsos[key].submode);
                         }
 
+                        // Sort and unique
+                        $.uniqueSort(bands);
+                        $.uniqueSort(modes);
+                        $.uniqueSort(submodes);
+
                         string += "<br />Bands: " + bands.join(", ");
                         string += "<br />Modes: " + modes.join(", ");
                         string += "<br />Submodes: " + submodes.join(", ");
