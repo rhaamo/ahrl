@@ -365,7 +365,8 @@ def lib_jambon_band_to_freq():
         raise InvalidUsage('Missing band or mode', status_code=400)
 
     response = {'status': 'ok', 'band': band, 'mode': mode, 'frequency': band_to_frequency(int(band), int(mode))}
-    return Response(json.dumps(response), mimetype='application/json')
+    return Response(json.dumps(response, encoding='utf-8', ensure_ascii=False),
+                    mimetype='application/json;charset=utf-8')
 
 
 @bp_qsos.route('/qsos/lib/geo/bearing', methods=['GET'])
@@ -397,7 +398,8 @@ def lib_geo_bearing():
                                                            _t['longitude'])}
     response['bearing_star'] = geo_bearing_star(response['bearing'])
 
-    return Response(json.dumps(response), mimetype='application/json')
+    return Response(json.dumps(response, encoding='utf-8', ensure_ascii=False),
+                    mimetype='application/json;charset=utf-8')
 
 
 @bp_qsos.route('/qsos/lib/clublog/dxcc', methods=['GET'])
@@ -415,7 +417,8 @@ def lib_clublog_dxcc():
     response = {'status': 'ok'}
     response.update(dxcc)
 
-    return Response(json.dumps(response), mimetype='application/json')
+    return Response(json.dumps(response, encoding='utf-8', ensure_ascii=False),
+                    mimetype='application/json;charset=utf-8')
 
 
 @bp_qsos.route('/qsos/lib/hamqth/call', methods=['GET'])
@@ -439,7 +442,8 @@ def lib_hamqth_call():
     if _csd:
         response.update(_csd)
 
-    return Response(json.dumps(response), mimetype='application/json')
+    return Response(json.dumps(response, encoding='utf-8', ensure_ascii=False),
+                    mimetype='application/json;charset=utf-8')
 
 
 @bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/geojson', methods=['GET'])
@@ -537,7 +541,7 @@ def logbook_geojson(username, logbook_id):
         }
         j.append(f)
 
-    return Response(json.dumps(j), mimetype='application/json')
+    return Response(json.dumps(j, encoding='utf-8', ensure_ascii=False), mimetype='application/json;charset=utf-8')
 
 
 @bp_qsos.route('/logbook/qso/<int:qso_id>/geojson', methods=['GET'])
@@ -604,7 +608,7 @@ def logbook_qso_geojson(qso_id):
         "coordinates": [[_f['longitude'], _f['latitude']], [_u['longitude'], _u['latitude']]]
     })
 
-    return Response(json.dumps(f), mimetype='application/json')
+    return Response(json.dumps(f, encoding='utf-8', ensure_ascii=False), mimetype='application/json;charset=utf-8')
 
 
 @bp_qsos.route('/logbook/<string:username>/<int:logbook_id>/qso/<int:qso_id>', methods=['GET'])
