@@ -33,7 +33,7 @@
                     <h5>From logbook: {{ logbook.name }}</h5>
                 </div>
             {% endif %}
-            <div class="col-lg-4 col-lg-offset-2">
+            <div class="col-lg-6">
                 <form action="{{ url_for('bp_qsos.logbook', username=user.name, logbook_id=logbook.id) }}" method="get">
                     <div class="col-lg-5">{{ wtf.form_field(filter_form.band, 'inline') }}</div>
                     <div class="col-lg-5">{{ wtf.form_field(filter_form.mode, 'inline') }}</div>
@@ -49,8 +49,15 @@
         <div id="map" style="width: 1024px; height: 300px"></div>
     </div>
     </div>
+    <div class="row">
+    <div class="col-lg-3"><small id="curDate"></small></div>
+    <div class="col-lg-2 col-lg-offset-7">
+        Show day/night <input type="checkbox" id="toggleGreyline">
+    </div>
+    </div>
 
     <div class="row">
+    <br />
     <div class="col-lg-9">
         <table class="table table-condensed table-stripped">
             <tr>
@@ -157,6 +164,7 @@
     <script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
     <script src="{{ url_for('static', filename='js/leaflet.ajax.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/leaflet.awesome-markers.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/L.Terminator.js') }}"></script>
 
     <script>
         {% if uqth %}
@@ -217,6 +225,36 @@
             });
 
             var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_geojson', username=user.name, band=band, mode=mode, logbook_id=logbook.id) }}"],{onEachFeature:popUp}).addTo(map);
+
+            var t = L.terminator();
+            if ($('input#toggleGreyline').is(':checked')) {
+                t.addTo(map);
+            }
+
+            setInterval(function(){updateTerminator(t)}, 1000);
+
+            function updateTerminator(t) {
+                var check = $('input#toggleGreyline').is(':checked');
+                if (!check) {
+                    return;
+                }
+                var t2 = L.terminator();
+                t.setLatLngs(t2.getLatLngs());
+                t.redraw();
+                $("#curDate").html(Date());
+            }
+
+            $('input#toggleGreyline').change(function() {
+                var checked = this.checked;
+                if (checked) {
+                    t.addTo(map);
+                    console.log("Added greyline");
+                } else {
+                    map.removeLayer(t);
+                    $("#curDate").html("");
+                    console.log("Removed greyline");
+                }
+            })
         {% endif %}
 
         $('#ModalQsoSingle').on('shown.bs.modal', function(ev) {
