@@ -9,7 +9,13 @@
 </div>
 <div class="row">
     <div class="col-lg-4">
-        <table class="table table-borderless">
+        <table class="table table-borderless table-condensed">
+            {% if qso.name %}
+            <tr>
+                <td>Nick</td>
+                <td>{{ qso.name }}</td>
+            </tr>
+            {% endif %}
             <tr>
                 <td>Band</td>
                 <td>{{ qso.band.name }}</td>
@@ -20,20 +26,22 @@
             </tr>
             <tr>
                 <td>Mode</td>
-                <td>{{ qso.mode.mode }}</td>
+                <td colspan="3">{{ qso.mode.mode }}</td>
             </tr>
             <tr>
-                <td>RST Sent</td>
-                <td>{{ qso.rst_sent }}</td>
-            </tr>
-            <tr>
-                <td>RST Recv</td>
-                <td>{{ qso.rst_rcvd }}</td>
+                <td>RST:</td>
+                <td>Sent: {{ qso.rst_sent }}, Recv: {{ qso.rst_rcvd }}</td>
             </tr>
             <tr>
                 <td>Country</td>
                 <td>{{ qso.country }}</td>
             </tr>
+            {% if qso.qth %}
+            <tr>
+                <td>Qth</td>
+                <td>{{ qso.qth }}</td>
+            </tr>
+            {% endif %}
             <tr>
                 <td>Distance</td>
                 <td>{{ qso_bearing | round }}&deg; {{ qso_bearing_star }} - {{ qso_distance | round }} {{ qso_distance_unit }}</td>
