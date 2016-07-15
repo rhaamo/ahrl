@@ -41,6 +41,17 @@ Another Ham Radio Log
   - python ahrl.py cron update_qsos_countries  # Update all QSOs if missing a Country/DXCC entry by using ClubLog
   - python ahrl.py cron  # List all available crons
   - python ahrl.py cache  # Same for cache actions
+  
+# Crons explained
+  - update_qsos_countries               Update QSOs which have an empty country
+  - sync_to_eqsl                        Push to eQSL marked QSO with 'Requested'
+  - sync_from_eqsl                      Get from eQSL log to update QSOs eQSL state
+  - update_dxcc_from_cty                Update the database copy of this file
+  - update_qsos_hamqth                  Update all QSOs with datas from HamQTH if needed
+  
+# Crontabs example
+    */5 * * * * cd /where/is/ahrl ; python3 ahrl.py cron sync_to_eqsl
+    */5 * * * * cd /where/is/ahrl ; python3 ahrl.py cron sync_from_eqsl
 
 # Licensing
  - MIT License
@@ -85,7 +96,5 @@ Another Ham Radio Log
  - So in some places the keyword 'mode' is used but in fact it's really 'submode' which is used
 
 # TODO
- - eQSL integration
- - HAMQTH integration
  - Radio/CAT edit, add you own rig and link them when QSOing
 
