@@ -3,16 +3,20 @@ from __future__ import print_function
 import gzip
 import os
 import shutil
+import urllib.parse
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ElementTree
+import re
+import datetime
 
 from dateutil import parser
 from flask import current_app, g
 
 from libjambon import eqsl_upload_log, get_dxcc_from_clublog_or_database
-from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging, User
+from models import db, DxccEntities, DxccExceptions, DxccPrefixes, Log, Config, UserLogging, User, Logbook
 from utils import add_log
+from adif import parse as parse_adif
 
 from pyhamqth import HamQTH, HamQTHQueryFailed
 
@@ -224,7 +228,131 @@ def parse_element(element):
     print('-- Committed {0} new elements'.format(elements))
 
 
+def cron_sync_from_eqsl(dry_run=False):
+    """ https://www.eqsl.cc/qslcard/DownloadInBox.txt """
+
+    if dry_run:
+        print("-- [DRY RUN] Fetching logs from eQSL")
+    else:
+        print("-- Fetching logs from eQSL")
+
+    _logbooks = Logbook.query.filter(Logbook.eqsl_qth_nickname.isnot(None)).all()
+    for logbook in _logbooks:
+        if not logbook.user.eqsl_name or not logbook.user.eqsl_password:
+            continue  # Skip logbooks of user not using eQSL
+
+        config = Config.query.first()
+        if not config:
+            print("!!! Error: config not found")
+            add_log(category='CONFIG', level='ERROR', message='Config not found')
+            return
+
+        print("-- Working on logbook [{0}] {1}".format(logbook.id, logbook.name))
+
+        _payload = urllib.parse.urlencode({
+            "UserName": logbook.user.eqsl_name,
+            "Password": logbook.user.eqsl_password,
+            "QTHNickname": logbook.eqsl_qth_nickname
+        })
+
+        _url = "{0}?{1}".format(config.eqsl_download_url, _payload)
+
+        _req = urllib.request.Request(_url)
+        _text = None
+
+        err_fetch = UserLogging()
+        err_fetch.user_id = logbook.user.id
+        err_fetch.logbook_id = logbook.id
+        err_fetch.category = 'EQSL FETCH'
+
+        try:
+            with urllib.request.urlopen(_req) as f:
+                _text = f.read().decode('UTF-8')
+        except urllib.error.URLError as e:
+            err_fetch.level = 'ERROR'
+            err_fetch.message = 'Error fetching from eQSL: {0}'.format(e)
+            db.session.add(err_fetch)
+            db.session.commit()
+            continue  # skip to next
+
+        if not _text:
+            err_fetch.level = 'ERROR'
+            err_fetch.message = 'Error fetching from EQSL, _text undefined'
+            db.session.add(err_fetch)
+            db.session.commit()
+            continue  # skip to next
+
+        # Now get the download link
+        # <li><a href="downloadedfiles/xxx.adi">.ADI file</a>
+        m = re.search('<A HREF="(.*)">.ADI file</A>', _text)
+
+        if m:
+            _file_path = m.group(1)
+            _url = "{0}/{1}".format(os.path.dirname(config.eqsl_download_url), _file_path)
+            _req = urllib.request.Request(_url)
+            _text = None
+
+            try:
+                print("-- Fetching ADIF {0}".format(_url))
+                with urllib.request.urlopen(_req) as f:
+                    # eQSL returns a file encoded in ISO8859-1 so decode it then re-encode it in UTF-8
+                    _text = f.read().decode('ISO8859-1').encode('UTF-8')
+            except urllib.error.URLError as e:
+                err_fetch.level = 'ERROR'
+                err_fetch.message = 'Error fetching from eQSL: {0}'.format(e)
+                db.session.add(err_fetch)
+                db.session.commit()
+                continue  # skip to next
+
+            if not _text:
+                err_fetch.level = 'ERROR'
+                err_fetch.message = 'Error fetching from EQSL, _text for final URL undefined'
+                db.session.add(err_fetch)
+                db.session.commit()
+                continue  # skip to next
+
+            adif = parse_adif(_text)
+
+            for log in adif:
+                err_log = UserLogging()
+                err_log.user_id = logbook.user.id
+                err_log.logbook_id = logbook.id
+                err_log.category = 'EQSL LOG'
+
+                _date = "{0} {1}".format(log["qso_date"], log["time_on"])
+                _date_first = datetime.datetime.strptime(_date + "00", "%Y%m%d %H%M%S")
+                _date_second = datetime.datetime.strptime(_date + "59", "%Y%m%d %H%M%S")
+                # Try to find a matching log entry
+                qso = Log.query.filter(Log.logbook_id == logbook.id,
+                                       Log.user_id == logbook.user.id,
+                                       Log.call == log['call'].upper(),
+                                       Log.time_on.between(_date_first, _date_second)).first()
+                if qso:
+                    if qso.eqsl_qsl_rcvd == 'Y':
+                        continue  # this eQSL have already been matched
+                    print("-- Matching log found for {0} on {1} : ID {2}".format(log['call'],
+                                                                                 _date, qso.id))
+                    if not dry_run:
+                        qso.eqsl_qsl_rcvd = 'Y'
+                        err_log.level = 'INFO'
+                        err_log.message = 'QSO from eQSL by {0} on {1} received and updated'.format(log['call'], _date)
+                else:
+                    print("-- No matching log found for {0} on {1}".format(log['call'], _date))
+                    err_log.level = 'INFO'
+                    err_log.message = 'QSO from eQSL by {0} on {1} not found in database'.format(log['call'], _date)
+                if not dry_run:
+                    db.session.add(err_log)
+                    db.session.commit()
+        else:
+            err_fetch.level = 'ERROR'
+            err_fetch.message = 'Error fetching from EQSL, link not found in body'
+            db.session.add(err_fetch)
+            db.session.commit()
+
+
 def cron_sync_eqsl(dry_run=False):
+    """ https://www.eqsl.cc/qslcard/ImportADIF.txt """
+
     if dry_run:
         print("--- [DRY RUN] Sending logs to eQSL when requested")
     else:
