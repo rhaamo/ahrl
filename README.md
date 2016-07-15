@@ -50,8 +50,9 @@ Another Ham Radio Log
   - update_qsos_hamqth                  Update all QSOs with datas from HamQTH if needed
   
 # Crontabs example
+    # eQSL may cache the file to download so only fetch every four hours 
     */5 * * * * cd /where/is/ahrl ; python3 ahrl.py cron sync_to_eqsl
-    */5 * * * * cd /where/is/ahrl ; python3 ahrl.py cron sync_from_eqsl
+    0 */4 * * * cd /where/is/ahrl ; python3 ahrl.py cron sync_from_eqsl
 
 # Licensing
  - MIT License
