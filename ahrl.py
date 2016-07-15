@@ -185,7 +185,7 @@ def update_qsos_countries():
 @CronCommand.command
 @CronCommand.option('--dryrun', dest='dry_run', action='store_true', default=False,
                     help="Dry run, doesn't commit anything")
-def sync_eqsl(dry_run=False):
+def sync_to_eqsl(dry_run=False):
     """Push to eQSL logs with requested eQSL sync"""
     cron_sync_eqsl(dry_run)
 
