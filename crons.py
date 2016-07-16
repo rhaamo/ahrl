@@ -231,6 +231,11 @@ def parse_element(element):
 def cron_sync_from_eqsl(dry_run=False):
     """ https://www.eqsl.cc/qslcard/DownloadInBox.txt """
 
+    """
+    todo: to avoid downloading too much (not really in fact) logs, get the oldest time with a eqsl_rcvd == 'N'
+    and put it in query with RcvdSince = (YYYYMMDDHHMM)
+    """
+
     if dry_run:
         print("-- [DRY RUN] Fetching logs from eQSL")
     else:
@@ -334,6 +339,7 @@ def cron_sync_from_eqsl(dry_run=False):
                                                                                  _date, qso.id))
                     if not dry_run:
                         qso.eqsl_qsl_rcvd = 'Y'
+                        err_log.log_id = qso.id
                         err_log.level = 'INFO'
                         err_log.message = 'QSO from eQSL by {0} on {1} received and updated'.format(log['call'], _date)
                 else:
