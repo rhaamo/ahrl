@@ -11,8 +11,9 @@ Another Ham Radio Log
     cd ahrl
     git submodule init
     git submodule update
-    pip3 install --requirement requirements.txt  # if present
+    pip3 install git+https://github.com/ggramaize/libqth.git
     pip3 install git+http://dev.sigpipe.me/DashieHam/pyHamQth.git
+    pip3 install --requirement requirements.txt  # if present
     cp config.py.sample config.py
     $EDITOR config.py
     python3 ahrl.py db upgrade
