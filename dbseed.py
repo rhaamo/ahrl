@@ -6,7 +6,7 @@ def make_db_seed(db):
     db.session.begin(subtransactions=True)
     try:
         seed_config(db)
-        # seed_users(db)  # after timezones because not null relation
+        seed_users(db)  # after timezones because not null relation
         # also seeds roles admin/user
     except:
         db.session.rollback()
