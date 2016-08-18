@@ -31,6 +31,15 @@ from forms import ExtendedRegisterForm
 from models import db, user_datastore
 from utils import dt_utc_to_user_tz, InvalidUsage, show_date_no_offset, is_admin
 
+try:
+    from raven.contrib.flask import Sentry
+    import raven
+    print(" * Sentry support loaded")
+    HAS_SENTRY=True
+except ImportError as e:
+    print(" * No Sentry support")
+    HAS_SENTRY=False
+
 __VERSION__ = "0.0.1"
 
 # App Configuration
@@ -52,6 +61,11 @@ if not app.debug:
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
     app.logger.addHandler(file_handler)
+
+if HAS_SENTRY:
+    app.config['SENTRY_RELEASE'] = raven.fetch_git_sha(os.path.dirname(__file__))
+    sentry = Sentry(app, dsn=app.config['SENTRY_DSN'])
+    print(" * Sentry support activated")
 
 toolbar = DebugToolbarExtension(app)
 mail = Mail(app)
