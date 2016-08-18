@@ -1,6 +1,6 @@
 """Delete old band plan and add default IARU Zone 1 Band Plan (Will break if QSO already present, see this file for help)
 
-Revision ID: 488cd2ea543d
+Revision ID: 488cd2ea543d3
 Revises: f4d4e3c42eb7
 Create Date: 2016-06-13 21:55:03.390082
 
@@ -23,8 +23,8 @@ from models import db, Band, Log
 
 
 def upgrade():
-    cleaned = Band.query.delete()
-    print("-- Cleaned {0} records".format(cleaned))
+    #cleaned = Band.query.delete()
+    #print("-- Cleaned {0} records".format(cleaned))
 
     # All IARU1 datas extracted from http://f4eed.wordpress.com/ "Petit Memento Radioamateur et SWL"
     # And wikipedia articles synthetizing IARU Band Plans
