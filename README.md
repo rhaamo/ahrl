@@ -5,7 +5,7 @@ Another Ham Radio Log
  - Python >= 3.3 (3.0, 3.1, 3.2 not supported)
 
 # Installation
-    Install a BDD (mysql is supported, SQLite maybe)
+    Install a BDD (mysql is supported, SQLite maybe, PostgreSQL should be)
     Makes sure that encoding is/will be in UNICODE/UTF-8
     git clone http://dev.sigpipe.me/DashieHam/ahrl
     cd ahrl
@@ -99,4 +99,3 @@ Another Ham Radio Log
 
 # TODO
  - Radio/CAT edit, add you own rig and link them when QSOing
- - Lot of "custom" join aren't compatible with PostgreSQL anymore and needs to be ajusted / fixed
