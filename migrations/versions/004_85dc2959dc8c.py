@@ -1,4 +1,4 @@
-"""empty message
+"""Create picture table
 
 Revision ID: 85dc2959dc8c
 Revises: eeb294f07948

@@ -23,8 +23,8 @@ from models import db, Band, Log
 
 
 def upgrade():
-    #cleaned = Band.query.delete()
-    #print("-- Cleaned {0} records".format(cleaned))
+    cleaned = Band.query.delete()
+    print("-- Cleaned {0} records".format(cleaned))
 
     # All IARU1 datas extracted from http://f4eed.wordpress.com/ "Petit Memento Radioamateur et SWL"
     # And wikipedia articles synthetizing IARU Band Plans
@@ -153,17 +153,16 @@ def upgrade():
 
     # Now re-create relations for Logs
     updated = 0
-    for log in Log.query.all():
-        a = log
+    for log in db.session.query(Log.id, Log.freq, Log.band_id):
         band = Band.query.filter(Band.start.is_(None),
-                                 Band.lower <= a.freq,
-                                 Band.upper >= a.freq).all()
+                                 Band.lower <= log.freq,
+                                 Band.upper >= log.freq).all()
         if not band or len(band) <= 0:
             print("!! Could not get band for QSO ID {0} and frequency {1}. Please check !".format(
-                a.id, a.freq
+                log.id, log.freq
             ))
             continue
-        a.band_id = band[0].id
+        log.band_id = band[0].id
         updated += 1
     db.session.commit()
     print('-- Updated {0} logs'.format(updated))
