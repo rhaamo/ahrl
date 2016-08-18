@@ -91,14 +91,14 @@ def logbook(username, logbook_id):
     _a_logs = Bundle('log', Log.mode_id)
     _b_modes = Bundle('modes', Mode.id, Mode.mode, Mode.submode)
     for _modes, _logs in db.session.query(_b_modes, _a_logs).join(
-            Mode.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.mode_id).all():
+            Mode.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(_a_logs, _b_modes).all():
         filter_modes.append([_modes.id, '{0} - {1}'.format(_modes.mode, _modes.submode)])
 
     filter_bands = []
     _a_logs = Bundle('log', Log.band_id)
     _b_bands = Bundle('bands', Band.id, Band.name)
     for _bands, _logs in db.session.query(_b_bands, _a_logs).join(
-            Band.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.band_id).all():
+            Band.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(_a_logs, _b_bands).all():
         filter_bands.append([_bands.name, _bands.name])
 
     filter_modes.insert(0, ['all', 'All modes'])
