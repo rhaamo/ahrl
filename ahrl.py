@@ -35,10 +35,10 @@ try:
     from raven.contrib.flask import Sentry
     import raven
     print(" * Sentry support loaded")
-    HAS_SENTRY=True
+    HAS_SENTRY = True
 except ImportError as e:
     print(" * No Sentry support")
-    HAS_SENTRY=False
+    HAS_SENTRY = False
 
 __VERSION__ = "0.0.1"
 
