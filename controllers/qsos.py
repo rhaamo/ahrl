@@ -428,6 +428,9 @@ def lib_hamqth_call():
     if not callsign:
         raise InvalidUsage('Missing callsign', status_code=400)
 
+    if not current_user.hamqth_name or not current_user.hamqth_password:
+        raise InvalidUsage('Missing HamQTH Username or Password', status_code=500)
+
     _v = "AHRL"
     _hq = HamQTH(user=current_user.hamqth_name, password=current_user.hamqth_password, user_agent_suffix=_v)
     _csd = None
@@ -829,7 +832,8 @@ def logbook_stats(username, logbook_id):
     _a_logs = Bundle('log', Log.mode_id, func.count(Log.id))
     _b_modes = Bundle('modes', Mode.id, Mode.submode)
     for _modes, _logs in db.session.query(_b_modes, _a_logs).join(
-            Mode.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.mode_id).all():
+            Mode.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(
+        Log.mode_id, Mode.id, Mode.submode).all():
         stats_modes.append({'label': _modes[1], 'data': _logs[1]})
 
     # Pie with bands
@@ -837,7 +841,9 @@ def logbook_stats(username, logbook_id):
     _a_logs = Bundle('log', Log.band_id, func.count(Log.id))
     _b_bands = Bundle('bands', Band.id, Band.name)
     for _bands, _logs in db.session.query(_b_bands, _a_logs).join(
-            Band.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(Log.band_id).all():
+            Band.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(
+        Log.band_id, Band.id, Band.name
+    ).all():
         stats_bands.append({'label': _bands[1], 'data': _logs[1]})
 
     # DXCC Awards worked
