@@ -154,7 +154,7 @@ if not app.debug:
 
 # Other commands
 @manager.command
-def dump_routes():
+def routes():
     """Dump all routes of defined app"""
     table = texttable.Texttable()
     table.set_deco(texttable.Texttable().HEADER)
