@@ -164,7 +164,7 @@ def routes():
 
     table.add_rows([["Prefix", "Verb", "URI Pattern"]])
 
-    for rule in sorted(app.url_map.iter_rules(), key=lambda x: x.match_compare_key()):
+    for rule in sorted(app.url_map.iter_rules(), key=lambda x: str(x)):
         methods = ','.join(rule.methods)
         table.add_row([rule.endpoint, methods, rule])
 
