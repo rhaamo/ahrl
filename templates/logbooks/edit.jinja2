@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <form action="{{ url_for('bp_logbooks.edit', logbook_id=logbook.id) }}" method="POST" class="form-horizontal" name="gtfo-lastpass-search">
+    <form action="{{ url_for('bp_logbooks.edit', logbook_slug=logbook.slug) }}" method="POST" class="form-horizontal" name="gtfo-lastpass-search">
         {{ form.hidden_tag() }}
         {{ wtf.form_errors(form, hiddens=True) }}
 

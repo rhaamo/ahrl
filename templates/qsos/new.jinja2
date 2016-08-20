@@ -8,7 +8,7 @@
             <h3>New QSO <small class="freq_mhz"></small><small>TZ: {{ current_user.timezone }}</small></h3>
             <h5>Adding in logbook: {{ logbook.name }}</h5>
 
-            <form action="{{ url_for('bp_qsos.new', method=method, logbook_id=logbook.id) }}" method="POST" class="form-horizontal new-qso" name="gtfo-lastpass-search">
+            <form action="{{ url_for('bp_qsos.new', method=method, logbook_slug=logbook.slug) }}" method="POST" class="form-horizontal new-qso" name="gtfo-lastpass-search">
                 {{ form.hidden_tag() }}
                 {{ wtf.form_errors(form) }}
 
@@ -183,7 +183,7 @@
             var callsign = $('input#call').val();
             if (callsign) {
                 $.ajax({
-                    url: "/logbook/{{ logbook.id }}/qsos/last16",
+                    url: "/logbook/{{ logbook.slug }}/qsos/last16",
                     data: 'callsign=' + callsign,
                     dataType: 'html',
                     success: function (result) {
@@ -204,7 +204,7 @@
         reload_frequency(); // first call on page load
 
         // Load right page table
-        var last16_url = "/logbook/{{ logbook.id }}/qsos/last16";
+        var last16_url = "/logbook/{{ logbook.slug }}/qsos/last16";
         $('div.new_qso_logs_table').load(last16_url);
     </script>
 {% endblock %}

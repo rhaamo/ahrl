@@ -8,14 +8,14 @@
             <ul>
             {% for l in user.logbooks %}
                 {% if l.public or (current_user.id == l.user_id) %}
-                <li><a href="{{ url_for('bp_qsos.logbook', username=user.name, logbook_id=l.id) }}">{{ l.name }}</a>
+                <li><a href="{{ url_for('bp_qsos.logbook', username=user.name, logbook_slug=l.slug) }}">{{ l.name }}</a>
                 <small>
                     ({{ l.logs.count() }} qsos{% if l.default %}, default{% endif %}{% if not l.public %}, private{% endif %})
-                    <a href="{{ url_for('bp_qsos.logbook_stats', username=l.user.name, logbook_id=l.id) }}" class="btn btn-info btn-xs">stats</a>
+                    <a href="{{ url_for('bp_qsos.logbook_stats', username=l.user.name, logbook_slug=l.slug) }}" class="btn btn-info btn-xs">stats</a>
                     {% if current_user.is_authenticated and (current_user.id == l.user_id) %}
-                        <a href="{{ url_for('bp_tools.adif_export_dl', username=l.user.name, logbook_id=l.id) }}" class="btn btn-success btn-xs">adif export</a>
-                        <a href="{{ url_for('bp_logbooks.edit', logbook_id=l.id) }}" class="btn btn-primary btn-xs">edit</a>
-                        <a href="{{ url_for('bp_logbooks.delete', logbook_id=l.id) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                        <a href="{{ url_for('bp_tools.adif_export_dl', username=l.user.name, logbook_slug=l.slug) }}" class="btn btn-success btn-xs">adif export</a>
+                        <a href="{{ url_for('bp_logbooks.edit', logbook_slug=l.slug) }}" class="btn btn-primary btn-xs">edit</a>
+                        <a href="{{ url_for('bp_logbooks.delete', logbook_slug=l.slug) }}" class="btn btn-danger btn-xs delete_link">delete</a>
                     {% endif %}
                 </small>
                 </li>

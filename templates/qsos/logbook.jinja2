@@ -34,7 +34,7 @@
                 </div>
             {% endif %}
             <div class="col-lg-6">
-                <form action="{{ url_for('bp_qsos.logbook', username=user.name, logbook_id=logbook.id) }}" method="get">
+                <form action="{{ url_for('bp_qsos.logbook', username=user.name, logbook_slug=logbook.slug) }}" method="get">
                     <div class="col-lg-5">{{ wtf.form_field(filter_form.band, 'inline') }}</div>
                     <div class="col-lg-5">{{ wtf.form_field(filter_form.mode, 'inline') }}</div>
                     <div class="col-lg-1">{{ wtf.form_field(filter_form.submit, button_map={'submit': 'success'}) }}</div>
@@ -77,7 +77,7 @@
                 <tr>
                 <td>{{ log.time_on | localize(user=log.user) | show_date_no_offset }}</td>
                 <td>
-                    <a href="{{ url_for('bp_qsos.view', username=log.user.name, logbook_id=log.logbook.id, qso_id=log.id) }}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a href="{{ url_for('bp_qsos.view', username=log.user.name, logbook_slug=log.logbook.slug, qso_slug=log.slug) }}"><span class="glyphicon glyphicon-eye-open"></span></a>
                     <a data-toggle="modal" data-target="#ModalQsoSingle" data-qso-id="{{ log.id }}">{{ log.call }}</a>
                 </td>
                 <td>
@@ -94,8 +94,8 @@
                 <td class="log-cnty">{{ log.country }}</td>
                 {% if current_user.is_authenticated and (current_user.id == log.user_id) %}
                     <td>
-                        <a href="{{ url_for('bp_qsos.edit', qso_id=log.id, logbook_id=log.logbook.id) }}" class="btn btn-primary btn-xs">edit</a>
-                        <a href="{{ url_for('bp_qsos.delete', qso_id=log.id) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                        <a href="{{ url_for('bp_qsos.edit', qso_slug=log.slug, logbook_slug=log.logbook.slug) }}" class="btn btn-primary btn-xs">edit</a>
+                        <a href="{{ url_for('bp_qsos.delete', qso_slug=log.slug) }}" class="btn btn-danger btn-xs delete_link">delete</a>
                     </td>
                 {% endif %}
                 </tr>
@@ -239,7 +239,7 @@
                 markerColor: 'green'
             });
 
-            var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_geojson', username=user.name, band=band, mode=mode, logbook_id=logbook.id) }}"],{onEachFeature:popUp}).addTo(map);
+            var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_geojson', username=user.name, band=band, mode=mode, logbook_slug=logbook.slug) }}"],{onEachFeature:popUp}).addTo(map);
 
             var t = L.terminator();
 

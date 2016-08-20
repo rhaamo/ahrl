@@ -75,7 +75,7 @@
         <div id="map-single-qso" style="height: 250px"></div>
         {% if current_user.is_authenticated and (current_user.id == qso.user_id) %}
             <br/>
-            <form action="{{ url_for('bp_qsos.view_post', logbook_id=qso.logbook.id, username=qso.user.name, qso_id=qso.id) }}" method="POST" enctype="multipart/form-data" class="form-horizontal new-qso" name="gtfo-lastpass-search">
+            <form action="{{ url_for('bp_qsos.view_post', logbook_slug=qso.logbook.slug, username=qso.user.name, qso_slug=qso.slug) }}" method="POST" enctype="multipart/form-data" class="form-horizontal new-qso" name="gtfo-lastpass-search">
                 {{ new_pic.hidden_tag() }}
                 {{ wtf.form_errors(new_pic, hiddens=True) }}
 
@@ -94,7 +94,7 @@
                     <a href="/uploads/pictures/{{ col.filename }}" target="_blank"><img alt="{{ col.name }}" width="150px" src="/uploads/pictures/{{ col.filename }}"/></a>
                     <br/>
                     {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('bp_qsos.delete_picture', logbook_id=col.log.logbook.id, username=col.log.user.name, qso_id=col.log.id, picture_id=col.id) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                    <a href="{{ url_for('bp_qsos.delete_picture', logbook_slug=col.log.logbook.slug, username=col.log.user.name, qso_slug=col.log.slug  , picture_id=col.id) }}" class="btn btn-danger btn-xs delete_link">delete</a>
                     {% endif %}
                     {{ col.name }}
                     <br/><br/>

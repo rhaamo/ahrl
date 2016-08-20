@@ -29,12 +29,12 @@ def logbooks(user):
     return render_template('logbooks/logbooks.jinja2', pcfg=pcfg, user=user, logbooks=_logbooks)
 
 
-@bp_logbooks.route('/logbooks/<int:logbook_id>/edit', methods=['GET', 'POST'])
+@bp_logbooks.route('/logbooks/<string:logbook_slug>/edit', methods=['GET', 'POST'])
 @login_required
 @check_default_profile
-def edit(logbook_id):
+def edit(logbook_slug):
     pcfg = {"title": "Edit my logbooks"}
-    a = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.id == logbook_id).first()
+    a = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.slug == logbook_slug).first()
     if not a:
         flash("Logbook not found", 'error')
         return redirect(url_for('bp_logbooks.logbooks', user=current_user.name))
@@ -64,7 +64,7 @@ def edit(logbook_id):
         flash("Success saving logbook: {0}".format(a.name), 'success')
         return redirect(url_for('bp_logbooks.logbooks', user=current_user.name))
 
-    return render_template('logbooks/edit.jinja2', pcfg=pcfg, form=form, logbook=a, logbook_id=logbook_id)
+    return render_template('logbooks/edit.jinja2', pcfg=pcfg, form=form, logbook=a, logbook_slug=logbook_slug)
 
 
 @bp_logbooks.route('/logbooks/new', methods=['GET', 'POST'])
@@ -116,11 +116,11 @@ def new():
     return render_template('logbooks/new.jinja2', pcfg=pcfg, form=form)
 
 
-@bp_logbooks.route('/logbooks/<int:logbook_id>/delete', methods=['GET', 'DELETE', 'PUT'])
+@bp_logbooks.route('/logbooks/<string:logbook_slug>/delete', methods=['GET', 'DELETE', 'PUT'])
 @login_required
 @check_default_profile
-def delete(logbook_id):
-    logbook = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.id == logbook_id).first()
+def delete(logbook_slug):
+    logbook = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.slug == logbook_slug).first()
     if not logbook:
         flash("Logbook not found", 'error')
         return redirect(url_for('bp_logbooks.logbooks', user=current_user.name))

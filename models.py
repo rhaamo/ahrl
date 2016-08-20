@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from geohelper import distance
 from sqlalchemy.sql import func
 from sqlalchemy_searchable import make_searchable
+from sqlalchemy import event
+from slugify import slugify
 
 db = SQLAlchemy()
 make_searchable()
@@ -49,6 +51,8 @@ class User(db.Model, UserMixin):
     timezone = db.Column(db.String(255), nullable=False, default='UTC')  # Managed and fed by pytz
     swl = db.Column(db.Boolean(), nullable=False, default=False)
     zone = db.Column(db.String(10), nullable=False, default='iaru1')
+
+    slug = db.Column(db.String(255), unique=True, nullable=True)
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
     logbooks = db.relationship('Logbook', backref='user', lazy='dynamic', cascade="delete")
@@ -112,6 +116,7 @@ class Cat(db.Model):
     frequency = db.Column(db.Integer(), nullable=False)
     mode = db.Column(db.String(10), nullable=False)
     timestamp = db.Column(db.DateTime(timezone=False), nullable=False)
+    slug = db.Column(db.String(255), unique=True, nullable=True)
 
 
 class Config(db.Model):
@@ -151,6 +156,7 @@ class ContestTemplate(db.Model):
     qra = db.Column(db.String(20), nullable=False)
     other_exch = db.Column(db.String(255), nullable=False)
     scoring = db.Column(db.String(255), nullable=False)
+    slug = db.Column(db.String(255), unique=True, nullable=True)
 
 
 class Contest(db.Model):
@@ -162,6 +168,7 @@ class Contest(db.Model):
     end = db.Column(db.DateTime(timezone=False), nullable=False)
     template = db.Column(db.Integer(), nullable=False)
     serial_num = db.Column(db.Integer(), nullable=False)
+    slug = db.Column(db.String(255), unique=True, nullable=True)
     # possible FK template->contest_template
 
 
@@ -176,6 +183,7 @@ class Contact(db.Model):
     bearing_star = db.Column(db.String(32))
     longitude = db.Column(db.Float)
     latitude = db.Column(db.Float)
+    slug = db.Column(db.String(255), unique=True, nullable=True)
 
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
 
@@ -191,6 +199,7 @@ class Logbook(db.Model):
     default = db.Column(db.Boolean, default=False)
     public = db.Column(db.Boolean, default=True)
     eqsl_qth_nickname = db.Column(db.String(255))
+    slug = db.Column(db.String(255), unique=True, nullable=True)
 
     logs = db.relationship('Log', backref='logbook', lazy='dynamic', cascade="delete")
     user_loggings = db.relationship('UserLogging', backref='logbook', lazy='dynamic', cascade="delete")
@@ -205,6 +214,7 @@ class Picture(db.Model):
     filename = db.Column(db.String(255), unique=False, nullable=True)
     filesize = db.Column(db.Integer, unique=False, nullable=True, default=0)  # stored as bytes
     hash = db.Column(db.String(255), unique=True, nullable=True)
+    slug = db.Column(db.String(255), unique=True, nullable=True)
 
     log_id = db.Column(db.Integer(), db.ForeignKey('log.id'), nullable=False)
 
@@ -335,6 +345,7 @@ class Log(db.Model):
     user_defined_9 = db.Column(db.String(64), default=None)
     credit_granted = db.Column(db.String(64), default=None)
     credit_submitted = db.Column(db.String(64), default=None)
+    slug = db.Column(db.String(255), unique=True, nullable=True)
 
     qsl_comment = db.Column(db.UnicodeText(), default=None)
 
@@ -392,6 +403,7 @@ class Note(db.Model):
     title = db.Column(db.String(255), nullable=False)
     note = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime(timezone=False), server_default=func.now(), onupdate=func.now())
+    slug = db.Column(db.String(255), unique=True, nullable=True)
 
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
 
@@ -529,3 +541,93 @@ def cutename(call, name=None):
         cute += " - "
     cute += call
     return cute
+
+
+@event.listens_for(User, 'after_update')
+@event.listens_for(User, 'after_insert')
+def make_slug(mapper, connection, target):
+    title = "{0} {1}".format(target.id, target.name)
+    slug = slugify(title)
+    connection.execute(
+        User.__table__.update().where(User.__table__.c.id == target.id).values(slug=slug)
+    )
+
+
+@event.listens_for(Cat, 'after_update')
+@event.listens_for(Cat, 'after_insert')
+def make_slug(mapper, connection, target):
+    title = "{0} {1}".format(target.id, target.radio)
+    slug = slugify(title)
+    connection.execute(
+        Cat.__table__.update().where(Cat.__table__.c.id == target.id).values(slug=slug)
+    )
+
+
+@event.listens_for(ContestTemplate, 'after_update')
+@event.listens_for(ContestTemplate, 'after_insert')
+def make_slug(mapper, connection, target):
+    title = "{0} {1}".format(target.id, target.name)
+    slug = slugify(title)
+    connection.execute(
+        ContestTemplate.__table__.update().where(ContestTemplate.__table__.c.id == target.id).values(slug=slug)
+    )
+
+
+@event.listens_for(Contest, 'after_update')
+@event.listens_for(Contest, 'after_insert')
+def make_slug(mapper, connection, target):
+    title = "{0} {1}".format(target.id, target.name)
+    slug = slugify(title)
+    connection.execute(
+        Contest.__table__.update().where(Contest.__table__.c.id == target.id).values(slug=slug)
+    )
+
+
+@event.listens_for(Contact, 'after_update')
+@event.listens_for(Contact, 'after_insert')
+def make_slug(mapper, connection, target):
+    title = "{0} {1}".format(target.id, target.callsign)
+    slug = slugify(title)
+    connection.execute(
+        Contact.__table__.update().where(Contact.__table__.c.id == target.id).values(slug=slug)
+    )
+
+
+@event.listens_for(Logbook, 'after_update')
+@event.listens_for(Logbook, 'after_insert')
+def make_slug(mapper, connection, target):
+    title = "{0} {1}".format(target.id, target.name)
+    slug = slugify(title)
+    connection.execute(
+        Logbook.__table__.update().where(Logbook.__table__.c.id == target.id).values(slug=slug)
+    )
+
+
+@event.listens_for(Picture, 'after_update')
+@event.listens_for(Picture, 'after_insert')
+def make_slug(mapper, connection, target):
+    title = "{0} {1}".format(target.id, target.name)
+    slug = slugify(title)
+    connection.execute(
+        Picture.__table__.update().where(Picture.__table__.c.id == target.id).values(slug=slug)
+    )
+
+
+@event.listens_for(Log, 'after_update')
+@event.listens_for(Log, 'after_insert')
+def make_slug(mapper, connection, target):
+    title = "{0} {1}".format(target.id, target.call)
+    slug = slugify(title)
+    connection.execute(
+        Log.__table__.update().where(Log.__table__.c.id == target.id).values(slug=slug)
+    )
+
+
+@event.listens_for(Note, 'after_update')
+@event.listens_for(Note, 'after_insert')
+def make_slug(mapper, connection, target):
+    title = "{0} {1}".format(target.id, target.title)
+    slug = slugify(title)
+    connection.execute(
+        Note.__table__.update().where(Note.__table__.c.id == target.id).values(slug=slug)
+    )
