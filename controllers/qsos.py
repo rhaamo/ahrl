@@ -25,7 +25,7 @@ bp_qsos = Blueprint('bp_qsos', __name__)
 pictures = UploadSet('pictures', IMAGES)
 
 
-@bp_qsos.route('/logbook/<string:username>/<string:logbook_slug>', methods=['GET'])
+@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>', methods=['GET'])
 @check_default_profile
 def logbook(username, logbook_slug):
     user = User.query.filter(User.name == username).first()
@@ -455,7 +455,7 @@ def lib_hamqth_call():
                     mimetype='application/json;charset=utf-8')
 
 
-@bp_qsos.route('/logbook/<string:username>/<string:logbook_slug>/geojson', methods=['GET'])
+@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/geojson', methods=['GET'])
 def logbook_geojson(username, logbook_slug):
     if not username:
         raise InvalidUsage('Missing username', status_code=400)
@@ -633,8 +633,8 @@ def logbook_qso_geojson(qso_id):
     return Response(json.dumps(f, encoding='utf-8', ensure_ascii=False), mimetype='application/json;charset=utf-8')
 
 
-@bp_qsos.route('/logbook/<string:username>/<string:logbook_slug>/qso/<string:qso_slug>', methods=['GET'])
-@bp_qsos.route('/logbook/<string:username>/<string:logbook_slug>/qso/<string:qso_slug>/pictures/new', endpoint='view_post',
+@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/qso/<string:qso_slug>', methods=['GET'])
+@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/qso/<string:qso_slug>/pictures/new', endpoint='view_post',
                methods=['POST'])
 @check_default_profile
 def view(username, logbook_slug, qso_slug):
@@ -786,7 +786,7 @@ def single_qso_modal(qso_id):
                            qso_bearing_star=qso_bearing_star, qso_distance_unit='Km')
 
 
-@bp_qsos.route('/logbook/<string:username>/<string:logbook_slug>/stats', methods=['GET'])
+@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/stats', methods=['GET'])
 @check_default_profile
 def logbook_stats(username, logbook_slug):
     user = User.query.filter(User.name == username).first()

@@ -134,7 +134,7 @@ def adif_import_file():
     return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=form.logbook.raw_data[0]))
 
 
-@bp_tools.route('/logbook/<string:username>/<string:logbook_slug>/adif/export', methods=['GET'])
+@bp_tools.route('/user/<string:username>/logbook/<string:logbook_slug>/adif/export', methods=['GET'])
 @login_required
 def adif_export_dl(username, logbook_slug):
     user = User.query.filter(User.name == username).first()

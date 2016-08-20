@@ -7,7 +7,7 @@ from utils import generate_uniques_apitoken
 bp_api = Blueprint('bp_api', __name__)
 
 
-@bp_api.route('/apitoken/new')
+@bp_api.route('/api/token/new')
 @login_required
 def apitoken_new():
     apitoken = generate_uniques_apitoken()
@@ -23,7 +23,7 @@ def apitoken_new():
     return redirect(url_for('bp_users.user_profile'))
 
 
-@bp_api.route('/apitoken/<string:apit>/del')
+@bp_api.route('/api/token/<string:apit>/del')
 @login_required
 def apitoken_del(apit):
     apitoken = Apitoken.query.filter(Apitoken.id == apit).first()
