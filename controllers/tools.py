@@ -10,7 +10,7 @@ from adif import parse as adif_parser
 from forms import AdifParse
 from models import db, Log, Mode, User, Logbook, Band
 from utils import check_default_profile, InvalidUsage
-from libjambon import ADIF_FIELDS
+from libjambon import ADIF_FIELDS, adif_coordinate
 
 bp_tools = Blueprint('bp_tools', __name__)
 
@@ -64,7 +64,7 @@ def adif_import_file():
                     val = log[key]
 
                 setattr(l, key, val)
-            
+
             # other fields to manage specifically
             if 'class' in log:
                 l.klass = log['class']
@@ -137,6 +137,7 @@ def adif_import_file():
 @bp_tools.route('/user/<string:username>/logbook/<string:logbook_slug>/adif/export', methods=['GET'])
 @login_required
 def adif_export_dl(username, logbook_slug):
+    """ http://hamclubs.info/adif-validator/ """
     user = User.query.filter(User.name == username).first()
     if not user:
         raise InvalidUsage("User not found", 404)
@@ -151,6 +152,10 @@ def adif_export_dl(username, logbook_slug):
         v = str(v)
         return u"<{0}:{1}>{2} ".format(k, len(v), v)
 
+    def ab(k, t, v):
+        v = str(v)
+        return u"<{0}:{1}:{2}>{3} ".format(k, len(v), t, v)
+
     def generate():
         yield 'ADIF Export by AHRL\r\n'
         yield '\r\n'
@@ -160,8 +165,13 @@ def adif_export_dl(username, logbook_slug):
         yield a('programversion', vers) + '\r\n'
         ct = datetime.datetime.utcnow().strftime('%Y%m%d %H%M%S')
         yield a('created_timestamp', ct) + '\r\n'
-        # yield a('station_callsign', user.callsign) + '\r\n'
-        # yield a('operator', user.callsign) + '\r\n'
+
+        yield ab('app_ahrl_station_callsign', 'S', user.callsign) + '\r\n'
+        yield ab('app_ahrl_operator', 'S', user.callsign) + '\r\n'
+        yield ab('app_ahrl_logbook', 'I', logbook.name) + '\r\n'
+        yield ab('app_ahrl_logbook_swl', 'B', 'Y' if logbook.swl else 'N') + '\r\n'
+        yield ab('app_ahrl_logbook_private', 'B', 'N' if logbook.public else 'Y') + '\r\n'
+
         yield '\r\n'
         yield '<eoh>\r\n\r\n'
 
@@ -181,6 +191,19 @@ def adif_export_dl(username, logbook_slug):
                             val = 'N'
                         else:
                             val = 'Y'
+                    elif key == 'lat':
+                        val = adif_coordinate(value, 'Latitude')
+                    elif key == 'lon':
+                        val = adif_coordinate(value, 'Longitude')
+                    elif key == 'notes':
+                        val = ''.join([i
+                                       if (126 >= ord(i) >= 32) or (i == '\r') or (i == '\n')
+                                       else ' ' for i in value])
+                    elif key == 'iota':
+                        if len(value) == 5:
+                            val = "{0}-{1}".format(value[0:2], value[2:5])
+                        else:
+                            val = value
                     else:
                         val = value
                     yield a(key, val)

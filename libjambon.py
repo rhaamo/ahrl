@@ -257,3 +257,35 @@ def get_dxcc_from_clublog_or_database(callsign):
             response['source'] = 'database'
 
     return response
+
+
+def adif_coordinate(coord, type):
+    """
+    a sequence of characters representing a latitude or longitude in XDDD MM.MMM format, where
+
+    X is a directional Character from the set {E, W, N, S}
+    DDD is a 3-Digit degrees specifier, where 0 <= DDD <= 180 [use leading zeroes]
+    MM.MMM is a 6-Digit minutes specifier, where 0 <= MM.MMM <= 59.999  [use leading zeroes]
+    """
+    degrees = int(coord)
+    minutes = abs((coord - int(coord)) * 60)
+
+    direction = ""
+    if type == "Longitude":
+        if degrees <= 0:
+            direction = "W"
+            degrees = abs(degrees)
+        elif degrees > 0:
+            direction = "E"
+        else:
+            direction = ""
+    elif type == "Latitude":
+        if degrees < 0:
+            direction = "S"
+            degrees = abs(degrees)
+        elif degrees > 0:
+            direction = "N"
+        else:
+            direction = ""
+
+    return "{0}{1} {min:06.3f}".format(direction, str(degrees).zfill(3), min=minutes)
