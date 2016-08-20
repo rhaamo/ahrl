@@ -333,7 +333,7 @@ def edit(logbook_slug, qso_slug):
         flash("Success updating QSO with {0} on {1} using {2}".format(
             a.call, a.band.name, a.mode.submode
         ), 'success')
-        return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook=a.logbook.slug))
+        return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_slug=a.logbook.slug))
 
     # DateTimes in database are stored in UTC format
     # Before displaying them, we convert them to a timezone-aware of UTC
