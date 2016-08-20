@@ -102,7 +102,7 @@
     <script>
         function reload_frequency() {
             $.ajax({
-                url: '/qsos/lib/jambon/band_to_freq',
+                url: '{{ url_for('bp_qsos.lib_jambon_band_to_freq') }}',
                 data: 'mode=' + $('select#mode').val() + '&band=' + $('select#band').val(),
                 dataType: 'json',
                 success: function (result) {
@@ -113,7 +113,7 @@
 
         function get_bearing() {
             $.ajax({
-                url: '/qsos/lib/geo/bearing',
+                url: '{{ url_for('bp_qsos.lib_geo_bearing') }}',
                 data: 'locator_qso=' + $('input#locator').val() + '&locator_user={{ current_user.locator }}',
                 dataType: 'json',
                 success: function (result) {
@@ -151,7 +151,7 @@
                 document.getElementById("submit").disabled = true;
                 // DXCC
                 $.ajax({
-                    url: '/qsos/lib/clublog/dxcc',
+                    url: '{{ url_for('bp_qsos.lib_clublog_dxcc') }}',
                     data: 'callsign=' + callsign,
                     dataType: 'json',
                     success: function (result) {
@@ -164,7 +164,7 @@
 
                 // HamQTH
                 $.ajax({
-                    url: '/qsos/lib/hamqth/call',
+                    url: '{{ url_for('bp_qsos.lib_hamqth_call') }}',
                     data: 'callsign=' + callsign,
                     dataType: 'json',
                     success: function (result) {
@@ -183,7 +183,7 @@
             var callsign = $('input#call').val();
             if (callsign) {
                 $.ajax({
-                    url: "/logbook/{{ logbook.slug }}/qsos/last16",
+                    url: '{{ url_for('bp_qsos.last_16_qsos', logbook_slug=logbook.slug) }}',
                     data: 'callsign=' + callsign,
                     dataType: 'html',
                     success: function (result) {
@@ -204,7 +204,7 @@
         reload_frequency(); // first call on page load
 
         // Load right page table
-        var last16_url = "/logbook/{{ logbook.slug }}/qsos/last16";
+        var last16_url = '{{ url_for('bp_qsos.last_16_qsos', logbook_slug=logbook.slug) }}';
         $('div.new_qso_logs_table').load(last16_url);
     </script>
 {% endblock %}
