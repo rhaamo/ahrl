@@ -1,6 +1,10 @@
 <div class="row">
     <div class="col-lg-12">
-        <h3>QSO with {{ qso.call }} on {{ qso.time_on | localize(user=qso.user) | show_date_no_offset }}</h3>
+        <h3>
+            <a href="{{ url_for('bp_qsos.view', username=qso.user.name, logbook_slug=qso.logbook.slug, qso_slug=qso.slug) }}" title="Full QSO page infos">
+                QSO with {{ qso.call }} on {{ qso.time_on | localize(user=qso.user) | show_date_no_offset }}
+            </a>
+        </h3>
     </div>
 </div>
 <div class="row">
