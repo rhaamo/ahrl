@@ -60,7 +60,7 @@ def adif_import_file():
 
                 if key == 'swl':
                     val = 1 if log[key] == 'Y' else 0
-                if key == 'lon' or key == 'lat':
+                elif key == 'lon' or key == 'lat':
                     val = coordinates_adif(log[key])
                 else:
                     val = log[key]
