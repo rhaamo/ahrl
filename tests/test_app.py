@@ -62,12 +62,13 @@ class TestViews(TestCase):
         rv = self.client.get("/user", follow_redirects=True)
         self.assertIn(b"Please log in to access this page.", rv.data)
 
-    def test_logged_user(self):
+    def test_logging_user(self):
         self.register()
         self.login()
         rv = self.client.get("/user", follow_redirects=True)
         self.assertIn(b"dashie@sigpipe.me", rv.data)
         self.logout()
+        self.assertIn(b"Logged as dashie", rv.data)
 
 
 if __name__ == '__main__':
