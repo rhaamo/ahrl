@@ -121,7 +121,7 @@
         function get_bearing() {
             $.ajax({
                 url: '{{ url_for('bp_qsos.lib_geo_bearing') }}',
-                data: 'locator_qso=' + $('input#locator').val() + '&locator_user={{ current_user.locator }}',
+                data: 'locator_qso=' + $('input#gridsquare').val() + '&locator_user={{ current_user.locator }}',
                 dataType: 'json',
                 success: function (result) {
                     var b = Math.round(result.bearing) + "&deg; " + result.bearing_star + " " + result.distance.toFixed(2) + result.unit;
@@ -134,7 +134,7 @@
             })
         }
 
-        $('input#locator').keyup(function() { get_bearing(); });
+        $('input#gridsquare').keyup(function() { get_bearing(); });
 
 
         $('#call').focusout(function() {
