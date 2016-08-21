@@ -910,3 +910,51 @@ def last_16_qsos(logbook_slug):
                                Log.call.contains(call)).order_by(Log.time_on.desc()).limit(16).all()
 
     return render_template('qsos/_logbook_table.jinja2', qsos=qsos, call=call)
+
+
+@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/search/simple', methods=['GET'])
+def logbook_search(username, logbook_slug):
+    user = User.query.filter(User.name == username).first()
+    if not user:
+        flash("User not found", "error")
+        return redirect(url_for("bp_main.home"))
+
+    _logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.slug == logbook_slug).first()
+    if not _logbook:
+        flash("Logbook not found", "error")
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    search_term = request.args.get('q', None)
+    if not search_term or search_term == "":
+        flash("No search term entered", "warning")
+        return redirect(url_for("bp_qsos.logbook", username=user.name, logbook_slug=_logbook.slug))
+
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+
+    pcfg = {"title": "Search {0} from {0}'s ({1}) logbook".format(search_term, user.name, user.callsign)}
+
+    uqth = user.qth_to_coords()
+
+    if not _logbook.public and not current_user.is_authenticated:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if not _logbook.public and _logbook.user_id != current_user.id:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    bq = Log.query.filter(User.id == user.id,
+                          Log.logbook_id == _logbook.id).search(search_term).paginate(page=page, per_page=20)
+
+    if current_user.is_authenticated:
+        logbooks = db.session.query(Logbook.id, Logbook.slug, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
+    else:
+        logbooks = db.session.query(Logbook.id, Logbook.slug, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == user.id, Logbook.public.is_(True)).group_by(Logbook.id).all()
+
+    return render_template('qsos/search.jinja2', logbooks=logbooks, qsos=bq, logbook=_logbook, user=user,
+                           search_term=search_term)

@@ -2,15 +2,20 @@ import datetime
 from libqth import is_valid_qth, qth_to_coords, coords_to_qth
 
 from flask_security import SQLAlchemyUserDatastore, UserMixin, RoleMixin
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, BaseQuery
 from geohelper import distance
 from sqlalchemy.sql import func
-from sqlalchemy_searchable import make_searchable
+from sqlalchemy_searchable import make_searchable, SearchQueryMixin
 from sqlalchemy import event
 from slugify import slugify
+from sqlalchemy_utils.types import TSVectorType
 
 db = SQLAlchemy()
 make_searchable()
+
+
+class LogQuery(BaseQuery, SearchQueryMixin):
+    pass
 
 
 roles_users = db.Table('roles_users',
@@ -220,6 +225,7 @@ class Picture(db.Model):
 
 
 class Log(db.Model):
+    query_class = LogQuery
     __tablename__ = "log"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -355,6 +361,9 @@ class Log(db.Model):
     logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=False)
     pictures = db.relationship('Picture', backref='log', lazy='dynamic')
     user_loggings = db.relationship('UserLogging', backref='log', lazy='dynamic', cascade="delete")
+
+    search_vector = db.Column(TSVectorType('call', 'comment', 'country', 'email', 'name', 'notes', 'operator',
+                                           'owner_callsign', 'qslmsg', 'station_callsign', 'web', 'qsl_comment'))
 
     __mapper_args__ = {"order_by": time_on.desc()}
 
