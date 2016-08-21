@@ -28,9 +28,12 @@ from utils import dt_utc_to_user_tz, InvalidUsage, show_date_no_offset, is_admin
 __VERSION__ = "0.0.1"
 
 
-def create_app():
+def create_app(cfg={}):
     # App Configuration
     app = Flask(__name__)
+    app.config.from_pyfile("config.py")
+    app.config.update(cfg)
+
     Bootstrap(app)
 
     app.jinja_env.add_extension('jinja2.ext.with_')
@@ -38,8 +41,6 @@ def create_app():
     app.jinja_env.filters['localize'] = dt_utc_to_user_tz
     app.jinja_env.filters['show_date_no_offset'] = show_date_no_offset
     app.jinja_env.globals.update(is_admin=is_admin)
-
-    app.config.from_pyfile("config.py")
 
     # Logging
     if not app.debug:
