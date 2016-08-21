@@ -32,6 +32,11 @@ def adif_import_file():
 
     form = AdifParse()
 
+    _logbook = Logbook.query.filter(Logbook.user_id == current_user.id, Logbook.id == form.logbook.raw_data[0]).first()
+    if not _logbook:
+        flash("Logbook not found", "error")
+        return redirect(url_for("bp_tools.adif_import"))
+
     if form.validate_on_submit():
         filename = secure_filename(form.adif_file.data.filename)
         files = form.adif_file.raw_data[0].stream.read()
@@ -48,7 +53,7 @@ def adif_import_file():
             duplicates_count = db.session.query(Log.id).filter(Log.user_id == current_user.id,
                                                                Log.call == log['call'],
                                                                Log.time_on == _date_wo_tz,
-                                                               Log.logbook_id == form.logbook.raw_data[0]).count()
+                                                               Log.logbook_id == _logbook.id).count()
             if duplicates_count > 0:
                 duplicates += 1
                 continue  # duplicate found, skip record
@@ -123,7 +128,7 @@ def adif_import_file():
             if 'comment_intl' in log:
                 l.comment = log['comment_intl']
             l.user = current_user  # oops dont miss it
-            l.logbook_id = form.logbook.raw_data[0]
+            l.logbook_id = _logbook.id
 
             db.session.add(l)
             count += 1  # One more in the stack
@@ -133,7 +138,7 @@ def adif_import_file():
     else:
         return render_template('tools/adif_import.jinja2', pcfg=pcfg, form=form, flash='Error with the file')
 
-    return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_id=form.logbook.raw_data[0]))
+    return redirect(url_for('bp_qsos.logbook', username=current_user.name, logbook_slug=_logbook.slug))
 
 
 @bp_tools.route('/user/<string:username>/logbook/<string:logbook_slug>/adif/export', methods=['GET'])
