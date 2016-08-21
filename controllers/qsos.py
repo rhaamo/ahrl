@@ -744,7 +744,8 @@ def delete_picture(username, logbook_slug, qso_slug, picture_id):
     db.session.commit()
 
     f = os.path.join(current_app.config['UPLOADED_PICTURES_DEST'], picture.filename)
-    os.remove(f)
+    if os.path.isfile(f):
+        os.remove(f)
 
     return redirect(url_for('bp_qsos.view', username=user.name, logbook_slug=_logbook.slug, qso_slug=qso.slug))
 
