@@ -5,6 +5,7 @@
 <div class="row">
     <div class="col-lg-12">
         <h3>QSO with {{ qso.call }} on {{ qso.time_on | localize(user=qso.user) | show_date_no_offset }}</h3>
+        <h5>In logbook {{ qso.logbook.name }}</h5>
     </div>
 </div>
 <div class="row">
