@@ -259,7 +259,7 @@ def get_dxcc_from_clublog_or_database(callsign):
     return response
 
 
-def adif_coordinate(coord, type):
+def coordinates2adif(coord, type):
     """
     a sequence of characters representing a latitude or longitude in XDDD MM.MMM format, where
 
@@ -291,7 +291,7 @@ def adif_coordinate(coord, type):
     return "{0}{1} {min:06.3f}".format(direction, str(degrees).zfill(3), min=minutes)
 
 
-def coordinates_adif(coord):
+def adif2coordinates(coord):
     """
     a sequence of characters representing a latitude or longitude in XDDD MM.MMM format, where
 

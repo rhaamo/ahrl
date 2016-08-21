@@ -10,7 +10,7 @@ from adif import parse as adif_parser
 from forms import AdifParse
 from models import db, Log, Mode, User, Logbook, Band
 from utils import check_default_profile, InvalidUsage
-from libjambon import ADIF_FIELDS, adif_coordinate, coordinates_adif
+from libjambon import ADIF_FIELDS, coordinates2adif, adif2coordinates
 
 bp_tools = Blueprint('bp_tools', __name__)
 
@@ -66,7 +66,7 @@ def adif_import_file():
                 if key == 'swl':
                     val = 1 if log[key] == 'Y' else 0
                 elif key == 'lon' or key == 'lat':
-                    val = coordinates_adif(log[key])
+                    val = adif2coordinates(log[key])
                 else:
                     val = log[key]
 
@@ -199,9 +199,9 @@ def adif_export_dl(username, logbook_slug):
                         else:
                             val = 'Y'
                     elif key == 'lat':
-                        val = adif_coordinate(value, 'Latitude')
+                        val = coordinates2adif(value, 'Latitude')
                     elif key == 'lon':
-                        val = adif_coordinate(value, 'Longitude')
+                        val = coordinates2adif(value, 'Longitude')
                     elif key == 'notes':
                         val = ''.join([i
                                        if (126 >= ord(i) >= 32) or (i == '\r') or (i == '\n')
