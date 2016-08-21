@@ -289,3 +289,20 @@ def adif_coordinate(coord, type):
             direction = ""
 
     return "{0}{1} {min:06.3f}".format(direction, str(degrees).zfill(3), min=minutes)
+
+
+def coordinates_adif(coord):
+    """
+    a sequence of characters representing a latitude or longitude in XDDD MM.MMM format, where
+
+    X is a directional Character from the set {E, W, N, S}
+    DDD is a 3-Digit degrees specifier, where 0 <= DDD <= 180 [use leading zeroes]
+    MM.MMM is a 6-Digit minutes specifier, where 0 <= MM.MMM <= 59.999  [use leading zeroes]
+    """
+    p = re.match(r'([NWES])([\d]{3})\s(\d\d\.\d\d\d)', coord)
+
+    coords = int(p.group(2)) + float(p.group(3)) / 60.0
+    if p.group(1) in ['W', 'S'] and coords >= 0:
+        coords = math.fabs(coords) * -1
+
+    return coords
