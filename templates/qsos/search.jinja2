@@ -82,6 +82,11 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.ajax.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.awesome-markers.js') }}"></script>
+
     <script>
         $('#ModalQsoSingle').on('shown.bs.modal', function(ev) {
             var btn = $(ev.relatedTarget);
@@ -90,4 +95,8 @@
             $('div.modal-body').load(url);
         });
     </script>
+{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.awesome-markers.css') }}" />
 {% endblock %}
