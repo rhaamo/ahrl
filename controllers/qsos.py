@@ -702,8 +702,6 @@ def view(username, logbook_slug, qso_slug):
             a = Picture()
             a.name = form.name.data
             a.filename = filename
-            a.filesize = None
-            a.hash = None
             a.log_id = qso.id
             db.session.add(a)
             db.session.commit()

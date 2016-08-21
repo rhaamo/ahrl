@@ -217,8 +217,6 @@ class Picture(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     filename = db.Column(db.String(255), unique=False, nullable=True)
-    filesize = db.Column(db.Integer, unique=False, nullable=True, default=0)  # stored as bytes
-    hash = db.Column(db.String(255), unique=True, nullable=True)
     slug = db.Column(db.String(255), unique=True, nullable=True)
 
     log_id = db.Column(db.Integer(), db.ForeignKey('log.id'), nullable=False)
