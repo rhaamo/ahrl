@@ -980,8 +980,6 @@ def logbook_search_adv(username, logbook_slug):
 
     pcfg = {"title": "Adv Search from {0}'s ({1}) logbook".format(user.name, user.callsign)}
 
-    uqth = user.qth_to_coords()
-
     if not _logbook.public and not current_user.is_authenticated:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
@@ -1076,4 +1074,4 @@ def logbook_search_adv(username, logbook_slug):
     qsos=bq.all()
 
     return render_template('qsos/adv_search.jinja2', qsos=qsos, form=form, logbooks=logbooks,
-                           logbook=_logbook, user=user, filtered=filtered)
+                           logbook=_logbook, user=user, filtered=filtered, pcfg=pcfg)
