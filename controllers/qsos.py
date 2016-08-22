@@ -40,8 +40,6 @@ def logbook(username, logbook_slug):
 
     pcfg = {"title": "{0}'s ({1}) logbook".format(user.name, user.callsign)}
 
-    uqth = user.qth_to_coords()
-
     _logbook = Logbook.query.filter(Logbook.slug == logbook_slug, Logbook.user_id == user.id).first()
     if not _logbook:
         flash("Logbook not found", 'error')
@@ -54,6 +52,8 @@ def logbook(username, logbook_slug):
     if not _logbook.public and _logbook.user_id != current_user.id:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    uqth = user.qth_to_coords()
 
     d = datetime.datetime.utcnow()
     mr_m = monthrange(d.year, d.month)
