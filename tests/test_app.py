@@ -72,6 +72,7 @@ class TestViews(TestCase):
         self.logout()
         self.assertIn(b"Logged as dashie", rv.data)
 
+    ### Profile
     def test_profile(self):
         self.register()
         self.login()
@@ -92,6 +93,7 @@ class TestViews(TestCase):
         self.assertIn(b"<td>N0CALL</td>", rv.data)
         self.assertIn(b"<td>JN18CX</td>", rv.data)
 
+    ### Contacts
     def add_contact(self, call, loc):
         return self.client.post('/contacts/new',
                                 data=dict(callsign=call, gridsquare=loc),
@@ -102,6 +104,7 @@ class TestViews(TestCase):
         self.login()
         self.update_profile()
         rv = self.add_contact("F4TEST", "JN11DW")
+        self.assertIn(b"<td>F4TEST</td>", rv.data)
         self.assertIn(b"<td>783.0 Km</td>", rv.data)
         self.assertIn(b"<td>179.0</td>", rv.data)
         self.assertIn(b"<td>S</td>", rv.data)
@@ -111,4 +114,44 @@ class TestViews(TestCase):
         self.login()
         rv = self.add_contact("F4TEST", "JN11DW")
         self.assertIn(b"Missing locator_qso or locator_user", rv.data)
-    
+
+    def test_edit_contact(self):
+        self.register()
+        self.login()
+        self.update_profile()
+        self.add_contact("F4TEST", "JN11DW")
+        rv = self.client.post("/contacts/1/edit", follow_redirects=True, data=dict(callsign="F8COIN",
+                                                                                   gridsquare="JN11DW"))
+        self.assertIn(b"<td>F8COIN</td>", rv.data)
+        self.assertIn(b"<td>783.0 Km</td>", rv.data)
+        self.assertIn(b"<td>179.0</td>", rv.data)
+        self.assertIn(b"<td>S</td>", rv.data)
+
+    def test_delete_contact(self):
+        self.register()
+        self.login()
+        self.update_profile()
+        self.add_contact("F4TEST", "JN11DW")
+        rv = self.client.get('/contacts/1/delete')
+        self.assertNotIn(b"<td>F4TEST</td>", rv.data)
+        self.assertNotIn(b"<td>783.0 Km</td>", rv.data)
+        self.assertNotIn(b"<td>179.0</td>", rv.data)
+        self.assertNotIn(b"<td>S</td>", rv.data)
+
+    def test_add_contact_missing_locator(self):
+        self.register()
+        self.login()
+        self.update_profile()
+        rv = self.client.post('/contacts/new',
+                                   data=dict(callsign="F4TEST"),
+                                   follow_redirects=True)
+        self.assertIn(b"QTH is too broad or empty, please input valid QTH", rv.data)
+
+    def test_add_contact_missing_call(self):
+        self.register()
+        self.login()
+        self.update_profile()
+        rv = self.client.post('/contacts/new',
+                                   data=dict(gridsquare="JN18CX"),
+                                   follow_redirects=True)
+        self.assertIn(b"This field is required.", rv.data)
