@@ -114,6 +114,11 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Search <span class="caret"></span></a>
               <ul id="search-dd" class="dropdown-menu">
                   <li>
+                    <div class="row adv-search">
+                      <div class="col-md-12">
+                          <a href="{{ url_for('bp_qsos.logbook_search_adv', logbook_slug=logbook.slug, username=logbook.user.name) }}">Advanced search page</a>
+                      </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-12">
                             <form accept-charset="UTF-8" role="form" class="form-inline" method="get" action="{{ url_for('bp_qsos.logbook_search', logbook_slug=logbook.slug, username=logbook.user.name) }}">

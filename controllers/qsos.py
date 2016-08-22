@@ -12,7 +12,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Bundle
 from sqlalchemy.sql.expression import case
 
-from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm
+from forms import QsoForm, EditQsoForm, FilterLogbookBandMode, PictureForm, AdvSearchForm
 from libjambon import band_to_frequency, geo_bearing_star, get_dxcc_from_clublog_or_database
 from models import db, User, Log, Band, Mode, Logbook, Picture
 from models import ham_country_grid_coords, cutename
@@ -292,6 +292,9 @@ def edit(logbook_slug, qso_slug):
 
         if not form.gridsquare.data or form.gridsquare.data == '':
             cmp_qth = ham_country_grid_coords(a.call)
+            if not cmp_qth:
+                flash("DXCC database empty", "error")
+                return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
             a.cache_gridsquare = cmp_qth['qth']
             a.gridsquare = form.gridsquare.data.upper()
         else:
@@ -961,3 +964,110 @@ def logbook_search(username, logbook_slug):
 
     return render_template('qsos/search.jinja2', logbooks=logbooks, qsos=bq, logbook=_logbook, user=user,
                            search_term=search_term)
+
+
+@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/search/advanced', methods=['GET', 'POST'])
+def logbook_search_adv(username, logbook_slug):
+    user = User.query.filter(User.name == username).first()
+    if not user:
+        flash("User not found", "error")
+        return redirect(url_for("bp_main.home"))
+
+    _logbook = Logbook.query.filter(Logbook.user_id == user.id, Logbook.slug == logbook_slug).first()
+    if not _logbook:
+        flash("Logbook not found", "error")
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    pcfg = {"title": "Adv Search from {0}'s ({1}) logbook".format(user.name, user.callsign)}
+
+    uqth = user.qth_to_coords()
+
+    if not _logbook.public and not current_user.is_authenticated:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if not _logbook.public and _logbook.user_id != current_user.id:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if current_user.is_authenticated:
+        logbooks = db.session.query(Logbook.id, Logbook.slug, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
+    else:
+        logbooks = db.session.query(Logbook.id, Logbook.slug, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == user.id, Logbook.public.is_(True)).group_by(Logbook.id).all()
+
+    if request.method == 'GET':
+        form = AdvSearchForm()
+    else:
+        form = AdvSearchForm(request.form)
+
+    filter_modes = []
+    _a_logs = Bundle('log', Log.mode_id)
+    _b_modes = Bundle('modes', Mode.id, Mode.mode, Mode.submode)
+    for _modes, _logs in db.session.query(_b_modes, _a_logs).join(
+            Mode.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(_a_logs, _b_modes).all():
+        filter_modes.append([_modes.id, '{0} - {1}'.format(_modes.mode, _modes.submode)])
+
+    filter_bands = []
+    _a_logs = Bundle('log', Log.band_id)
+    _b_bands = Bundle('bands', Band.id, Band.name)
+    for _bands, _logs in db.session.query(_b_bands, _a_logs).join(
+            Band.logs).filter(Log.user_id == user.id, Log.logbook_id == _logbook.id).group_by(_a_logs, _b_bands).all():
+        filter_bands.append([_bands.name, _bands.name])
+
+    filter_countries = []
+    for _log in db.session.query(Log.country).group_by(Log.country).order_by(Log.country).all():
+        filter_countries.append([_log.country, _log.country])
+
+    filter_modes.insert(0, ['any', 'Any mode'])
+    filter_bands.insert(0, ['any', 'Any band'])
+    filter_countries.insert(0, ['any', 'Any country'])
+
+    if request.method == 'GET':
+        form.country.data = 'any'
+        form.mode.data = 'any'
+        form.band.data = 'any'
+
+    form.country.choices = filter_countries
+    form.mode.choices = filter_modes
+    form.band.choices = filter_bands
+
+    bq = Log.query.filter(User.id == user.id, Log.logbook_id == _logbook.id)
+    filtered = False
+
+    if form.country.data != "any":
+        filtered = True
+        bq = bq.filter(Log.country == form.country.data)
+
+    if form.mode.data != "any":
+        filtered = True
+        bq = bq.filter(Log.mode_id == form.mode.data)
+
+    if form.band.data != "any":
+        band_id = Band.query.filter(Band.name == form.band.data).first()
+        if not band_id:
+            flash("Invalid band", "warning")
+        else:
+            filtered = True
+            bq = bq.filter(Log.band_id == band_id.id)
+
+    if form.frequency.data != "" and form.frequency.data is not None:
+        filtered = True
+        bq = bq.filter(Log.freq == form.frequency.data)
+
+    if form.call.data != "" and form.call.data is not None:
+        filtered = True
+        bq = bq.filter(Log.call.ilike(form.call.data))
+
+    if form.fts.data != "" and form.fts.data is not None:
+        filtered = True
+        bq = bq.search(form.fts.data)
+
+    if not filtered:
+        bq = bq.limit(20)
+
+    qsos=bq.all()
+
+    return render_template('qsos/adv_search.jinja2', qsos=qsos, form=form, logbooks=logbooks,
+                           logbook=_logbook, user=user, filtered=filtered)

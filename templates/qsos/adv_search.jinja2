@@ -1,0 +1,146 @@
+{% extends "layout.jinja2" %}
+{% from "bootstrap/pagination.html" import render_pagination %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="ModalQsoSingle">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-6">
+                <h4>Advanced QSO Search</h4>
+                <h5>From logbook: {{ logbook.name }}</h5>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="row form-adv-search">
+        <div class="col-lg-12">
+            <h5>Full text search input will match from any of theses fields: Call, Comment, Country, Email, Name, Notes, Operator, Owner callsign, Qslmsg, Station callsign, Web and Qsl comment.</h5>
+
+            <form action="{{ url_for('bp_qsos.logbook_search_adv', username=logbook.user.name, logbook_slug=logbook.slug) }}" method="POST" class="form-horizontal" name="gtfo-lastpass-search">
+                {{ form.hidden_tag() }}
+                {{ wtf.form_errors(form, hiddens=True) }}
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        {{ wtf.form_field(form.from_date, 'vertical', class="form-control input-sm") }}
+                        {{ wtf.form_field(form.fts, 'vertical', class="form-control input-sm", placeholder="Full text search") }}
+                        {{ wtf.form_field(form.mode, 'vertical', class="form-control input-sm") }}
+                    </div>
+
+                    <div class="col-lg-3 col-lg-offset-1">
+                        {{ wtf.form_field(form.to_date, 'vertical', class="form-control input-sm") }}
+                        {{ wtf.form_field(form.call, 'vertical', class="form-control input-sm") }}
+                        {{ wtf.form_field(form.band, 'vertical', class="form-control input-sm") }}
+                    </div>
+
+                    <div class="col-lg-3 col-lg-offset-1">
+                        {{ wtf.form_field(form.frequency, 'vertical', class="form-control input-sm", placeholder="In hertz") }}
+                        {{ wtf.form_field(form.country, 'vertical', class="form-control input-sm") }}
+                        {{ wtf.form_field(form.pictures, 'vertical', class="form-control input-sm") }}
+                    </div>
+                </div>
+                <div class="row form-adv-submit">
+                    <div class="col-lg-6">
+                        {{ wtf.form_field(form.submit, button_map={'submit': 'success'}) }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <h5>
+                Results: {{ qsos|count }}
+                {% if not filtered %}
+                 (no search argument, limited to 20)
+                {% endif %}
+            </h5>
+        </div>
+    </div>
+
+    <div class="row">
+    <div class="col-lg-12">
+        <table class="table table-condensed table-stripped">
+            <tr>
+                <th>Date</th>
+                <th>Call</th>
+                <th>Mode</th>
+                <th>Sent</th>
+                <th>Recv</th>
+                <th>Band</th>
+                <th>Distance</th>
+                <th>Country</th>
+                {% if current_user.is_authenticated and (current_user.id == user.id) %}
+                    <th>Actions</th>
+                {% endif %}
+            </tr>
+            {% for log in qsos %}
+                <tr>
+                <td>{{ log.time_on | localize(user=log.user) | show_date_no_offset }}</td>
+                <td>
+                    <a href="{{ url_for('bp_qsos.view', username=log.user.name, logbook_slug=log.logbook.slug, qso_slug=log.slug) }}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a data-toggle="modal" data-target="#ModalQsoSingle" data-qso-id="{{ log.id }}">{{ log.call }}</a>
+                </td>
+                <td>
+                    {% if log.pictures.count() > 0 %}
+                    <strong title="Pictures attached">{{ log.mode.submode }}</strong>
+                    {% else %}
+                    {{ log.mode.submode }}
+                {% endif %}
+                </td>
+                <td>{{ log.rst_sent }}</td>
+                <td>{{ log.rst_rcvd }}</td>
+                <td>{{ log.band.name }}</td>
+                <td>{% if log.distance_from_user() %}{{ log.distance_from_user() | round }} Km{% endif %}</td>
+                <td class="log-cnty">{{ log.country }}</td>
+                {% if current_user.is_authenticated and (current_user.id == log.user_id) %}
+                    <td>
+                        <a href="{{ url_for('bp_qsos.edit', qso_slug=log.slug, logbook_slug=log.logbook.slug) }}" class="btn btn-primary btn-xs">edit</a>
+                        <a href="{{ url_for('bp_qsos.delete', qso_slug=log.slug) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                    </td>
+                {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.ajax.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.awesome-markers.js') }}"></script>
+
+    <script>
+        $('#ModalQsoSingle').on('shown.bs.modal', function(ev) {
+            var btn = $(ev.relatedTarget);
+            var qso_id = btn.data('qso-id');
+            var url = "/logbook/qso/" + qso_id + "/modal";
+            $('div.modal-body').load(url);
+        });
+    </script>
+{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.awesome-markers.css') }}" />
+{% endblock %}

@@ -9,7 +9,7 @@ from wtforms import StringField, PasswordField, SubmitField, TextAreaField, Sele
     HiddenField, BooleanField
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, ValidationError, Optional
 from wtforms_alchemy import model_form_factory
 from wtforms_components.fields import SelectField as WTFComponentsSelectField
 from wtforms import widgets
@@ -321,3 +321,28 @@ class ConfigForm(Form):
     clublog_api_key = StringField('ClubLog API Key')
 
     submit = SubmitField('Update config')
+
+
+class AdvSearchForm(Form):
+    # Remember that the Full Text Search already search text within:
+    # Call, Comment, Country, Email, Name, Notes, Operator,
+    # Owner callsign, Qslmsg, Station callsign, Web and Qsl comment
+
+    # Select inputs will have a first field "Any" value "any"
+    from_date = DateTimeField("From date", [Optional()])
+    to_date = DateTimeField("To date", [Optional()])
+    fts = StringField("Search string", [Optional()])
+    country = SelectField(label='Country', validators=[Optional()])
+    call = StringField("Callsign", [Optional()])
+    mode = SelectField(label='Mode', validators=[Optional()])
+    band = SelectField(label='Band', validators=[Optional()])
+    frequency = IntegerField("Freq", [Optional()])
+    pictures = SelectField(label='Has pictures', validators=[Optional()],
+                           choices=[['any', 'Any'],
+                                    ['Y', 'Yes'],
+                                    ['N', 'No']])
+    # qsl statues <select>
+    # eqsl statues <select>
+    # pictures <select>
+
+    submit = SubmitField('Search')
