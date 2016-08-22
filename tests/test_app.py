@@ -1,10 +1,7 @@
 from flask_testing import TestCase
 from app import create_app
-from nose2.compat import unittest
-# import sys
-# sys.path.insert(0, sys.path[0] + '/../')
 
-from models import db, User, user_datastore, Role
+from models import db, User
 from dbseed import seed_config, seed_bands
 
 
@@ -72,7 +69,7 @@ class TestViews(TestCase):
         self.logout()
         self.assertIn(b"Logged as dashie", rv.data)
 
-    ### Profile
+    # Profile
     def test_profile(self):
         self.register()
         self.login()
@@ -93,7 +90,7 @@ class TestViews(TestCase):
         self.assertIn(b"<td>N0CALL</td>", rv.data)
         self.assertIn(b"<td>JN18CX</td>", rv.data)
 
-    ### Contacts
+    # Contacts
     def add_contact(self, call, loc):
         return self.client.post('/contacts/new',
                                 data=dict(callsign=call, gridsquare=loc),
@@ -143,8 +140,8 @@ class TestViews(TestCase):
         self.login()
         self.update_profile()
         rv = self.client.post('/contacts/new',
-                                   data=dict(callsign="F4TEST"),
-                                   follow_redirects=True)
+                              data=dict(callsign="F4TEST"),
+                              follow_redirects=True)
         self.assertIn(b"QTH is too broad or empty, please input valid QTH", rv.data)
 
     def test_add_contact_missing_call(self):
@@ -152,6 +149,26 @@ class TestViews(TestCase):
         self.login()
         self.update_profile()
         rv = self.client.post('/contacts/new',
-                                   data=dict(gridsquare="JN18CX"),
-                                   follow_redirects=True)
+                              data=dict(gridsquare="JN18CX"),
+                              follow_redirects=True)
         self.assertIn(b"This field is required.", rv.data)
+
+    # Notes
+
+    # Logbooks
+
+    # Non existent
+    def test_nonexist_user(self):
+        rv = self.client.get('/user/davenull/logbook/1-test', follow_redirects=True)
+        self.assertIn(b"User not found", rv.data)
+
+    def test_nonexist_logbook(self):
+        self.register()
+        rv = self.client.get('/user/dashie/logbook/1-test', follow_redirects=True)
+        self.assertIn(b"Logbook not found", rv.data)
+
+        # QSOs
+
+        # JSons and APIs
+
+        # Adif import / export
