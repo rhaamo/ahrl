@@ -80,17 +80,35 @@ class TestViews(TestCase):
         self.assertIn(b"Please fill me !", rv.data)
         self.logout()
 
-    # Todo test profile edit
+    def update_profile(self):
+        return self.client.post("/user/edit", follow_redirects=True, data=dict(
+            callsign="N0CALL", locator="JN18CX"
+        ))
 
-    #def add_contact(self, call, loc):
-    #    return self.client.post('/login',
-    #                            data=dict(email='dashie@sigpipe.me', password='fluttershy'),
-    #                            follow_redirects=True)
+    def test_profile_edit(self):
+        self.register()
+        self.login()
+        rv = self.update_profile()
+        self.assertIn(b"<td>N0CALL</td>", rv.data)
+        self.assertIn(b"<td>JN18CX</td>", rv.data)
 
-    #def test_add_contact(self):
-    #    self.register()
-    #    self.login()
-    #    rv = self.add_contact("F4TEST", "JN1742")
+    def add_contact(self, call, loc):
+        return self.client.post('/contacts/new',
+                                data=dict(callsign=call, gridsquare=loc),
+                                follow_redirects=True)
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_add_contact(self):
+        self.register()
+        self.login()
+        self.update_profile()
+        rv = self.add_contact("F4TEST", "JN11DW")
+        self.assertIn(b"<td>783.0 Km</td>", rv.data)
+        self.assertIn(b"<td>179.0</td>", rv.data)
+        self.assertIn(b"<td>S</td>", rv.data)
+
+    def test_add_contact_no_locator(self):
+        self.register()
+        self.login()
+        rv = self.add_contact("F4TEST", "JN11DW")
+        self.assertIn(b"Missing locator_qso or locator_user", rv.data)
+    
