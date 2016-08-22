@@ -32,7 +32,6 @@ if HAS_SENTRY:
     print(" * Sentry DSN: %s" % app.config['SENTRY_DSN'])
 
 toolbar = DebugToolbarExtension(app)
-migrate = Migrate(app, db)
 manager = Manager(app)
 
 

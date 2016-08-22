@@ -51,6 +51,7 @@ def create_app(cfg={}):
         app.logger.addHandler(file_handler)
 
     mail = Mail(app)
+    migrate = Migrate(app, db)
 
     db.init_app(app)
 

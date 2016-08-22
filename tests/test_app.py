@@ -5,6 +5,7 @@ from nose2.compat import unittest
 # sys.path.insert(0, sys.path[0] + '/../')
 
 from models import db, User, user_datastore, Role
+from dbseed import seed_config, seed_bands
 
 
 class TestViews(TestCase):
@@ -19,8 +20,9 @@ class TestViews(TestCase):
         return app
 
     def setUp(self):
-        # Switch to a post / registration
         db.create_all()
+        seed_config(db)
+        seed_bands(db)
 
     def tearDown(self):
         db.session.remove()
@@ -70,6 +72,25 @@ class TestViews(TestCase):
         self.logout()
         self.assertIn(b"Logged as dashie", rv.data)
 
+    def test_profile(self):
+        self.register()
+        self.login()
+        rv = self.client.get("/user", follow_redirects=True)
+        self.assertIn(b"Please fill me !", rv.data)
+        self.assertIn(b"Please fill me !", rv.data)
+        self.logout()
+
+    # Todo test profile edit
+
+    #def add_contact(self, call, loc):
+    #    return self.client.post('/login',
+    #                            data=dict(email='dashie@sigpipe.me', password='fluttershy'),
+    #                            follow_redirects=True)
+
+    #def test_add_contact(self):
+    #    self.register()
+    #    self.login()
+    #    rv = self.add_contact("F4TEST", "JN1742")
 
 if __name__ == '__main__':
     unittest.main()
