@@ -53,7 +53,11 @@ def logbook(username, logbook_slug):
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
-    uqth = user.qth_to_coords()
+    if is_valid_qth(user.locator, 6):
+        uqth = user.qth_to_coords()
+    else:
+        flash("User gridsquare is invalid")
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
 
     d = datetime.datetime.utcnow()
     mr_m = monthrange(d.year, d.month)
