@@ -1064,6 +1064,12 @@ def logbook_search_adv(username, logbook_slug):
         filtered = True
         bq = bq.search(form.fts.data)
 
+    if form.pictures.data == "Y":
+        filtered = True
+        bq = bq.filter(Log.pictures)
+    else:
+        bq = bq.filter(Log.pictures == None)
+
     if not filtered:
         bq = bq.limit(20)
 
