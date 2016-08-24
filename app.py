@@ -21,6 +21,7 @@ from controllers.notes import bp_notes
 from controllers.qsos import bp_qsos
 from controllers.tools import bp_tools
 from controllers.users import bp_users
+from controllers.extapi import bp_extapi
 from forms import ExtendedRegisterForm
 from models import db, user_datastore
 from utils import dt_utc_to_user_tz, InvalidUsage, show_date_no_offset, is_admin
@@ -93,6 +94,7 @@ def create_app(cfg={}):
     app.register_blueprint(bp_contacts)
     app.register_blueprint(bp_logbooks)
     app.register_blueprint(bp_admin)
+    app.register_blueprint(bp_extapi)
 
 
     # Used in development
