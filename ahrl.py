@@ -27,7 +27,7 @@ app = create_app()
 
 if HAS_SENTRY:
     app.config['SENTRY_RELEASE'] = raven.fetch_git_sha(os.path.dirname(__file__))
-    sentry = Sentry(app, dsn=app.config['SENTRY_DSN'], level=logging.ERROR, logging=True)
+    sentry = Sentry(app, dsn=app.config['SENTRY_DSN'], level=logging.INFO, logging=True, logging_exclusions=("logger"))
     print(" * Sentry support activated")
     print(" * Sentry DSN: %s" % app.config['SENTRY_DSN'])
 
