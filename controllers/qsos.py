@@ -1078,3 +1078,48 @@ def logbook_search_adv(username, logbook_slug):
 
     return render_template('qsos/adv_search.jinja2', qsos=qsos, form=form, logbooks=logbooks,
                            logbook=_logbook, user=user, filtered=filtered, pcfg=pcfg)
+
+
+@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/map', methods=['GET'])
+@check_default_profile
+def map(username, logbook_slug):
+    user = User.query.filter(User.name == username).first()
+    if not user:
+        flash("User not found", "error")
+        return redirect(url_for("bp_main.home"))
+
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+
+    pcfg = {"title": "{0}'s ({1}) logbook map".format(user.name, user.callsign)}
+
+    _logbook = Logbook.query.filter(Logbook.slug == logbook_slug, Logbook.user_id == user.id).first()
+    if not _logbook:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if not _logbook.public and not current_user.is_authenticated:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if not _logbook.public and _logbook.user_id != current_user.id:
+        flash("Logbook not found", 'error')
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if is_valid_qth(user.locator, 6):
+        uqth = user.qth_to_coords()
+    else:
+        flash("User gridsquare is invalid")
+        return redirect(url_for("bp_logbooks.logbooks", user=user.name))
+
+    if current_user.is_authenticated:
+        logbooks = db.session.query(Logbook.id, Logbook.slug, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
+    else:
+        logbooks = db.session.query(Logbook.id, Logbook.slug, Logbook.name, func.count(Log.id)).join(
+            Log).filter(Logbook.user_id == user.id, Logbook.public.is_(True)).group_by(Logbook.id).all()
+
+    return render_template('qsos/map.jinja2', pcfg=pcfg, user=user, logbook=_logbook,
+                           uqth=uqth, logbooks=logbooks)

@@ -50,8 +50,11 @@
     </div>
     </div>
     <div class="row">
-    <div class="col-lg-3"><small id="curDate"></small></div>
-    <div class="col-lg-2 col-lg-offset-7">
+    <div class="col-lg-4">
+        <a href="{{ url_for("bp_qsos.map", logbook_slug=logbook.slug, username=logbook.user.name) }}" class="btn btn-xs btn-default">bigger map</a>
+        <small id="curDate"></small>
+    </div>
+    <div class="col-lg-2 col-lg-offset-6">
         Show day/night <input type="checkbox" id="toggleGreyline">
     </div>
     </div>
