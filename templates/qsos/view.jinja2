@@ -4,7 +4,15 @@
 {% block content %}
 <div class="row">
     <div class="col-lg-12">
-        <h3>QSO with {{ qso.call }} on {{ qso.time_on | localize(user=qso.user) | show_date_no_offset }}</h3>
+        <h3>
+            {% if current_user.is_authenticated and (current_user.id == qso.user_id) %}
+                <td>
+                    <a href="{{ url_for('bp_qsos.edit', qso_slug=qso.slug, logbook_slug=qso.logbook.slug) }}" class="btn btn-primary btn-xs">edit</a>
+                    <a href="{{ url_for('bp_qsos.delete', qso_slug=qso.slug) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                </td>
+            {% endif %}
+            QSO with {{ qso.call }} on {{ qso.time_on | localize(user=qso.user) | show_date_no_offset }}
+        </h3>
         <h5>In logbook {{ qso.logbook.name }}</h5>
     </div>
 </div>
