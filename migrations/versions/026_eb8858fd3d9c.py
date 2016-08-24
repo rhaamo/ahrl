@@ -16,6 +16,7 @@ from models import db, Band
 def upgrade():
     db.session.add(Band(name='630m', zone='iaru1', lower=472000, upper=476000))
     db.session.add(Band(name='60m', zone='iaru1', lower=5351500, upper=5366500))
+    db.session.commit()
 
 
 def downgrade():
