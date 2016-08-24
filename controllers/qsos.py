@@ -641,7 +641,8 @@ def logbook_qso_geojson(qso_id):
 
 
 @bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/qso/<string:qso_slug>', methods=['GET'])
-@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/qso/<string:qso_slug>/pictures/new', endpoint='view_post',
+@bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/qso/<string:qso_slug>/pictures/new',
+               endpoint='view_post',
                methods=['POST'])
 @check_default_profile
 def view(username, logbook_slug, qso_slug):
@@ -720,8 +721,9 @@ def view(username, logbook_slug, qso_slug):
                            pcfg=pcfg, logbook=_logbook)
 
 
-@bp_qsos.route('/logbook/<string:username>/<string:logbook_slug>/qso/<string:qso_slug>/pictures/<int:picture_id>/delete',
-               methods=['GET', 'POST'])
+@bp_qsos.route(
+    '/logbook/<string:username>/<string:logbook_slug>/qso/<string:qso_slug>/pictures/<int:picture_id>/delete',
+    methods=['GET', 'POST'])
 @check_default_profile
 @login_required
 def delete_picture(username, logbook_slug, qso_slug, picture_id):
@@ -873,10 +875,10 @@ def logbook_stats(username, logbook_slug):
             dxcc_worked[c[0]] = {}
         dxcc_worked[c[0]][c[1]] = c[2]
 
-    # Fixme, do something better, get the list from database filtered by the logbook user zone <3
-    dxcc_bands = ['2222m', '630m', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m', '2m',
-                  '70cm', '23cm', '13cm', '5cm', '3cm', '1,2cm',
-                  '6mm', '4mm', '2,4mm', '2mm', '1,2mm']
+    dxcc_bands = [bandname[0] for bandname in db.session.query(
+        Band.name).filter(Band.modes.is_(None),
+                          Band.start.is_(None),
+                          Band.zone == current_user.zone).order_by(Band.lower.asc()).all()]
 
     stats = {
         'current_year': stats_months[0],
@@ -1072,7 +1074,7 @@ def logbook_search_adv(username, logbook_slug):
     if not filtered:
         bq = bq.limit(20)
 
-    qsos=bq.all()
+    qsos = bq.all()
 
     return render_template('qsos/adv_search.jinja2', qsos=qsos, form=form, logbooks=logbooks,
                            logbook=_logbook, user=user, filtered=filtered, pcfg=pcfg)
