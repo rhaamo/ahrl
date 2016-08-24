@@ -57,8 +57,10 @@ def seed_config(db):
 #### Only used by tests
 def seed_bands(db):
     db.session.add(Band(name='2222m', zone='iaru1', lower=135700, upper=137800))
+    db.session.add(Band(name='630m', zone='iaru1', lower=472000, upper=476000))
     db.session.add(Band(name='160m', zone='iaru1', lower=1810000, upper=1850000))
     db.session.add(Band(name='80m', zone='iaru1', lower=3500000, upper=3800000))
+    db.session.add(Band(name='60m', zone='iaru1', lower=5351500, upper=5366500))
     db.session.add(Band(name='40m', zone='iaru1', lower=7000000, upper=7200000))
     db.session.add(Band(name='30m', zone='iaru1', lower=10100000, upper=10150000))
     db.session.add(Band(name='20m', zone='iaru1', lower=14000000, upper=14350000))
