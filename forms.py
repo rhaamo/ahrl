@@ -117,7 +117,7 @@ def get_modes():
 def get_bands():
     return Band.query.filter(Band.modes.is_(None),
                              Band.start.is_(None),
-                             Band.zone == current_user.zone).all()
+                             Band.zone == current_user.zone).order_by(Band.lower.asc()).all()
 
 
 def dflt_mode():

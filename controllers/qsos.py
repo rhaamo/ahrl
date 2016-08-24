@@ -873,6 +873,7 @@ def logbook_stats(username, logbook_slug):
             dxcc_worked[c[0]] = {}
         dxcc_worked[c[0]][c[1]] = c[2]
 
+    # Fixme, do something better, get the list from database filtered by the logbook user zone <3
     dxcc_bands = ['2222m', '630m', '160m', '80m', '60m', '40m', '30m', '20m', '17m', '15m', '12m', '10m', '6m', '2m',
                   '70cm', '23cm', '13cm', '5cm', '3cm', '1,2cm',
                   '6mm', '4mm', '2,4mm', '2mm', '1,2mm']
