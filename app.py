@@ -6,10 +6,8 @@ from logging.handlers import RotatingFileHandler
 
 from flask import Flask, render_template, g, send_from_directory, jsonify
 from flask_bootstrap import Bootstrap
-from flask_debugtoolbar import DebugToolbarExtension
 from flask_mail import Mail
 from flask_migrate import Migrate
-from flask_script import Manager
 from flask_security import Security
 from flask_uploads import configure_uploads, UploadSet, IMAGES
 
@@ -29,8 +27,10 @@ from utils import dt_utc_to_user_tz, InvalidUsage, show_date_no_offset, is_admin
 __VERSION__ = "0.0.1"
 
 
-def create_app(cfg={}):
+def create_app(cfg=None):
     # App Configuration
+    if cfg is None:
+        cfg = {}
     app = Flask(__name__)
     app.config.from_pyfile("config.py")
     app.config.update(cfg)
@@ -67,7 +67,6 @@ def create_app(cfg={}):
         if git_version:
             git_version = git_version.strip().decode('UTF-8')
 
-
     @app.before_request
     def before_request():
         g.cfg = {
@@ -75,7 +74,6 @@ def create_app(cfg={}):
             'AHRL_VERSION_GIT': git_version,
             'AHRL_VERSION': "{0} ({1})".format(__VERSION__, git_version),
         }
-
 
     @app.errorhandler(InvalidUsage)
     def handle_invalid_usage(error):
@@ -96,20 +94,17 @@ def create_app(cfg={}):
     app.register_blueprint(bp_admin)
     app.register_blueprint(bp_extapi)
 
-
     # Used in development
     @app.route('/uploads/<path:stuff>', methods=['GET'])
     def get_uploads_stuff(stuff):
         print("Get {0} from {1}".format(stuff, app.config['UPLOADS_DEFAULT_DEST']))
         return send_from_directory(app.config['UPLOADS_DEFAULT_DEST'], stuff, as_attachment=False)
 
-
     @app.errorhandler(404)
     def page_not_found(msg):
         pcfg = {"title": "Whoops, something failed.",
                 "error": 404, "message": "Page not found", "e": msg}
         return render_template('error_page.jinja2', pcfg=pcfg), 404
-
 
     @app.errorhandler(403)
     def err_forbidden(msg):

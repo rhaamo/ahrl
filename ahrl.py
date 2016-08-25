@@ -1,11 +1,10 @@
 # encoding: utf-8
 from pprint import pprint as pp
 import datetime
-import logging
 import os
 import texttable
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_migrate import Migrate, MigrateCommand
+from flask_migrate import MigrateCommand
 from flask_script import Manager
 from crons import update_qsos_without_countries, update_dxcc_from_cty_xml, \
     populate_logs_gridsquare_cache, cron_sync_eqsl, update_qsos_from_hamqth, cron_sync_from_eqsl

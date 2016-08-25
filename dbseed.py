@@ -53,7 +53,6 @@ def seed_config(db):
     db.session.commit()
     # Bug, two commit necessary
 
-
 #### Only used by tests
 def seed_bands(db):
     db.session.add(Band(name='2222m', zone='iaru1', lower=135700, upper=137800))

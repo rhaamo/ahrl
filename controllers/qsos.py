@@ -945,8 +945,6 @@ def logbook_search(username, logbook_slug):
 
     pcfg = {"title": "Search {0} from {0}'s ({1}) logbook".format(search_term, user.name, user.callsign)}
 
-    uqth = user.qth_to_coords()
-
     if not _logbook.public and not current_user.is_authenticated:
         flash("Logbook not found", 'error')
         return redirect(url_for("bp_logbooks.logbooks", user=user.name))
@@ -966,7 +964,7 @@ def logbook_search(username, logbook_slug):
             Log).filter(Logbook.user_id == user.id, Logbook.public.is_(True)).group_by(Logbook.id).all()
 
     return render_template('qsos/search.jinja2', logbooks=logbooks, qsos=bq, logbook=_logbook, user=user,
-                           search_term=search_term)
+                           search_term=search_term, pcfg=pcfg)
 
 
 @bp_qsos.route('/user/<string:username>/logbook/<string:logbook_slug>/search/advanced', methods=['GET', 'POST'])
@@ -1068,8 +1066,8 @@ def logbook_search_adv(username, logbook_slug):
     if form.pictures.data == "Y":
         filtered = True
         bq = bq.filter(Log.pictures)
-    else:
-        bq = bq.filter(Log.pictures == None)
+    elif form.pictures.data == "N":
+        bq = bq.filter(Log.pictures == None)  # the " == " seems mandatory for sqlalchemy
 
     if not filtered:
         bq = bq.limit(20)
