@@ -15,7 +15,7 @@ def home():
 
     logbooks = None
     if current_user.is_authenticated:
-        logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
+        logbooks = db.session.query(Logbook.id, Logbook.slug, Logbook.name, func.count(Log.id)).join(
             Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
 
     return render_template('home.jinja2', pcfg=pcfg, users=users, logbooks=logbooks)
