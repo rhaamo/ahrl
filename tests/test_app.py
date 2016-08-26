@@ -1,8 +1,9 @@
 from flask_testing import TestCase
 from app import create_app
 
-from models import db, User
+from models import db, User, DxccPrefixes, DxccExceptions, DxccEntities
 from dbseed import seed_config, seed_bands
+from crons import update_dxcc_from_cty_xml
 
 
 class TestViews(TestCase):
@@ -39,29 +40,47 @@ class TestViews(TestCase):
     def logout(self):
         return self.client.post('/logout', follow_redirects=True)
 
+    def import_cty(self):
+        update_dxcc_from_cty_xml(self.app.config['TEMP_DOWNLOAD_FOLDER'] + "/../tests/cty.xml", True)
+
+    # Test cty.xml import
+    def test_010_import_xml_offline(self):
+        self.import_cty()
+        _dp = db.session.query(DxccPrefixes.id).count()
+        _dx = db.session.query(DxccExceptions.id).count()
+        _de = db.session.query(DxccEntities.id).count()
+        # Count as of 25/08/16 was:
+        # 3665     16435     401
+        # check are lowered to avoid changing them maybe too frequently
+        self.assertGreaterEqual(_dp, 3500)
+        self.assertGreaterEqual(_dx, 16300)
+        self.assertGreaterEqual(_de, 300)
+
     # Test main app
-    def test_home(self):
+    def test_020_home(self):
+        self.import_cty()
         rv = self.client.get("/")
         self.assertIn(b"You can view the following logbook", rv.data)
 
-    def test_registration(self):
+    def test_030_registration(self):
+        self.import_cty()
         rv = self.register()
         self.assertIn(b"Logged as dashie", rv.data)
 
-    def test_user_in_bdd(self):
+    def test_040_user_in_bdd(self):
         self.register()
         a = User.query.filter(User.name == 'dashie').first()
         self.assertIsNotNone(a)
 
-    def test_count_user(self):
+    def test_050_count_user(self):
         a = User.query.all()
         self.assertEqual(len(a), 0)
 
-    def test_not_logged_user(self):
+    def test_060_not_logged_user(self):
         rv = self.client.get("/user", follow_redirects=True)
         self.assertIn(b"Please log in to access this page.", rv.data)
 
-    def test_logging_user(self):
+    def test_070_logging_user(self):
         self.register()
         self.login()
         rv = self.client.get("/user", follow_redirects=True)
@@ -70,7 +89,7 @@ class TestViews(TestCase):
         self.assertIn(b"Logged as dashie", rv.data)
 
     # Profile
-    def test_profile(self):
+    def test_080_profile(self):
         self.register()
         self.login()
         rv = self.client.get("/user", follow_redirects=True)
@@ -83,7 +102,7 @@ class TestViews(TestCase):
             callsign="N0CALL", locator="JN18CX"
         ))
 
-    def test_profile_edit(self):
+    def test_090_profile_edit(self):
         self.register()
         self.login()
         rv = self.update_profile()
@@ -96,7 +115,7 @@ class TestViews(TestCase):
                                 data=dict(callsign=call, gridsquare=loc),
                                 follow_redirects=True)
 
-    def test_add_contact(self):
+    def test_100_add_contact(self):
         self.register()
         self.login()
         self.update_profile()
@@ -106,13 +125,13 @@ class TestViews(TestCase):
         self.assertIn(b"<td>179.0</td>", rv.data)
         self.assertIn(b"<td>S</td>", rv.data)
 
-    def test_add_contact_no_locator(self):
+    def test_110_add_contact_no_locator(self):
         self.register()
         self.login()
         rv = self.add_contact("F4TEST", "JN11DW")
         self.assertIn(b"Missing locator_qso or locator_user", rv.data)
 
-    def test_edit_contact(self):
+    def test_120_edit_contact(self):
         self.register()
         self.login()
         self.update_profile()
@@ -124,7 +143,7 @@ class TestViews(TestCase):
         self.assertIn(b"<td>179.0</td>", rv.data)
         self.assertIn(b"<td>S</td>", rv.data)
 
-    def test_delete_contact(self):
+    def test_130_delete_contact(self):
         self.register()
         self.login()
         self.update_profile()
@@ -135,7 +154,7 @@ class TestViews(TestCase):
         self.assertNotIn(b"<td>179.0</td>", rv.data)
         self.assertNotIn(b"<td>S</td>", rv.data)
 
-    def test_add_contact_missing_locator(self):
+    def test_140_add_contact_missing_locator(self):
         self.register()
         self.login()
         self.update_profile()
@@ -144,7 +163,7 @@ class TestViews(TestCase):
                               follow_redirects=True)
         self.assertIn(b"QTH is too broad or empty, please input valid QTH", rv.data)
 
-    def test_add_contact_missing_call(self):
+    def test_150_add_contact_missing_call(self):
         self.register()
         self.login()
         self.update_profile()
@@ -158,11 +177,12 @@ class TestViews(TestCase):
     # Logbooks
 
     # Non existent
-    def test_nonexist_user(self):
+    def test_160_nonexist_user(self):
+        self.import_cty()
         rv = self.client.get('/user/davenull/logbook/1-test', follow_redirects=True)
         self.assertIn(b"User not found", rv.data)
 
-    def test_nonexist_logbook(self):
+    def test_170_nonexist_logbook(self):
         self.register()
         rv = self.client.get('/user/dashie/logbook/1-test', follow_redirects=True)
         self.assertIn(b"Logbook not found", rv.data)

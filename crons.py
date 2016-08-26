@@ -104,45 +104,63 @@ def populate_logs_gridsquare_cache():
     print("-- Updated {0} QSOs".format(updated))
 
 
-def update_dxcc_from_cty_xml():
-    print("--- Updating DXCC tables (prefixes, entities, exceptions) from cty.xml")
+def update_dxcc_from_cty_xml(_file=None, silent=False):
+    if not silent:
+        print("--- Updating DXCC tables (prefixes, entities, exceptions) from cty.xml")
     fname = os.path.join(current_app.config['TEMP_DOWNLOAD_FOLDER'], 'cty.xml')
 
     config = Config.query.first()
     if not config:
-        print("!!! Error: config not found")
+        if not silent:
+            print("!!! Error: config not found")
         add_log(category='CONFIG', level='ERROR', message='Config not found')
         return
 
     if os.path.isfile(fname):
         os.remove(fname)
-        print("-- Removed old file {0}".format(fname))
+        if not silent:
+            print("-- Removed old file {0}".format(fname))
 
-    print("-- Downloading...")
-    if not config.clublog_api_key:
-        print("!! Clublog API Key not defined")
-        add_log(category='CRONS', level='ERROR', message='Clublog API Key not defined')
-        return
-    url = "https://secure.clublog.org/cty.php?api={0}".format(config.clublog_api_key)
+    if not _file:
+        if not silent:
+            print("-- Downloading...")
+        if not config.clublog_api_key:
+            if not silent:
+                print("!! Clublog API Key not defined")
+            add_log(category='CRONS', level='ERROR', message='Clublog API Key not defined')
+            return
+        url = "https://secure.clublog.org/cty.php?api={0}".format(config.clublog_api_key)
 
-    try:
-        with urllib.request.urlopen(url) as response, open(fname, 'wb') as out_file:
-            with gzip.GzipFile(fileobj=response) as uncompressed:
-                shutil.copyfileobj(uncompressed, out_file)
-    except urllib.error.URLError as err:
-        print("!! Error: {0}".format(err))
-        exit(-1)
-    print("-- File downloaded at {0}".format(fname))
+        try:
+            with urllib.request.urlopen(url) as response, open(fname, 'wb') as out_file:
+                with gzip.GzipFile(fileobj=response) as uncompressed:
+                    shutil.copyfileobj(uncompressed, out_file)
+        except urllib.error.URLError as err:
+            if not silent:
+                print("!! Error: {0}".format(err))
+            exit(-1)
+        if not silent:
+            print("-- File downloaded at {0}".format(fname))
+    elif os.path.isfile(_file):
+        fname = _file
+        if not silent:
+            print("-- File at {0}".format(fname))
+    else:
+        if not silent:
+            print("-- derp ?")
+        exit()
 
     # Now parse XML file
     tree = None
     try:
         tree = ElementTree.parse(fname)
     except FileNotFoundError as err:
-        print("!! Error: {0}".format(err))
+        if not silent:
+            print("!! Error: {0}".format(err))
         exit(-1)
     except ElementTree.ParseError as err:
-        print("!! Error: {0}".format(err))
+        if not silent:
+            print("!! Error: {0}".format(err))
         exit(-1)
 
     if not tree:
@@ -152,25 +170,31 @@ def update_dxcc_from_cty_xml():
 
     for element in root:
         if element.tag == '{http://www.clublog.org/cty/v1.0}entities':
-            print('++ Parsing {0}'.format(element.tag))
+            if not silent:
+                print('++ Parsing {0}'.format(element.tag))
             rmed = DxccEntities.query.delete()
-            print('-- Cleaned {0} old entries'.format(rmed))
-            parse_element(element)
+            if not silent:
+                print('-- Cleaned {0} old entries'.format(rmed))
+            parse_element(element, silent)
 
         elif element.tag == '{http://www.clublog.org/cty/v1.0}exceptions':
-            print('++ Parsing {0}'.format(element.tag))
+            if not silent:
+                print('++ Parsing {0}'.format(element.tag))
             rmed = DxccExceptions.query.delete()
-            print('-- Cleaned {0} old entries'.format(rmed))
-            parse_element(element)
+            if not silent:
+                print('-- Cleaned {0} old entries'.format(rmed))
+            parse_element(element, silent)
 
         elif element.tag == '{http://www.clublog.org/cty/v1.0}prefixes':
-            print('++ Parsing {0}'.format(element.tag))
+            if not silent:
+                print('++ Parsing {0}'.format(element.tag))
             rmed = DxccPrefixes.query.delete()
-            print('-- Cleaned {0} old entries'.format(rmed))
-            parse_element(element)
+            if not silent:
+                print('-- Cleaned {0} old entries'.format(rmed))
+            parse_element(element, silent)
 
 
-def parse_element(element):
+def parse_element(element, silent=False):
     elements = 0
     for child in element:
         skip = False
@@ -225,7 +249,8 @@ def parse_element(element):
         db.session.add(_obj)
         elements += 1
     db.session.commit()
-    print('-- Committed {0} new elements'.format(elements))
+    if not silent:
+        print('-- Committed {0} new elements'.format(elements))
 
 
 def cron_sync_from_eqsl(dry_run=False):
