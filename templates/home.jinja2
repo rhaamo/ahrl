@@ -7,12 +7,12 @@
         <ul>
             {% for u in users %}
                 <li>
-                    <a href="{{ url_for('bp_logbooks.logbooks', user=u.name) }}">{{ u.callsign }}</a>
+                    <a href="{{ url_for('bp_logbooks.logbooks', user=u.name) }}">{{ u.callsign }}, {{ u.name }}</a>
                     <ul>
                     {% for l in u.logbooks %}
                         {% if l.public %}
                         <li>
-                            <a href="{{ url_for('bp_qsos.logbook', username=u.name, logbook_slug=l.slug) }}">{{ l.name }}</a> <small>({{ l.logs.count() }} qsos)</small>
+                            <a href="{{ url_for('bp_qsos.logbook', username=u.name, logbook_slug=l.slug) }}">{{ l.name }}</a> <small>({{ l.callsign }}, {{ l.logs.count() }} qsos)</small>
                             {% if current_user.id == l.user.id %}
                             <a href="{{ url_for('bp_tools.adif_export_dl', username=l.user.name, logbook_slug=l.slug) }}" class="btn btn-success btn-xs">adif export</a>
                             {% endif %}
