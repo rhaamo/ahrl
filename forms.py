@@ -217,7 +217,7 @@ class BaseQsoForm(Form):
 
 
 class QsoForm(BaseQsoForm):
-    date = DateTimeField('Date', default=datetime.datetime.utcnow, display_format='%d-%m-%Y')
+    date = DateTimeField('Date', default=datetime.datetime.utcnow, display_format='%Y-%m-%d')
     time = DateTimeField('Time', default=foo_bar_baz_qux, display_format='%H:%M:%S')
 
 

@@ -188,12 +188,10 @@ def new(logbook_slug, method):
         # We get from user input a date with timezone offset (we asume that)
         # We store in database in UTC offset, so first convert to DT then makes aware
         # of the user timezone, and then convert to UTC
-        # Warning: form.xxx.data seems to have month and day reversed ???
-        # So instead of %d-%m we use %m-%d
-        date = form.date.data.strftime('%m-%d-%Y')
+        date = form.date.data.strftime('%Y-%m-%d')
         time = form.time.data.strftime('%H:%M:%S')
         date_wo_tz = datetime.datetime.strptime("{0} {1}".format(date, time),
-                                                "%m-%d-%Y %H:%M:%S")
+                                                "%Y-%m-%d %H:%M:%S")
         date_w_tz = pytz.timezone(current_user.timezone).localize(date_wo_tz)
 
         a.time_on = date_w_tz.astimezone(pytz.timezone('UTC')).replace(tzinfo=None)
