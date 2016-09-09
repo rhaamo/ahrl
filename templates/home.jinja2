@@ -16,7 +16,7 @@
                             {% if current_user.id == l.user.id %}
                             <a href="{{ url_for('bp_tools.adif_export_dl', username=l.user.name, logbook_slug=l.slug) }}" class="btn btn-success btn-xs">adif export</a>
                             {% endif %}
-                            <a href="{{ url_for('bp_qsos.logbook_stats', username=l.user.name, logbook_slug=l.slugg) }}" class="btn btn-info btn-xs">stats</a>
+                            <a href="{{ url_for('bp_qsos.logbook_stats', username=l.user.name, logbook_slug=l.slug) }}" class="btn btn-info btn-xs">stats</a>
                         </li>
                         {% endif %}
                     {% endfor %}
