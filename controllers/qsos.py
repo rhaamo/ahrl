@@ -876,7 +876,7 @@ def logbook_stats(username, logbook_slug):
     dxcc_bands = [bandname[0] for bandname in db.session.query(
         Band.name).filter(Band.modes.is_(None),
                           Band.start.is_(None),
-                          Band.zone == current_user.zone).order_by(Band.lower.asc()).all()]
+                          Band.zone == user.zone).order_by(Band.lower.asc()).all()]
 
     stats = {
         'current_year': stats_months[0],
