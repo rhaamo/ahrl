@@ -10,7 +10,7 @@
                 {% if l.public or (current_user.id == l.user_id) %}
                 <li><a href="{{ url_for('bp_qsos.logbook', username=user.name, logbook_slug=l.slug) }}">{{ l.name }}</a>
                 <small>
-                    ({{ l.callsign }}, {{ l.logs.count() }} qsos{% if l.default %}, default{% endif %}{% if not l.public %}, private{% endif %}{% if l.old %},<b>old unused</b>{% endif %})
+                    ({{ l.callsign }}, {{ l.logs.count() }} qsos{% if l.default %}, default{% endif %}{% if not l.public %}, private{% endif %}{% if l.old %}, old unused{% endif %})
                     <a href="{{ url_for('bp_qsos.logbook_stats', username=l.user.name, logbook_slug=l.slug) }}" class="btn btn-info btn-xs">stats</a>
                     {% if current_user.is_authenticated and (current_user.id == l.user_id) %}
                         <a href="{{ url_for('bp_tools.adif_export_dl', username=l.user.name, logbook_slug=l.slug) }}" class="btn btn-success btn-xs">adif export</a>
