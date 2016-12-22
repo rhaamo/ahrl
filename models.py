@@ -205,6 +205,7 @@ class Logbook(db.Model):
     public = db.Column(db.Boolean, default=True)
     eqsl_qth_nickname = db.Column(db.String(255))
     slug = db.Column(db.String(255), unique=True, nullable=True)
+    old = db.Column(db.Boolean, default=False)
 
     logs = db.relationship('Log', backref='logbook', lazy='dynamic', cascade="delete")
     user_loggings = db.relationship('UserLogging', backref='logbook', lazy='dynamic', cascade="delete")
