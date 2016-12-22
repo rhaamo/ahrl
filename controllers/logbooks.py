@@ -50,6 +50,7 @@ def edit(logbook_slug):
         a.swl = form.swl.data
         a.user_id = current_user.id
         a.default = form.default.data
+        a.old = form.old.data
 
         if a.default:
             for logbook in current_user.logbooks:

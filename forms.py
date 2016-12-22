@@ -298,6 +298,7 @@ class LogbookForm(Form):
     swl = BooleanField('Logbook of a SWL HAM ?')
     default = BooleanField('Do you want this logbook to be the default one ?')
     public = BooleanField('Make this logbook public ?')
+    old = BooleanField('Old and unused logbook ?')
 
     eqsl_qth_nickname = StringField('eQSL QTH Nickname')
 
