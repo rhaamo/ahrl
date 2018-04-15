@@ -19,7 +19,7 @@ def home():
     # check are lowered to avoid changing them maybe too frequently
     if _dp < 3500 or _dx < 16300 or _de < 300:
         flash("DXCC Tables are empty, check manual", "error")
-        abort(500)
+        #abort(500)
 
     pcfg = {"title": "AHRL - Another Ham Radio Log"}
     users = User.query.all()
