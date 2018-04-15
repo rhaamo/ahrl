@@ -33,7 +33,7 @@ def edit(note_id):
         flash("Note not found", 'error')
         return redirect(url_for('bp_notes.notes'))
 
-    form = NoteForm(request.form, a)
+    form = NoteForm(request.form, obj=a)
 
     if form.validate_on_submit():
         a.title = form.title.data

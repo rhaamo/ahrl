@@ -272,7 +272,7 @@ def edit(logbook_slug, qso_slug):
     logbooks = db.session.query(Logbook.id, Logbook.slug, Logbook.name, func.count(Log.id)).join(
         Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
 
-    form = EditQsoForm(request.form, a)
+    form = EditQsoForm(request.form, obj=a)
 
     # Fix bug with SelectField not managing relations properly
     form.mode.data = a.mode.id

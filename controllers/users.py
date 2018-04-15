@@ -52,7 +52,7 @@ def edit():
         flash("User not found", 'error')
         return redirect(url_for("bp_main.home"))
 
-    form = UserProfileForm(request.form, user)
+    form = UserProfileForm(request.form, obj=user)
     form.timezone.choices = [[str(i), str(i)] for i in pytz.all_timezones]
 
     if form.validate_on_submit():

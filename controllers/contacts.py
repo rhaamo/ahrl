@@ -34,7 +34,7 @@ def edit(contact_id):
         flash("Contact not found", "error")
         return redirect(url_for("bp_contacts.contacts"))
 
-    form = ContactsForm(request.form, a)
+    form = ContactsForm(request.form, obj=a)
 
     if form.validate_on_submit():
         a.callsign = form.callsign.data

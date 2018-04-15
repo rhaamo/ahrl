@@ -39,7 +39,7 @@ def edit(logbook_slug):
         flash("Logbook not found", 'error')
         return redirect(url_for('bp_logbooks.logbooks', user=current_user.name))
 
-    form = LogbookForm(request.form, a)
+    form = LogbookForm(request.form, obj=a)
 
     if form.validate_on_submit():
         a.name = form.name.data

@@ -33,7 +33,7 @@ def config():
         flash("Config not found", 'error')
         return redirect(url_for("bp_main.home"))
 
-    form = ConfigForm(request.form, _config)
+    form = ConfigForm(request.form, obj=_config)
 
     if form.validate_on_submit():
         _config.clublog_api_key = form.clublog_api_key.data
