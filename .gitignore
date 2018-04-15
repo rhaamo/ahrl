@@ -7,3 +7,4 @@ uploads/pictures/*
 tmp/cty.xml
 .ropeproject/
 venv
+*.log
