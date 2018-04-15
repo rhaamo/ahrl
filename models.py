@@ -11,7 +11,8 @@ from slugify import slugify
 from sqlalchemy_utils.types import TSVectorType
 
 db = SQLAlchemy()
-make_searchable()
+
+make_searchable(db.metadata)
 
 
 class LogQuery(BaseQuery, SearchQueryMixin):
@@ -639,3 +640,7 @@ def make_slug(mapper, connection, target):
     connection.execute(
         Note.__table__.update().where(Note.__table__.c.id == target.id).values(slug=slug)
     )
+
+# Always at the end !
+db.configure_mappers()
+
