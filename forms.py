@@ -3,7 +3,7 @@ from libqth import is_valid_qth
 
 from flask_security import RegisterForm, current_user
 from flask_uploads import UploadSet, IMAGES
-from flask_wtf import Form
+from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, \
     HiddenField, BooleanField

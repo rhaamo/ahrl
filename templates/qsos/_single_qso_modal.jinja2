@@ -46,10 +46,12 @@
                 <td>{{ qso.qth }}</td>
             </tr>
             {% endif %}
-            <tr>
-                <td>Distance</td>
-                <td>{{ qso_bearing | round }}&deg; {{ qso_bearing_star }} - {{ qso_distance | round }} {{ qso_distance_unit }}</td>
-            </tr>
+            {% if qso_bearing != -1 and qso_distance != -1 %}
+                <tr>
+                    <td>Distance</td>
+                    <td>{{ qso_bearing | round }}&deg; {{ qso_bearing_star }} - {{ qso_distance | round }} {{ qso_distance_unit }}</td>
+                </tr>
+            {% endif %}
             <tr>
                 <td>QSL Comment</td>
                 <td>{{ qso.qsl_comment or "No comment" }}</td>
@@ -74,8 +76,12 @@
             {% endif %}
         </table>
     </div>
-    <div class="col-lg-6"><div id="map-single-qso" style="width: 400px; height: 250px"></div></div>
+    {% if qso_bearing != -1 and qso_distance != -1 %}
+        <div class="col-lg-6"><div id="map-single-qso" style="width: 400px; height: 250px"></div></div>
+    {% endif %}
 </div>
+
+{% if qso_bearing != -1 and qso_distance != -1 %}
 <script>
     var map_single_qso = L.map('map-single-qso').setView([52, 4], 3);
     map_single_qso.addLayer(L.tileLayer.provider('OpenStreetMap.Mapnik'));
@@ -119,3 +125,4 @@
 
     var geojsonLayer = new L.GeoJSON.AJAX(["{{ url_for('bp_qsos.logbook_qso_geojson', qso_id=qso.id) }}"],{onEachFeature:popUp}).addTo(map_single_qso);
 </script>
+{% endif %}

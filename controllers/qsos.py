@@ -209,7 +209,8 @@ def new(logbook_slug, method):
 
         if not form.gridsquare.data or form.gridsquare.data == '':
             cmp_qth = ham_country_grid_coords(a.call)
-            a.cache_gridsquare = cmp_qth['qth']
+            if cmp_qth and 'qth' in cmp_qth:
+                a.cache_gridsquare = cmp_qth['qth']
         else:
             a.gridsquare = form.gridsquare.data.upper()
             a.cache_gridsquare = a.gridsquare
@@ -291,9 +292,10 @@ def edit(logbook_slug, qso_slug):
         if not form.gridsquare.data or form.gridsquare.data == '':
             cmp_qth = ham_country_grid_coords(a.call)
             if not cmp_qth:
-                flash("DXCC database empty", "error")
-                return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
-            a.cache_gridsquare = cmp_qth['qth']
+                flash("Could not find Grid Square", "error")
+                #return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
+            if cmp_qth:
+                a.cache_gridsquare = cmp_qth['qth']
             a.gridsquare = form.gridsquare.data.upper()
         else:
             a.gridsquare = form.gridsquare.data.upper()
@@ -678,27 +680,32 @@ def view(username, logbook_slug, qso_slug):
     else:
         qso_gs = qso.gridsquare
 
-    if not qso_gs or not qso.user.locator:
-        flash('Missing qso.gridsquare or qso.user.locator')
+    if not is_valid_qth(qso.user.locator, 6):
+        flash('User supplied QTH is not valid')
         return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_slug=_logbook.slug))
 
-    if not is_valid_qth(qso.user.locator, 6) or not is_valid_qth(qso_gs, 6):
-        flash('One of the supplied QTH is not valid')
+    if qso_gs and not is_valid_qth(qso_gs, 6):
+        flash('QSO supplied QTH is not valid')
         return redirect(url_for('bp_qsos.logbook', username=user.name, logbook_slug=_logbook.slug))
 
-    _f = qth_to_coords(qso.user.locator, 6)  # precision, latitude, longitude
-    _t = qth_to_coords(qso_gs, 6)  # precision, latitude, longitude
+    if qso_gs and qso.user.locator:
+        _f = qth_to_coords(qso.user.locator, 6)  # precision, latitude, longitude
+        _t = qth_to_coords(qso_gs, 6)  # precision, latitude, longitude
 
-    qso_distance = distance.haversine_km(_f['latitude'],
-                                         _f['longitude'],
-                                         _t['latitude'],
-                                         _t['longitude'])
+        qso_distance = distance.haversine_km(_f['latitude'],
+                                            _f['longitude'],
+                                            _t['latitude'],
+                                            _t['longitude'])
 
-    qso_bearing = bearing.initial_compass_bearing(_f['latitude'],
-                                                  _f['longitude'],
-                                                  _t['latitude'],
-                                                  _t['longitude'])
-    qso_bearing_star = geo_bearing_star(qso_bearing)
+        qso_bearing = bearing.initial_compass_bearing(_f['latitude'],
+                                                    _f['longitude'],
+                                                    _t['latitude'],
+                                                    _t['longitude'])
+        qso_bearing_star = geo_bearing_star(qso_bearing)
+    else:
+        qso_distance = -1
+        qso_bearing = -1
+        qso_bearing_star = ""
 
     form = None
     if current_user.is_authenticated:
@@ -768,25 +775,30 @@ def single_qso_modal(qso_id):
     else:
         qso_gs = qso.gridsquare
 
-    if not qso_gs or not qso.user.locator:
-        raise InvalidUsage('Missing qso.gridsquare or qso.user.locator', status_code=400)
+    if not is_valid_qth(qso.user.locator, 6):
+        raise InvalidUsage('User supplied QTH is not valid', status_code=400)
 
-    if not is_valid_qth(qso.user.locator, 6) or not is_valid_qth(qso_gs, 6):
-        raise InvalidUsage('One of the supplied QTH is not valid', status_code=400)
+    if qso_gs and not is_valid_qth(qso_gs, 6):
+        raise InvalidUsage('QSO supplied QTH is not valid', status_code=400)
 
-    _f = qth_to_coords(qso.user.locator, 6)  # precision, latitude, longitude
-    _t = qth_to_coords(qso_gs, 6)  # precision, latitude, longitude
+    if qso.user.locator and qso_gs:
+        _f = qth_to_coords(qso.user.locator, 6)  # precision, latitude, longitude
+        _t = qth_to_coords(qso_gs, 6)  # precision, latitude, longitude
 
-    qso_distance = distance.haversine_km(_f['latitude'],
-                                         _f['longitude'],
-                                         _t['latitude'],
-                                         _t['longitude'])
+        qso_distance = distance.haversine_km(_f['latitude'],
+                                            _f['longitude'],
+                                            _t['latitude'],
+                                            _t['longitude'])
 
-    qso_bearing = bearing.initial_compass_bearing(_f['latitude'],
-                                                  _f['longitude'],
-                                                  _t['latitude'],
-                                                  _t['longitude'])
-    qso_bearing_star = geo_bearing_star(qso_bearing)
+        qso_bearing = bearing.initial_compass_bearing(_f['latitude'],
+                                                    _f['longitude'],
+                                                    _t['latitude'],
+                                                    _t['longitude'])
+        qso_bearing_star = geo_bearing_star(qso_bearing)
+    else:
+        qso_distance = -1
+        qso_bearing = -1
+        qso_bearing_star = ""
 
     return render_template('qsos/_single_qso_modal.jinja2', qso=qso, qso_distance=qso_distance, qso_bearing=qso_bearing,
                            qso_bearing_star=qso_bearing_star, qso_distance_unit='Km')

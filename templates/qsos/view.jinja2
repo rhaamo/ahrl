@@ -51,10 +51,12 @@
                 <td>{{ qso.qth }}</td>
             </tr>
             {% endif %}
+            {% if qso_bearing != -1 and qso_distance != -1 %}
             <tr>
                 <td>Distance</td>
                 <td>{{ qso_bearing | round }}&deg; {{ qso_bearing_star }} - {{ qso_distance | round }} {{ qso_distance_unit }}</td>
             </tr>
+            {% endif %}
             <tr>
                 <td>eQSL</td>
                 <td>Sent: {{ qso.eqsl_qsl_sent }}, Rcvd: {{ qso.eqsl_qsl_rcvd }}</td>
@@ -81,7 +83,10 @@
     </div>
 
     <div class="col-lg-4">
-        <div id="map-single-qso" style="height: 250px"></div>
+        {% if qso_bearing != -1 and qso_distance != -1 %}
+            <div id="map-single-qso" style="height: 250px"></div>
+        {% endif %}
+
         {% if current_user.is_authenticated and (current_user.id == qso.user_id) %}
             <br/>
             <form action="{{ url_for('bp_qsos.view_post', logbook_slug=qso.logbook.slug, username=qso.user.name, qso_slug=qso.slug) }}" method="POST" enctype="multipart/form-data" class="form-horizontal new-qso" name="gtfo-lastpass-search">
@@ -115,6 +120,7 @@
 </div>
 {% endblock %}
 
+{% if qso_bearing != -1 and qso_distance != -1 %}
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
     <script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
@@ -168,3 +174,4 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.awesome-markers.css') }}" />
 {% endblock %}
+{% endif %}
