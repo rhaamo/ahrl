@@ -22,6 +22,20 @@ BaseModelForm = model_form_factory(Form)
 
 pictures = UploadSet('pictures', IMAGES)
 
+# monkeypatch for https://github.com/wtforms/wtforms/issues/373
+def _patch_wtforms_sqlalchemy():
+    from wtforms.ext.sqlalchemy import fields
+    from sqlalchemy.orm.util import identity_key
+
+    def get_pk_from_identity(obj):
+        key = identity_key(instance=obj)[1]
+        return u':'.join(map(str, key))
+
+    fields.get_pk_from_identity = get_pk_from_identity
+
+
+_patch_wtforms_sqlalchemy()
+del _patch_wtforms_sqlalchemy
 
 class PasswordFieldNotHidden(StringField):
     """
