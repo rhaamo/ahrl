@@ -27,7 +27,7 @@
         <div class="row">
             <div class="col-lg-6">
                 {{ wtf.form_field(form.submit, button_map={'submit': 'success'}) }}
-                <a class="btn btn-warning" href="{{ url_for('bp_logbooks.logbooks', user=current_user.name) }}">Cancel contact</a>
+                <a class="btn btn-warning" href="{{ url_for('bp_logbooks.logbooks', user=current_user.name) }}">Cancel creation</a>
             </div>
         </div>
     </form>

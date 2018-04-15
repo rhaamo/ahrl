@@ -100,7 +100,7 @@ class NoteForm(ModelForm):
     title = StringField('Title', [DataRequired()])
     note = TextAreaField('Note', [DataRequired()])
 
-    submit = SubmitField('Sauver note')
+    submit = SubmitField('Save note')
 
 
 def get_modes():
