@@ -1,6 +1,11 @@
 Another Ham Radio Log
 =====================
 
+<a href="https://dronegh.sigpipe.me/rhaamo/ahrl"><img src="https://dronegh.sigpipe.me/api/badges/rhaamo/ahrl/status.svg" alt="Build Status"/></a>
+<a href="https://github.com/rhaamo/ahrl"><img src="https://img.shields.io/badge/license-MIT-green.svg"/></a>
+<img src="https://img.shields.io/badge/python-%3E%3D3.6-blue.svg"/> [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+
+
 # Versions requirement
  - Python >= 3.3 (3.0, 3.1, 3.2 not supported)
 
@@ -99,3 +104,7 @@ Another Ham Radio Log
 
 # TODO
  - Radio/CAT edit, add you own rig and link them when QSOing
+
+# Licensing
+ - MIT License
+
