@@ -3,7 +3,7 @@ import datetime
 
 # Comes from https://web.bxhome.org/content/adifpy
 
-ADIF_REC_RE = re.compile(b"<(.*?):(\d+).*?>([^<\t\f\v]+)")
+ADIF_REC_RE = re.compile(br"<(.*?):(\d+).*?>([^<\t\f\v]+)")
 
 
 def parse(s):
