@@ -28,7 +28,7 @@ Flask-Uploads==0.2.1
 Flask-WTF==0.14.2
 future==0.16.0
 geohelper==0.2.0
-gunicorn==19.7.1
+gunicorn==19.9.0
 idna==2.6
 infinity==1.4
 intervals==0.8.1
