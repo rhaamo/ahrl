@@ -1,9 +1,8 @@
 from flask import Blueprint, request, Response
-from xmlrpc.server import CGIXMLRPCRequestHandler, SimpleXMLRPCDispatcher
+from xmlrpc.server import SimpleXMLRPCDispatcher
 from adif import parse as adif_parser
-from models import db, Log, Band, Mode
 
-bp_extapi = Blueprint('bp_extapi', __name__)
+bp_extapi = Blueprint("bp_extapi", __name__)
 
 handler = SimpleXMLRPCDispatcher(allow_none=True, encoding=None)
 
@@ -22,7 +21,7 @@ handler.register_introspection_functions()
 def add_record(adif_record):
     print("Log.add_record")
     # FLDIGI send only a record, add fake end-of-header to not break parser
-    parsed = adif_parser(b'<eoh>' + adif_record.encode('UTF-8'))
+    parsed = adif_parser(b"<eoh>" + adif_record.encode("UTF-8"))
     if len(parsed) >= 1:
         parsed = parsed[0]
     """
@@ -42,19 +41,19 @@ def get_record(call):
     print("Log.get_record")
     return "xxx"
 
+
 handler.register_function(add_record, name="log.add_record")
 handler.register_function(check_dup, name="log.check_dup")
 handler.register_function(get_record, name="log.get_record")
 
 
-@bp_extapi.route('/extapi/<path:whatever>', methods=['POST', 'GET'])
+@bp_extapi.route("/extapi/<path:whatever>", methods=["POST", "GET"])
 def catchall(whatever):
     print("You wanted: {0}".format(whatever))
 
 
-@bp_extapi.route('/extapi/RPC2', methods=['POST', 'GET'])
+@bp_extapi.route("/extapi/RPC2", methods=["POST", "GET"])
 def endpoint():
-    dispatch = getattr(handler, '_dispatch', None)
+    dispatch = getattr(handler, "_dispatch", None)
     req = handler._marshaled_dispatch(request.data, dispatch)
-    return Response(req, mimetype='text/xml')
-
+    return Response(req, mimetype="text/xml")
