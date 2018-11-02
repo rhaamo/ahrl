@@ -15,7 +15,7 @@ from models import db, Apitoken, Band, Role, Logging
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
 
-def slugify(text, delim=u'_'):
+def slugify(text, delim="_"):
     """
     Generate a slug in ASCII-only form
     :param text: Text to slugify
@@ -34,9 +34,7 @@ def gen_random_str(size=10):
     :param size: Size of string
     :return: Random string
     """
-    return ''.join(random.choice(string.ascii_uppercase +
-                                 string.ascii_lowercase +
-                                 string.digits) for _ in range(size))
+    return "".join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(size))
 
 
 def path_or_none(fbase, ftype, fname):
@@ -62,8 +60,7 @@ def generate_uniques_apitoken():
         tmp_token = gen_random_str(20)
         tmp_secret = gen_random_str(20)
 
-        blip = Apitoken.query.filter_by(token=tmp_token,
-                                        secret=tmp_secret).first()
+        blip = Apitoken.query.filter_by(token=tmp_token, secret=tmp_secret).first()
         if blip:
             continue
         else:
@@ -84,12 +81,12 @@ def dt_utc_to_user_tz(dt, user=None):
     user_tz = pytz.timezone(user.timezone)
     if dt.tzinfo == user_tz:
         return dt  # already converted
-    utc_dt = pytz.timezone('UTC').localize(dt)  # Makes a naive-UTC DateTime
-    return utc_dt.astimezone(user_tz)           # Then convert it to the user_tz
+    utc_dt = pytz.timezone("UTC").localize(dt)  # Makes a naive-UTC DateTime
+    return utc_dt.astimezone(user_tz)  # Then convert it to the user_tz
 
 
 def show_date_no_offset(dt):
-    return dt.strftime('%Y-%m-%d %H:%M:%S')
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class InvalidUsage(Exception):
@@ -104,9 +101,9 @@ class InvalidUsage(Exception):
 
     def to_dict(self):
         rv = dict(self.payload or ())
-        rv['message'] = self.message
-        rv['status'] = 'error'
-        rv['code'] = self.status_code
+        rv["message"] = self.message
+        rv["status"] = "error"
+        rv["code"] = self.status_code
         return rv
 
 
@@ -115,26 +112,30 @@ def check_default_profile(f):
     def wrap(*args, **kwargs):
         errs = []
         if current_user.is_authenticated:
-            if current_user.callsign == 'N0C4LL':
+            if current_user.callsign == "N0C4LL":
                 errs.append("Profile callsign not changed !")
-            if current_user.locator == 'JN':
+            if current_user.locator == "JN":
                 errs.append("Profile locator not changed !")
 
-            bands = db.session.query(Band.id).filter(Band.modes.is_(None),
-                                                     Band.start.is_(None),
-                                                     Band.zone == current_user.zone).count()
+            bands = (
+                db.session.query(Band.id)
+                .filter(Band.modes.is_(None), Band.start.is_(None), Band.zone == current_user.zone)
+                .count()
+            )
             if bands <= 0 or not bands:
                 errs.append(
-                    "The IARU Zone you selected doesn't have any band defined in AHRL yet. See with devs please.")
+                    "The IARU Zone you selected doesn't have any band defined in AHRL yet. See with devs please."
+                )
 
         if len(errs) > 0:
-            flash(Markup("Errors:<br />{0}".format("<br />".join(errs))), 'error')
+            flash(Markup("Errors:<br />{0}".format("<br />".join(errs))), "error")
         return f(*args, **kwargs)
+
     return wrap
 
 
 def is_admin():
-    adm = Role.query.filter(Role.name == 'admin').first()
+    adm = Role.query.filter(Role.name == "admin").first()
     if not current_user or not current_user.is_authenticated or not adm:
         return False
     if adm in current_user.roles:

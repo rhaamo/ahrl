@@ -7,26 +7,33 @@ from forms import UserProfileForm
 from models import db, User, Logbook, Log, UserLogging
 from utils import check_default_profile
 
-bp_users = Blueprint('bp_users', __name__)
+bp_users = Blueprint("bp_users", __name__)
 
 
-@bp_users.route('/user/logs', methods=['GET'])
+@bp_users.route("/user/logs", methods=["GET"])
 @login_required
 @check_default_profile
 def logs():
-    level = request.args.get('level')
+    level = request.args.get("level")
     pcfg = {"title": "User Logs"}
     if level:
-        _logs = UserLogging.query.filter(UserLogging.level == level.upper(),
-                                         UserLogging.user_id == current_user.id
-                                         ).order_by(UserLogging.timestamp.desc()).limit(100).all()
+        _logs = (
+            UserLogging.query.filter(UserLogging.level == level.upper(), UserLogging.user_id == current_user.id)
+            .order_by(UserLogging.timestamp.desc())
+            .limit(100)
+            .all()
+        )
     else:
-        _logs = UserLogging.query.filter(UserLogging.user_id == current_user.id
-                                         ).order_by(UserLogging.timestamp.desc()).limit(100).all()
-    return render_template('users/user_logs.jinja2', pcfg=pcfg, logs=_logs)
+        _logs = (
+            UserLogging.query.filter(UserLogging.user_id == current_user.id)
+            .order_by(UserLogging.timestamp.desc())
+            .limit(100)
+            .all()
+        )
+    return render_template("users/user_logs.jinja2", pcfg=pcfg, logs=_logs)
 
 
-@bp_users.route('/user', methods=['GET'])
+@bp_users.route("/user", methods=["GET"])
 @login_required
 @check_default_profile
 def profile():
@@ -34,22 +41,27 @@ def profile():
 
     user = User.query.filter(User.id == current_user.id).first()
     if not user:
-        flash("User not found", 'error')
+        flash("User not found", "error")
         return redirect(url_for("bp_main.home"))
 
-    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
-        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
-    return render_template('users/profile.jinja2', pcfg=pcfg, user=user, logbooks=logbooks)
+    logbooks = (
+        db.session.query(Logbook.id, Logbook.name, func.count(Log.id))
+        .join(Log)
+        .filter(Logbook.user_id == current_user.id)
+        .group_by(Logbook.id)
+        .all()
+    )
+    return render_template("users/profile.jinja2", pcfg=pcfg, user=user, logbooks=logbooks)
 
 
-@bp_users.route('/user/edit', methods=['GET', 'POST'])
+@bp_users.route("/user/edit", methods=["GET", "POST"])
 @login_required
 def edit():
     pcfg = {"title": "Edit my profile"}
 
     user = User.query.filter(User.id == current_user.id).first()
     if not user:
-        flash("User not found", 'error')
+        flash("User not found", "error")
         return redirect(url_for("bp_main.home"))
 
     form = UserProfileForm(request.form, obj=user)
@@ -75,8 +87,13 @@ def edit():
         user.zone = form.zone.data
 
         db.session.commit()
-        return redirect(url_for('bp_users.profile'))
+        return redirect(url_for("bp_users.profile"))
 
-    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
-        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
-    return render_template('users/edit.jinja2', pcfg=pcfg, form=form, user=user, logbooks=logbooks)
+    logbooks = (
+        db.session.query(Logbook.id, Logbook.name, func.count(Log.id))
+        .join(Log)
+        .filter(Logbook.user_id == current_user.id)
+        .group_by(Logbook.id)
+        .all()
+    )
+    return render_template("users/edit.jinja2", pcfg=pcfg, form=form, user=user, logbooks=logbooks)

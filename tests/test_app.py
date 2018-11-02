@@ -8,12 +8,14 @@ from crons import update_dxcc_from_cty_xml
 
 class TestViews(TestCase):
     def create_app(self):
-        cfg = {'SQLALCHEMY_DATABASE_URI': "postgresql+psycopg2://dashie:saucisse@localhost/ahrl_tests",
-               'DEBUG_TB_PROFILER_ENABLED': False,
-               'SECURITY_REGISTERABLE': True,
-               'WTF_CSRF_CHECK_DEFAULT': False,
-               'CSRF_ENABLED': False,
-               'WTF_CSRF_ENABLED': False}
+        cfg = {
+            "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2://dashie:saucisse@localhost/ahrl_tests",
+            "DEBUG_TB_PROFILER_ENABLED": False,
+            "SECURITY_REGISTERABLE": True,
+            "WTF_CSRF_CHECK_DEFAULT": False,
+            "CSRF_ENABLED": False,
+            "WTF_CSRF_ENABLED": False,
+        }
         app = create_app(cfg)
         return app
 
@@ -27,21 +29,22 @@ class TestViews(TestCase):
         db.drop_all()
 
     def register(self):
-        return self.client.post('/register',
-                                data=dict(email='dashie@sigpipe.me',
-                                          name='dashie', password='fluttershy', password_confirm='fluttershy'),
-                                follow_redirects=True)
+        return self.client.post(
+            "/register",
+            data=dict(email="dashie@sigpipe.me", name="dashie", password="fluttershy", password_confirm="fluttershy"),
+            follow_redirects=True,
+        )
 
     def login(self):
-        return self.client.post('/login',
-                                data=dict(email='dashie@sigpipe.me', password='fluttershy'),
-                                follow_redirects=True)
+        return self.client.post(
+            "/login", data=dict(email="dashie@sigpipe.me", password="fluttershy"), follow_redirects=True
+        )
 
     def logout(self):
-        return self.client.post('/logout', follow_redirects=True)
+        return self.client.post("/logout", follow_redirects=True)
 
     def import_cty(self):
-        update_dxcc_from_cty_xml(self.app.config['TEMP_DOWNLOAD_FOLDER'] + "/../tests/cty.xml", True)
+        update_dxcc_from_cty_xml(self.app.config["TEMP_DOWNLOAD_FOLDER"] + "/../tests/cty.xml", True)
 
     # Test cty.xml import
     def test_010_import_xml_offline(self):
@@ -69,7 +72,7 @@ class TestViews(TestCase):
 
     def test_040_user_in_bdd(self):
         self.register()
-        a = User.query.filter(User.name == 'dashie').first()
+        a = User.query.filter(User.name == "dashie").first()
         self.assertIsNotNone(a)
 
     def test_050_count_user(self):
@@ -98,9 +101,7 @@ class TestViews(TestCase):
         self.logout()
 
     def update_profile(self):
-        return self.client.post("/user/edit", follow_redirects=True, data=dict(
-            callsign="N0CALL", locator="JN18CX"
-        ))
+        return self.client.post("/user/edit", follow_redirects=True, data=dict(callsign="N0CALL", locator="JN18CX"))
 
     def test_090_profile_edit(self):
         self.register()
@@ -111,9 +112,7 @@ class TestViews(TestCase):
 
     # Contacts
     def add_contact(self, call, loc):
-        return self.client.post('/contacts/new',
-                                data=dict(callsign=call, gridsquare=loc),
-                                follow_redirects=True)
+        return self.client.post("/contacts/new", data=dict(callsign=call, gridsquare=loc), follow_redirects=True)
 
     def test_100_add_contact(self):
         self.register()
@@ -136,8 +135,9 @@ class TestViews(TestCase):
         self.login()
         self.update_profile()
         self.add_contact("F4TEST", "JN11DW")
-        rv = self.client.post("/contacts/1/edit", follow_redirects=True, data=dict(callsign="F8COIN",
-                                                                                   gridsquare="JN11DW"))
+        rv = self.client.post(
+            "/contacts/1/edit", follow_redirects=True, data=dict(callsign="F8COIN", gridsquare="JN11DW")
+        )
         self.assertIn(b"<td>F8COIN</td>", rv.data)
         self.assertIn(b"<td>783.0 Km</td>", rv.data)
         self.assertIn(b"<td>179.0</td>", rv.data)
@@ -148,7 +148,7 @@ class TestViews(TestCase):
         self.login()
         self.update_profile()
         self.add_contact("F4TEST", "JN11DW")
-        rv = self.client.get('/contacts/1/delete')
+        rv = self.client.get("/contacts/1/delete")
         self.assertNotIn(b"<td>F4TEST</td>", rv.data)
         self.assertNotIn(b"<td>783.0 Km</td>", rv.data)
         self.assertNotIn(b"<td>179.0</td>", rv.data)
@@ -158,18 +158,14 @@ class TestViews(TestCase):
         self.register()
         self.login()
         self.update_profile()
-        rv = self.client.post('/contacts/new',
-                              data=dict(callsign="F4TEST"),
-                              follow_redirects=True)
+        rv = self.client.post("/contacts/new", data=dict(callsign="F4TEST"), follow_redirects=True)
         self.assertIn(b"QTH is too broad or empty, please input valid QTH", rv.data)
 
     def test_150_add_contact_missing_call(self):
         self.register()
         self.login()
         self.update_profile()
-        rv = self.client.post('/contacts/new',
-                              data=dict(gridsquare="JN18CX"),
-                              follow_redirects=True)
+        rv = self.client.post("/contacts/new", data=dict(gridsquare="JN18CX"), follow_redirects=True)
         self.assertIn(b"This field is required.", rv.data)
 
     # Notes
@@ -179,12 +175,12 @@ class TestViews(TestCase):
     # Non existent
     def test_160_nonexist_user(self):
         self.import_cty()
-        rv = self.client.get('/user/davenull/logbook/1-test', follow_redirects=True)
+        rv = self.client.get("/user/davenull/logbook/1-test", follow_redirects=True)
         self.assertIn(b"User not found", rv.data)
 
     def test_170_nonexist_logbook(self):
         self.register()
-        rv = self.client.get('/user/dashie/logbook/1-test', follow_redirects=True)
+        rv = self.client.get("/user/dashie/logbook/1-test", follow_redirects=True)
         self.assertIn(b"Logbook not found", rv.data)
 
         # QSOs

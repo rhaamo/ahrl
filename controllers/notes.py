@@ -6,23 +6,28 @@ from forms import NoteForm
 from models import db, Note, Logbook, Log
 from utils import check_default_profile
 
-bp_notes = Blueprint('bp_notes', __name__)
+bp_notes = Blueprint("bp_notes", __name__)
 
 
-@bp_notes.route('/notes', methods=['GET'])
+@bp_notes.route("/notes", methods=["GET"])
 @login_required
 @check_default_profile
 def notes():
     pcfg = {"title": "My notes"}
 
     _notes = Note.query.filter(Note.user_id == current_user.id).all()
-    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
-        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
+    logbooks = (
+        db.session.query(Logbook.id, Logbook.name, func.count(Log.id))
+        .join(Log)
+        .filter(Logbook.user_id == current_user.id)
+        .group_by(Logbook.id)
+        .all()
+    )
 
-    return render_template('notes/view.jinja2', pcfg=pcfg, notes=_notes, logbooks=logbooks)
+    return render_template("notes/view.jinja2", pcfg=pcfg, notes=_notes, logbooks=logbooks)
 
 
-@bp_notes.route('/notes/<int:note_id>/edit', methods=['GET', 'POST'])
+@bp_notes.route("/notes/<int:note_id>/edit", methods=["GET", "POST"])
 @login_required
 @check_default_profile
 def edit(note_id):
@@ -30,8 +35,8 @@ def edit(note_id):
 
     a = Note.query.filter(Note.user_id == current_user.id, Note.id == note_id).first()
     if not a:
-        flash("Note not found", 'error')
-        return redirect(url_for('bp_notes.notes'))
+        flash("Note not found", "error")
+        return redirect(url_for("bp_notes.notes"))
 
     form = NoteForm(request.form, obj=a)
 
@@ -42,15 +47,15 @@ def edit(note_id):
 
         db.session.commit()
 
-        flash("Success saving note: {0}".format(a.title), 'success')
-        return redirect(url_for('bp_notes.notes'))
+        flash("Success saving note: {0}".format(a.title), "success")
+        return redirect(url_for("bp_notes.notes"))
 
     logbooks = Logbook.query.filter(Logbook.user_id == current_user.id).all()
 
-    return render_template('notes/edit.jinja2', pcfg=pcfg, form=form, note=a, note_id=note_id, logbooks=logbooks)
+    return render_template("notes/edit.jinja2", pcfg=pcfg, form=form, note=a, note_id=note_id, logbooks=logbooks)
 
 
-@bp_notes.route('/notes/new', methods=['GET', 'POST'])
+@bp_notes.route("/notes/new", methods=["GET", "POST"])
 @login_required
 @check_default_profile
 def new():
@@ -68,24 +73,29 @@ def new():
         db.session.add(a)
         db.session.commit()
 
-        flash("Success updating note: {0}".format(a.title), 'success')
-        return redirect(url_for('bp_notes.notes'))
+        flash("Success updating note: {0}".format(a.title), "success")
+        return redirect(url_for("bp_notes.notes"))
 
-    logbooks = db.session.query(Logbook.id, Logbook.name, func.count(Log.id)).join(
-        Log).filter(Logbook.user_id == current_user.id).group_by(Logbook.id).all()
-    return render_template('notes/new.jinja2', pcfg=pcfg, form=form, logbooks=logbooks)
+    logbooks = (
+        db.session.query(Logbook.id, Logbook.name, func.count(Log.id))
+        .join(Log)
+        .filter(Logbook.user_id == current_user.id)
+        .group_by(Logbook.id)
+        .all()
+    )
+    return render_template("notes/new.jinja2", pcfg=pcfg, form=form, logbooks=logbooks)
 
 
-@bp_notes.route('/notes/<int:note_id>/delete', methods=['GET', 'DELETE', 'PUT'])
+@bp_notes.route("/notes/<int:note_id>/delete", methods=["GET", "DELETE", "PUT"])
 @login_required
 @check_default_profile
 def delete(note_id):
     note = Note.query.filter(Note.user_id == current_user.id, Note.id == note_id).first()
     if not note:
-        flash("Note not found", 'error')
-        return redirect(url_for('bp_notes.notes'))
+        flash("Note not found", "error")
+        return redirect(url_for("bp_notes.notes"))
 
     db.session.delete(note)
     db.session.commit()
 
-    return redirect(url_for('bp_notes.notes'))
+    return redirect(url_for("bp_notes.notes"))

@@ -7,8 +7,8 @@ Create Date: 2016-06-14 17:09:53.898423
 """
 
 # revision identifiers, used by Alembic.
-revision = '516077ddda8d'
-down_revision = '790b9af160b5'
+revision = "516077ddda8d"
+down_revision = "790b9af160b5"
 
 from models import db, Band
 

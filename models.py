@@ -19,24 +19,26 @@ class LogQuery(BaseQuery, SearchQueryMixin):
     pass
 
 
-roles_users = db.Table('roles_users',
-                       db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-                       db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+roles_users = db.Table(
+    "roles_users",
+    db.Column("user_id", db.Integer(), db.ForeignKey("user.id")),
+    db.Column("role_id", db.Integer(), db.ForeignKey("role.id")),
+)
 
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False, info={'label': 'Name'})
-    description = db.Column(db.String(255), info={'label': 'Description'})
+    name = db.Column(db.String(80), unique=True, nullable=False, info={"label": "Name"})
+    description = db.Column(db.String(255), info={"label": "Description"})
 
     __mapper_args__ = {"order_by": name}
 
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), unique=True, nullable=False, info={'label': 'Email'})
-    name = db.Column(db.String(255), unique=True, nullable=False, info={'label': 'Name'})
-    password = db.Column(db.String(255), nullable=False, info={'label': 'Password'})
+    email = db.Column(db.String(255), unique=True, nullable=False, info={"label": "Email"})
+    name = db.Column(db.String(255), unique=True, nullable=False, info={"label": "Name"})
+    password = db.Column(db.String(255), nullable=False, info={"label": "Password"})
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
 
@@ -54,21 +56,21 @@ class User(db.Model, UserMixin):
     hamqth_name = db.Column(db.String(32))
     hamqth_password = db.Column(db.String(255))
 
-    timezone = db.Column(db.String(255), nullable=False, default='UTC')  # Managed and fed by pytz
+    timezone = db.Column(db.String(255), nullable=False, default="UTC")  # Managed and fed by pytz
     swl = db.Column(db.Boolean(), nullable=False, default=False)
-    zone = db.Column(db.String(10), nullable=False, default='iaru1')
+    zone = db.Column(db.String(10), nullable=False, default="iaru1")
 
     slug = db.Column(db.String(255), unique=True, nullable=True)
 
-    roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
-    logbooks = db.relationship('Logbook', backref='user', lazy='dynamic', cascade="delete")
-    logs = db.relationship('Log', backref='user', lazy='dynamic', cascade="delete")
-    notes = db.relationship('Note', backref='user', lazy='dynamic', cascade="delete")
-    apitokens = db.relationship('Apitoken', backref='user', lazy='dynamic', cascade="delete")
-    contacts = db.relationship('Contact', backref='user', lazy='dynamic', cascade="delete")
+    roles = db.relationship("Role", secondary=roles_users, backref=db.backref("users", lazy="dynamic"))
+    logbooks = db.relationship("Logbook", backref="user", lazy="dynamic", cascade="delete")
+    logs = db.relationship("Log", backref="user", lazy="dynamic", cascade="delete")
+    notes = db.relationship("Note", backref="user", lazy="dynamic", cascade="delete")
+    apitokens = db.relationship("Apitoken", backref="user", lazy="dynamic", cascade="delete")
+    contacts = db.relationship("Contact", backref="user", lazy="dynamic", cascade="delete")
 
-    user_loggings = db.relationship('UserLogging', backref='user', lazy='dynamic', cascade="delete")
-    loggings = db.relationship('Logging', backref='user', lazy='dynamic', cascade="delete")
+    user_loggings = db.relationship("UserLogging", backref="user", lazy="dynamic", cascade="delete")
+    loggings = db.relationship("Logging", backref="user", lazy="dynamic", cascade="delete")
 
     __mapper_args__ = {"order_by": name}
 
@@ -94,21 +96,21 @@ class User(db.Model, UserMixin):
         return cute
 
     def zone_str(self):
-        if self.zone == 'iaru1':
-            return 'IARU Zone 1'
-        elif self.zone == 'iaru2':
-            return 'IARU Zone 2'
-        elif self.zone == 'iaru3':
-            return 'IARU Zone 3'
+        if self.zone == "iaru1":
+            return "IARU Zone 1"
+        elif self.zone == "iaru2":
+            return "IARU Zone 2"
+        elif self.zone == "iaru3":
+            return "IARU Zone 3"
         else:
-            return 'You should not do that'
+            return "You should not do that"
 
 
 class Apitoken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
-    token = db.Column(db.String(255), unique=True, nullable=False, info={'label': 'Token'})
-    secret = db.Column(db.String(255), unique=True, nullable=False, info={'label': 'Secret'})
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False)
+    token = db.Column(db.String(255), unique=True, nullable=False, info={"label": "Token"})
+    secret = db.Column(db.String(255), unique=True, nullable=False, info={"label": "Secret"})
 
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -191,7 +193,7 @@ class Contact(db.Model):
     latitude = db.Column(db.Float)
     slug = db.Column(db.String(255), unique=True, nullable=True)
 
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False)
 
 
 class Logbook(db.Model):
@@ -208,9 +210,9 @@ class Logbook(db.Model):
     slug = db.Column(db.String(255), unique=True, nullable=True)
     old = db.Column(db.Boolean, default=False)
 
-    logs = db.relationship('Log', backref='logbook', lazy='dynamic', cascade="delete")
-    user_loggings = db.relationship('UserLogging', backref='logbook', lazy='dynamic', cascade="delete")
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+    logs = db.relationship("Log", backref="logbook", lazy="dynamic", cascade="delete")
+    user_loggings = db.relationship("UserLogging", backref="logbook", lazy="dynamic", cascade="delete")
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False)
 
 
 class Picture(db.Model):
@@ -221,7 +223,7 @@ class Picture(db.Model):
     filename = db.Column(db.String(255), unique=False, nullable=True)
     slug = db.Column(db.String(255), unique=True, nullable=True)
 
-    log_id = db.Column(db.Integer(), db.ForeignKey('log.id'), nullable=False)
+    log_id = db.Column(db.Integer(), db.ForeignKey("log.id"), nullable=False)
 
 
 class Log(db.Model):
@@ -237,7 +239,7 @@ class Log(db.Model):
     ant_path = db.Column(db.String(2), default=None)
     arrl_sect = db.Column(db.String(10), default=None)
 
-    band_id = db.Column(db.Integer(), db.ForeignKey('bands.id'), nullable=False)
+    band_id = db.Column(db.Integer(), db.ForeignKey("bands.id"), nullable=False)
 
     band_rx = db.Column(db.String(10), default=None)
     biography = db.Column(db.Text)
@@ -278,7 +280,7 @@ class Log(db.Model):
     lotw_status = db.Column(db.String(255), default=None)
     max_bursts = db.Column(db.Integer, default=None)
 
-    mode_id = db.Column(db.Integer(), db.ForeignKey('modes.id'), nullable=False)
+    mode_id = db.Column(db.Integer(), db.ForeignKey("modes.id"), nullable=False)
 
     ms_shower = db.Column(db.String(32), default=None)
     my_city = db.Column(db.String(32), default=None)
@@ -357,13 +359,27 @@ class Log(db.Model):
 
     consolidated_hamqth = db.Column(db.Boolean(), default=False, nullable=False)
 
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
-    logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=False)
-    pictures = db.relationship('Picture', backref='log', lazy='dynamic')
-    user_loggings = db.relationship('UserLogging', backref='log', lazy='dynamic', cascade="delete")
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False)
+    logbook_id = db.Column(db.Integer(), db.ForeignKey("logbook.id"), nullable=False)
+    pictures = db.relationship("Picture", backref="log", lazy="dynamic")
+    user_loggings = db.relationship("UserLogging", backref="log", lazy="dynamic", cascade="delete")
 
-    search_vector = db.Column(TSVectorType('call', 'comment', 'country', 'email', 'name', 'notes', 'operator',
-                                           'owner_callsign', 'qslmsg', 'station_callsign', 'web', 'qsl_comment'))
+    search_vector = db.Column(
+        TSVectorType(
+            "call",
+            "comment",
+            "country",
+            "email",
+            "name",
+            "notes",
+            "operator",
+            "owner_callsign",
+            "qslmsg",
+            "station_callsign",
+            "web",
+            "qsl_comment",
+        )
+    )
 
     __mapper_args__ = {"order_by": time_on.desc()}
 
@@ -377,7 +393,7 @@ class Log(db.Model):
     def country_grid(self):
         q = ham_country_grid_coords(self.call)
         if q:
-            return coords_to_qth(q['latitude'], q['longitude'], 6)['qth']
+            return coords_to_qth(q["latitude"], q["longitude"], 6)["qth"]
         else:
             return None
 
@@ -398,10 +414,7 @@ class Log(db.Model):
         _f = qth_to_coords(self.user.locator, 6)  # precision, latitude, longitude
         _t = qth_to_coords(qso_gs, 6)  # precision, latitude, longitude
 
-        return distance.haversine_km(_f['latitude'],
-                                     _f['longitude'],
-                                     _t['latitude'],
-                                     _t['longitude'])
+        return distance.haversine_km(_f["latitude"], _f["longitude"], _t["latitude"], _t["longitude"])
 
 
 class Note(db.Model):
@@ -414,7 +427,7 @@ class Note(db.Model):
     timestamp = db.Column(db.DateTime(timezone=False), server_default=func.now(), onupdate=func.now())
     slug = db.Column(db.String(255), unique=True, nullable=True)
 
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False)
 
     __mapper_args__ = {"order_by": id.desc()}
 
@@ -433,7 +446,7 @@ class Mode(db.Model):
     mode = db.Column(db.String(255), nullable=False)
     submode = db.Column(db.String(255), nullable=True)  # Unused as now
 
-    logs = db.relationship('Log', backref='mode', lazy='dynamic')
+    logs = db.relationship("Log", backref="mode", lazy="dynamic")
 
 
 class Band(db.Model):
@@ -446,9 +459,9 @@ class Band(db.Model):
     upper = db.Column(db.BigInteger(), nullable=True)
     start = db.Column(db.BigInteger(), nullable=True)
     # Zone format 'iaru1', 'iaru2', 'iaru3'
-    zone = db.Column(db.String(10), nullable=False, default='iaru1')
+    zone = db.Column(db.String(10), nullable=False, default="iaru1")
 
-    logs = db.relationship('Log', backref='band', lazy='dynamic')
+    logs = db.relationship("Log", backref="band", lazy="dynamic")
 
 
 class DxccEntities(db.Model):
@@ -508,7 +521,7 @@ class Logging(db.Model):
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime(timezone=False), server_default=func.now(), onupdate=func.now())
 
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=True)
 
 
 class UserLogging(db.Model):
@@ -520,26 +533,30 @@ class UserLogging(db.Model):
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime(timezone=False), server_default=func.now(), onupdate=func.now())
 
-    log_id = db.Column(db.Integer(), db.ForeignKey('log.id'), nullable=True)
-    logbook_id = db.Column(db.Integer(), db.ForeignKey('logbook.id'), nullable=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+    log_id = db.Column(db.Integer(), db.ForeignKey("log.id"), nullable=True)
+    logbook_id = db.Column(db.Integer(), db.ForeignKey("logbook.id"), nullable=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False)
 
 
 # Utils functions
 def ham_country_grid_coords(call):
-    if 'sqlite' in db.engine.driver:
-        q = DxccPrefixes.query.filter(
-            DxccPrefixes.call == func.substr(call, 1, func.LENGTH(DxccPrefixes.call))
-        ).order_by(func.length(DxccPrefixes.call).asc()).limit(1)
+    if "sqlite" in db.engine.driver:
+        q = (
+            DxccPrefixes.query.filter(DxccPrefixes.call == func.substr(call, 1, func.LENGTH(DxccPrefixes.call)))
+            .order_by(func.length(DxccPrefixes.call).asc())
+            .limit(1)
+        )
     else:
-        q = DxccPrefixes.query.filter(
-            DxccPrefixes.call == func.substring(call, 1, func.LENGTH(DxccPrefixes.call))
-        ).order_by(func.length(DxccPrefixes.call).asc()).limit(1)
+        q = (
+            DxccPrefixes.query.filter(DxccPrefixes.call == func.substring(call, 1, func.LENGTH(DxccPrefixes.call)))
+            .order_by(func.length(DxccPrefixes.call).asc())
+            .limit(1)
+        )
     if q.count() <= 0:
         return None
     else:
         qth = coords_to_qth(q[0].lat, q[0].long, 6)
-        return {'qth': qth['qth'], 'latitude': q[0].lat, 'longitude': q[0].long}
+        return {"qth": qth["qth"], "latitude": q[0].lat, "longitude": q[0].long}
 
 
 # Give a cute name <3 More like "name - callsign" or "callsign"
@@ -552,28 +569,24 @@ def cutename(call, name=None):
     return cute
 
 
-@event.listens_for(User, 'after_update')
-@event.listens_for(User, 'after_insert')
+@event.listens_for(User, "after_update")
+@event.listens_for(User, "after_insert")
 def make_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
-    connection.execute(
-        User.__table__.update().where(User.__table__.c.id == target.id).values(slug=slug)
-    )
+    connection.execute(User.__table__.update().where(User.__table__.c.id == target.id).values(slug=slug))
 
 
-@event.listens_for(Cat, 'after_update')
-@event.listens_for(Cat, 'after_insert')
+@event.listens_for(Cat, "after_update")
+@event.listens_for(Cat, "after_insert")
 def make_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.radio)
     slug = slugify(title)
-    connection.execute(
-        Cat.__table__.update().where(Cat.__table__.c.id == target.id).values(slug=slug)
-    )
+    connection.execute(Cat.__table__.update().where(Cat.__table__.c.id == target.id).values(slug=slug))
 
 
-@event.listens_for(ContestTemplate, 'after_update')
-@event.listens_for(ContestTemplate, 'after_insert')
+@event.listens_for(ContestTemplate, "after_update")
+@event.listens_for(ContestTemplate, "after_insert")
 def make_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
@@ -582,65 +595,53 @@ def make_slug(mapper, connection, target):
     )
 
 
-@event.listens_for(Contest, 'after_update')
-@event.listens_for(Contest, 'after_insert')
+@event.listens_for(Contest, "after_update")
+@event.listens_for(Contest, "after_insert")
 def make_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
-    connection.execute(
-        Contest.__table__.update().where(Contest.__table__.c.id == target.id).values(slug=slug)
-    )
+    connection.execute(Contest.__table__.update().where(Contest.__table__.c.id == target.id).values(slug=slug))
 
 
-@event.listens_for(Contact, 'after_update')
-@event.listens_for(Contact, 'after_insert')
+@event.listens_for(Contact, "after_update")
+@event.listens_for(Contact, "after_insert")
 def make_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.callsign)
     slug = slugify(title)
-    connection.execute(
-        Contact.__table__.update().where(Contact.__table__.c.id == target.id).values(slug=slug)
-    )
+    connection.execute(Contact.__table__.update().where(Contact.__table__.c.id == target.id).values(slug=slug))
 
 
-@event.listens_for(Logbook, 'after_update')
-@event.listens_for(Logbook, 'after_insert')
+@event.listens_for(Logbook, "after_update")
+@event.listens_for(Logbook, "after_insert")
 def make_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
-    connection.execute(
-        Logbook.__table__.update().where(Logbook.__table__.c.id == target.id).values(slug=slug)
-    )
+    connection.execute(Logbook.__table__.update().where(Logbook.__table__.c.id == target.id).values(slug=slug))
 
 
-@event.listens_for(Picture, 'after_update')
-@event.listens_for(Picture, 'after_insert')
+@event.listens_for(Picture, "after_update")
+@event.listens_for(Picture, "after_insert")
 def make_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
-    connection.execute(
-        Picture.__table__.update().where(Picture.__table__.c.id == target.id).values(slug=slug)
-    )
+    connection.execute(Picture.__table__.update().where(Picture.__table__.c.id == target.id).values(slug=slug))
 
 
-@event.listens_for(Log, 'after_update')
-@event.listens_for(Log, 'after_insert')
+@event.listens_for(Log, "after_update")
+@event.listens_for(Log, "after_insert")
 def make_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.call)
     slug = slugify(title)
-    connection.execute(
-        Log.__table__.update().where(Log.__table__.c.id == target.id).values(slug=slug)
-    )
+    connection.execute(Log.__table__.update().where(Log.__table__.c.id == target.id).values(slug=slug))
 
 
-@event.listens_for(Note, 'after_update')
-@event.listens_for(Note, 'after_insert')
+@event.listens_for(Note, "after_update")
+@event.listens_for(Note, "after_insert")
 def make_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.title)
     slug = slugify(title)
-    connection.execute(
-        Note.__table__.update().where(Note.__table__.c.id == target.id).values(slug=slug)
-    )
+    connection.execute(Note.__table__.update().where(Note.__table__.c.id == target.id).values(slug=slug))
+
 
 # Always at the end !
 db.configure_mappers()
-
