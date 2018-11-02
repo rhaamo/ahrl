@@ -1,7 +1,6 @@
 from flask import Blueprint, request, Response
-from xmlrpc.server import CGIXMLRPCRequestHandler, SimpleXMLRPCDispatcher
+from xmlrpc.server import SimpleXMLRPCDispatcher
 from adif import parse as adif_parser
-from models import db, Log, Band, Mode
 
 bp_extapi = Blueprint("bp_extapi", __name__)
 

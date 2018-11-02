@@ -9,7 +9,7 @@ def make_db_seed(db):
         seed_config(db)
         seed_users(db)  # after timezones because not null relation
         # also seeds roles admin/user
-    except:
+    except:  # noqa: E722
         db.session.rollback()
         raise
 
@@ -56,7 +56,7 @@ def seed_config(db):
     # Bug, two commit necessary
 
 
-#### Only used by tests
+# Only used by tests
 def seed_bands(db):
     db.session.add(Band(name="2222m", zone="iaru1", lower=135700, upper=137800))
     db.session.add(Band(name="630m", zone="iaru1", lower=472000, upper=476000))

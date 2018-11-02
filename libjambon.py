@@ -298,7 +298,7 @@ def get_dxcc_from_clublog(callsign):
 
     try:
         r = requests.get(clublog_uri)
-    except:
+    except:  # noqa: E722
         raise InvalidUsage("Error getting DXCC from ClubLog", status_code=500)
 
     if r.status_code != 200:

@@ -571,7 +571,7 @@ def cutename(call, name=None):
 
 @event.listens_for(User, "after_update")
 @event.listens_for(User, "after_insert")
-def make_slug(mapper, connection, target):
+def make_user_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
     connection.execute(User.__table__.update().where(User.__table__.c.id == target.id).values(slug=slug))
@@ -579,7 +579,7 @@ def make_slug(mapper, connection, target):
 
 @event.listens_for(Cat, "after_update")
 @event.listens_for(Cat, "after_insert")
-def make_slug(mapper, connection, target):
+def make_cat_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.radio)
     slug = slugify(title)
     connection.execute(Cat.__table__.update().where(Cat.__table__.c.id == target.id).values(slug=slug))
@@ -587,7 +587,7 @@ def make_slug(mapper, connection, target):
 
 @event.listens_for(ContestTemplate, "after_update")
 @event.listens_for(ContestTemplate, "after_insert")
-def make_slug(mapper, connection, target):
+def make_contestt_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
     connection.execute(
@@ -597,7 +597,7 @@ def make_slug(mapper, connection, target):
 
 @event.listens_for(Contest, "after_update")
 @event.listens_for(Contest, "after_insert")
-def make_slug(mapper, connection, target):
+def make_contest_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
     connection.execute(Contest.__table__.update().where(Contest.__table__.c.id == target.id).values(slug=slug))
@@ -605,7 +605,7 @@ def make_slug(mapper, connection, target):
 
 @event.listens_for(Contact, "after_update")
 @event.listens_for(Contact, "after_insert")
-def make_slug(mapper, connection, target):
+def make_contact_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.callsign)
     slug = slugify(title)
     connection.execute(Contact.__table__.update().where(Contact.__table__.c.id == target.id).values(slug=slug))
@@ -613,7 +613,7 @@ def make_slug(mapper, connection, target):
 
 @event.listens_for(Logbook, "after_update")
 @event.listens_for(Logbook, "after_insert")
-def make_slug(mapper, connection, target):
+def make_logbook_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
     connection.execute(Logbook.__table__.update().where(Logbook.__table__.c.id == target.id).values(slug=slug))
@@ -621,7 +621,7 @@ def make_slug(mapper, connection, target):
 
 @event.listens_for(Picture, "after_update")
 @event.listens_for(Picture, "after_insert")
-def make_slug(mapper, connection, target):
+def make_picture_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.name)
     slug = slugify(title)
     connection.execute(Picture.__table__.update().where(Picture.__table__.c.id == target.id).values(slug=slug))
@@ -629,7 +629,7 @@ def make_slug(mapper, connection, target):
 
 @event.listens_for(Log, "after_update")
 @event.listens_for(Log, "after_insert")
-def make_slug(mapper, connection, target):
+def make_log_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.call)
     slug = slugify(title)
     connection.execute(Log.__table__.update().where(Log.__table__.c.id == target.id).values(slug=slug))
@@ -637,7 +637,7 @@ def make_slug(mapper, connection, target):
 
 @event.listens_for(Note, "after_update")
 @event.listens_for(Note, "after_insert")
-def make_slug(mapper, connection, target):
+def make_note_slug(mapper, connection, target):
     title = "{0} {1}".format(target.id, target.title)
     slug = slugify(title)
     connection.execute(Note.__table__.update().where(Note.__table__.c.id == target.id).values(slug=slug))

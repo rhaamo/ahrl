@@ -10,7 +10,7 @@ Create Date: 2016-08-24 13:07:47.278565
 revision = "eb8858fd3d9c"
 down_revision = "df93b7d9aa63"
 
-from models import db, Band
+from models import db, Band  # noqa: E402
 
 
 def upgrade():

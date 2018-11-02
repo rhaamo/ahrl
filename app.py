@@ -51,13 +51,13 @@ def create_app(cfg=None):
         file_handler.setFormatter(formatter)
         app.logger.addHandler(file_handler)
 
-    mail = Mail(app)
-    migrate = Migrate(app, db)
+    mail = Mail(app)  # noqa: F841
+    migrate = Migrate(app, db)  # noqa: F841
 
     db.init_app(app)
 
     # Setup Flask-Security
-    security = Security(app, user_datastore, register_form=ExtendedRegisterForm)
+    security = Security(app, user_datastore, register_form=ExtendedRegisterForm)  # noqa: F841
 
     git_version = ""
     gitpath = os.path.join(os.getcwd(), ".git")

@@ -10,7 +10,7 @@ Create Date: 2016-06-15 11:38:25.620662
 revision = "8ddd19e5391a"
 down_revision = "516077ddda8d"
 
-from models import db, Mode
+from models import db, Mode  # noqa: E402
 
 
 def upgrade():

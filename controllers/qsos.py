@@ -1199,7 +1199,7 @@ def logbook_search_adv(username, logbook_slug):
         filtered = True
         bq = bq.filter(Log.pictures)
     elif form.pictures.data == "N":
-        bq = bq.filter(Log.pictures == None)  # the " == " seems mandatory for sqlalchemy
+        bq = bq.filter(Log.pictures == None)  # noqa: E711, the " == " seems mandatory for sqlalchemy
 
     if not filtered:
         bq = bq.limit(20)

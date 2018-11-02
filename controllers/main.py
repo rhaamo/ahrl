@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, abort
+from flask import Blueprint, render_template, flash
 from flask_security import current_user
 from sqlalchemy import func
 

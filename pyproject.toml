@@ -8,6 +8,7 @@ exclude = '''
   | \.idea
   | \__pycache__
   | venv
+  | \.ropeproject
 )/
 '''
 skip-numeric-underscore-normalization = true

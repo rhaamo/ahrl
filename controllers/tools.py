@@ -64,7 +64,7 @@ def adif_import_file():
                 duplicates += 1
                 continue  # duplicate found, skip record
 
-            l = Log()
+            l = Log()  # noqa: E741, FIXME: rename properly later
             for key in ADIF_FIELDS:
                 if key not in log:
                     continue

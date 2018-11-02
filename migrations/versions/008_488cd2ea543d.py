@@ -19,7 +19,7 @@ Help:
 revision = "488cd2ea543d"
 down_revision = "f4d4e3c42eb7"
 
-from models import db, Band, Log
+from models import db, Band, Log  # noqa: E402
 
 
 def upgrade():
