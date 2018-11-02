@@ -55,7 +55,7 @@ pyproj==1.9.5.1
 python-dateutil==2.7.5
 python-editor==1.0.3
 python-slugify==1.2.6
-pytz==2018.4
+pytz==2018.7
 requests>=2.20.0
 six==1.11.0
 snowballstemmer==1.2.1
