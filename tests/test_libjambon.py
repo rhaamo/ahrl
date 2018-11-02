@@ -4,7 +4,7 @@ sys.path.insert(0, sys.path[0] + "/../")
 from geohelper import bearing  # noqa: E402
 from libjambon import coordinates2adif, adif2coordinates, adif, geo_bearing_star  # noqa: E402
 import unittest  # noqa: E402
-from nose_parameterized import parameterized  # noqa: E402
+from parameterized import parameterized  # noqa: E402
 
 
 class TestLibjambon(unittest.TestCase):

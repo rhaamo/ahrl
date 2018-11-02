@@ -72,6 +72,7 @@ wrapt==1.10.11
 WTForms==2.2.1
 WTForms-Alchemy==0.16.7
 WTForms-Components==0.10.3
+parameterized==0.6.0
 git+http://dev.sigpipe.me/DashieHam/pyHamQth.git#egg=pyhamqth
 git+https://github.com/ggramaize/libqth.git#egg=libqth
 git+https://github.com/jswhit/pyproj.git#egg=pyproj

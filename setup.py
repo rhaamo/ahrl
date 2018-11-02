@@ -35,7 +35,7 @@ setup(
         "flask-accept",
         "geohelper",
         "flask_testing",
-        "nose_parameterized",
+        "parameterized",
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-cov", "jsonschema"],
