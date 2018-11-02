@@ -1,4 +1,3 @@
-cython
 git+https://github.com/jswhit/pyproj.git#egg=pyproj
 alembic==1.0.2
 astroid==2.0.4
@@ -77,3 +76,4 @@ WTForms-Alchemy==0.16.7
 WTForms-Components==0.10.3
 git+http://dev.sigpipe.me/DashieHam/pyHamQth.git#egg=pyhamqth
 git+https://github.com/ggramaize/libqth.git#egg=libqth
+git+https://github.com/jswhit/pyproj.git#egg=pyproj
