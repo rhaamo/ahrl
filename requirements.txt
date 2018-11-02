@@ -33,7 +33,7 @@ idna==2.6
 infinity==1.4
 intervals==0.8.1
 isort==4.3.4
-itsdangerous==0.24
+itsdangerous==1.1.0
 Jinja2==2.10
 LatLon==1.0.2
 lazy-object-proxy==1.3.1
