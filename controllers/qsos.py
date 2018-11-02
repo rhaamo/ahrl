@@ -1226,11 +1226,6 @@ def map(username, logbook_slug):
         flash("User not found", "error")
         return redirect(url_for("bp_main.home"))
 
-    try:
-        page = int(request.args.get("page", 1))
-    except ValueError:
-        page = 1
-
     pcfg = {"title": "{0}'s ({1}) logbook map".format(user.name, user.callsign)}
 
     _logbook = Logbook.query.filter(Logbook.slug == logbook_slug, Logbook.user_id == user.id).first()
