@@ -25,7 +25,6 @@ pipeline:
       - python setup.py install
       - black --check .
       - flake8 .
-      - cp tests/config_test.py config.py
       - python setup.py test
 
   migrations:
