@@ -1,3 +1,5 @@
+cython
+git+https://github.com/jswhit/pyproj.git#egg=pyproj
 alembic==1.0.2
 astroid==2.0.4
 Babel==2.6.0
