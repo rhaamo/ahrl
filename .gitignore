@@ -8,3 +8,6 @@ tmp/cty.xml
 .ropeproject/
 venv
 *.log
+.coverage
+ahrl.egg-info
+.eggs
