@@ -1,5 +1,6 @@
-import json
-from os.path import join, dirname
+import os
+from bs4 import BeautifulSoup as bs
+import re
 
 
 def login(client, email, password):
@@ -24,3 +25,28 @@ def register(c, email, password, name):
     logout(c)
     resp = c.get("/")
     assert b"Logged as" not in resp.data
+
+
+def update_profile(client, callsign, locator):
+    return client.post("/user/edit", follow_redirects=True, data=dict(callsign=callsign, locator=locator))
+
+
+def add_contact(client, callsign, locator):
+    return client.post("/contacts/new", data=dict(callsign=callsign, gridsquare=locator), follow_redirects=True)
+
+
+_contacts_reg = re.compile(r"/contacts/(\d+)/edit")
+
+
+def get_contact_id(html, callsign):
+    soup = bs(html, 'html.parser')
+    table = soup.find('table', {'class': 'contacts-list'})
+    rows = table.findAll('tr')
+    row = next(t for t in rows if t.findAll(text=re.compile(callsign)))
+    href = row.findAll('a', href=re.compile('edit'))
+    assert len(href) > 0
+    href = href[0]['href']
+    match = _contacts_reg.search(href)
+    assert match
+    assert len(match.groups()) >= 1
+    return match.group(1)

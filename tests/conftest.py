@@ -6,12 +6,16 @@ mypath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, mypath + "/../")
 from app import create_app  # noqa: E402
 from models import db as _db  # noqa: E402
-from dbseed import make_db_seed  # noqa: E402
+from dbseed import seed_config, seed_bands  # noqa: E402
+from crons import update_dxcc_from_cty_xml
+
+
+# Note: this file can't be named with another name than "conftest"
 
 
 @pytest.yield_fixture(scope="session")
 def app():
-    cfg = os.getenv("CONFIGTEST", "tests/config_test.py")
+    cfg = os.getenv("CONFIGTEST", "tests/config_tests.py")
     app = create_app(cfg)
     ctx = app.app_context()
     ctx.push()
@@ -27,7 +31,16 @@ def db(app):
     #_db.engine.connect().execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
     _db.create_all()
 
-    make_db_seed(_db)
+    seed_config(_db)
+    seed_bands(_db)
+
+    # Ok here is the joke, if we call update_dxcc_from_cty_xml() with DEBUG=True
+    # Everything in the test suite will became extremely slow
+    print("import_cty start")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "cty.xml")
+    update_dxcc_from_cty_xml(file_path, True)
+    print("import_cty end")
 
     yield _db
 
