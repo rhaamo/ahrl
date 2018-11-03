@@ -305,7 +305,9 @@ def create_app(config_filename="config.py", app_name=None, register_blueprints=T
         pass
 
     @cron.command()
-    @click.option("--file", default=None, help="Local file to import instead of downloading", type=click.Path(exists=True))
+    @click.option(
+        "--file", default=None, help="Local file to import instead of downloading", type=click.Path(exists=True)
+    )
     def update_dxcc_from_cty(file):
         """Update DXCC tables from cty.xml"""
         print("-- STARTED on {0}".format(datetime.datetime.now()))

@@ -9,8 +9,8 @@ def test_debug_testing(app):
     I have no effing idea why.
     See conftest.py:db() for more.
     """
-    assert not app.config['DEBUG']
-    assert app.config['TESTING']
+    assert not app.config["DEBUG"]
+    assert app.config["TESTING"]
 
 
 def test_gen_random_str():

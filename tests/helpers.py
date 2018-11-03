@@ -39,13 +39,13 @@ _contacts_reg = re.compile(r"/contacts/(\d+)/edit")
 
 
 def get_contact_id(html, callsign):
-    soup = bs(html, 'html.parser')
-    table = soup.find('table', {'class': 'contacts-list'})
-    rows = table.findAll('tr')
+    soup = bs(html, "html.parser")
+    table = soup.find("table", {"class": "contacts-list"})
+    rows = table.findAll("tr")
     row = next(t for t in rows if t.findAll(text=re.compile(callsign)))
-    href = row.findAll('a', href=re.compile('edit'))
+    href = row.findAll("a", href=re.compile("edit"))
     assert len(href) > 0
-    href = href[0]['href']
+    href = href[0]["href"]
     match = _contacts_reg.search(href)
     assert match
     assert len(match.groups()) >= 1
