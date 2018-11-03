@@ -13,7 +13,7 @@
           <div class="modal-body">
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
@@ -34,7 +34,7 @@
     <div class="row">
     <br />
     <div class="col-lg-12">
-        <table class="table table-condensed table-stripped">
+        <table class="table table-sm table-stripped">
             <tr>
                 <th>Date</th>
                 <th>Call</th>
@@ -69,8 +69,8 @@
                 <td class="log-cnty">{{ log.country }}</td>
                 {% if current_user.is_authenticated and (current_user.id == log.user_id) %}
                     <td>
-                        <a href="{{ url_for('bp_qsos.edit', qso_slug=log.slug, logbook_slug=log.logbook.slug) }}" class="btn btn-primary btn-xs">edit</a>
-                        <a href="{{ url_for('bp_qsos.delete', qso_slug=log.slug) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                        <a href="{{ url_for('bp_qsos.edit', qso_slug=log.slug, logbook_slug=log.logbook.slug) }}" class="btn btn-primary btn-sm">edit</a>
+                        <a href="{{ url_for('bp_qsos.delete', qso_slug=log.slug) }}" class="btn btn-danger btn-sm delete_link">delete</a>
                     </td>
                 {% endif %}
                 </tr>

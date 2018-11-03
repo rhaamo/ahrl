@@ -5,7 +5,7 @@
     <div class="col-lg-6">
         <h3>
             {{ current_user.name }}'s notes
-            <a href="{{ url_for('bp_notes.new') }}" class="btn btn-success btn-xs">new</a>
+            <a href="{{ url_for('bp_notes.new') }}" class="btn btn-success btn-sm">new</a>
         </h3>
 
     {% for note in notes %}

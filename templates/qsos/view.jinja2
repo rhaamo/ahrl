@@ -7,8 +7,8 @@
         <h3>
             {% if current_user.is_authenticated and (current_user.id == qso.user_id) %}
                 <td>
-                    <a href="{{ url_for('bp_qsos.edit', qso_slug=qso.slug, logbook_slug=qso.logbook.slug) }}" class="btn btn-primary btn-xs">edit</a>
-                    <a href="{{ url_for('bp_qsos.delete', qso_slug=qso.slug) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                    <a href="{{ url_for('bp_qsos.edit', qso_slug=qso.slug, logbook_slug=qso.logbook.slug) }}" class="btn btn-primary btn-sm">edit</a>
+                    <a href="{{ url_for('bp_qsos.delete', qso_slug=qso.slug) }}" class="btn btn-danger btn-sm delete_link">delete</a>
                 </td>
             {% endif %}
             QSO with {{ qso.call }} on {{ qso.time_on | localize(user=qso.user) | show_date_no_offset }}
@@ -18,7 +18,7 @@
 </div>
 <div class="row">
     <div class="col-lg-4">
-        <table class="table table-borderless table-condensed">
+        <table class="table table-borderless table-sm">
             {% if qso.name %}
             <tr>
                 <td>Nick</td>
@@ -108,7 +108,7 @@
                     <a href="/uploads/pictures/{{ col.filename }}" target="_blank"><img alt="{{ col.name }}" width="150px" src="/uploads/pictures/{{ col.filename }}"/></a>
                     <br/>
                     {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('bp_qsos.delete_picture', logbook_slug=col.log.logbook.slug, username=col.log.user.name, qso_slug=col.log.slug  , picture_id=col.id) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                    <a href="{{ url_for('bp_qsos.delete_picture', logbook_slug=col.log.logbook.slug, username=col.log.user.name, qso_slug=col.log.slug  , picture_id=col.id) }}" class="btn btn-danger btn-sm delete_link">delete</a>
                     {% endif %}
                     {{ col.name }}
                     <br/><br/>
