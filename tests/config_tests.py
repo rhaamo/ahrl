@@ -17,7 +17,7 @@ UPLOADS_DEFAULT_DEST = "/home/dashie/dev/ahrl/uploads"
 TEMP_DOWNLOAD_FOLDER = "/home/dashie/dev/ahrl/tmp"
 
 # If using sentry, set a DSN
-SENTRY_USER_ATTRS = ['name', 'email']
+SENTRY_USER_ATTRS = ["name", "email"]
 SENTRY_DSN = ""
 
 # Domain serving this app
@@ -39,7 +39,7 @@ SECURITY_REGISTERABLE = True
 SECURITY_RECOVERABLE = True
 # Salt used for password hashing
 # Do not change after users have registered
-SECURITY_PASSWORD_SALT = 'awooo'
+SECURITY_PASSWORD_SALT = "awooo"
 # Do not change after users have registered
 SECRET_KEY = "ahahahahahahahahahaquack"
 
@@ -73,7 +73,7 @@ SQLALCHEMY_RECORD_QUERIES = True
 # Do not disable, will breaks things
 SECURITY_CHANGEABLE = True
 # Password hash algorithm
-SECURITY_PASSWORD_HASH = 'bcrypt'
+SECURITY_PASSWORD_HASH = "bcrypt"
 BABEL_DEFAULT_TIMEZONE = "UTC"
 
 
