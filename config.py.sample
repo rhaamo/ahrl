@@ -25,7 +25,7 @@ AP_DOMAIN = "mylog.myname.me"
 BASE_URL = f"https://{AP_DOMAIN}"
 
 # You can use a PostgreSQL database
-SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://user:pass@host/ahrl"
+SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://postgres@database:5432/ahrl"
 # Or MySQL (at your own risks)
 # SQLALCHEMY_DATABASE_URI = 'mysql://user:pass@host/ahrl'
 # Or Maybe SQLite3 (at your own risks)
