@@ -51,7 +51,8 @@ def test_bearing(lon, lat, bear):
     # Always lon, lat
     _from = [2.208333333333343, 48.97916666666666]
     z = bearing.initial_compass_bearing(_from[1], _from[0], lat, lon)
-    assert z == bear
+    # assert z == bear
+    assert bear == pytest.approx(z)
 
 
 @parameterized.expand(
