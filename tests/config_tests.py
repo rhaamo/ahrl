@@ -53,7 +53,8 @@ MAIL_PASSWORD = None
 MAIL_DEFAULT_SENDER = f"postmaster@{AP_DOMAIN}"
 
 # Development only options
-DEBUG = True
+# LEAVE THIS TO FALSE OR I WILL EAT YOU
+DEBUG = False
 # We are testing
 TESTING = True
 SQLALCHEMY_ECHO = False
