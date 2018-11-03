@@ -3,11 +3,18 @@
  */
 
 body {
-      padding-top: 5rem;
 }
 
 .navbar-static-top {
   margin-bottom: 19px;
+}
+
+main.container {
+    min-height: 20rem;
+}
+
+nav.navbar {
+    background-color: #e3f2fd;
 }
 
 /*
@@ -15,12 +22,11 @@ body {
  */
 
 .blog-footer {
-  padding: 40px 0;
+  padding: 1rem 0;
   color: #999;
   text-align: center;
   background-color: #f9f9f9;
-  border-top: 1px solid #e5e5e5;
-  margin-top: 1em;
+  border-top: .05rem solid #e5e5e5;
 }
 .blog-footer p:last-child {
   margin-bottom: 0;

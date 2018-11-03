@@ -25,7 +25,7 @@
 
     <body>
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <nav class="navbar navbar-expand-md navbar-light">
       <a class="navbar-brand" href="{{ url_for('bp_main.home') }}">AHRL</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -42,7 +42,7 @@
 
             {% if logbook and (current_user.id == logbook.user_id) %}
             <li class="nav-item dropdown">
-              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">QSOs</a>
+              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">QSOs</a>
               <div class="dropdown-menu" aria-labelledby="dropdown_qso">
                 <a class="dropdown-item" href="{{ url_for('bp_qsos.new', method='live', logbook_slug=logbook.slug) }}">Live QSO</a>
                 <a class="dropdown-item" href="{{ url_for('bp_qsos.new', method='manual', logbook_slug=logbook.slug) }}">Post QSO</a>
@@ -51,7 +51,7 @@
             {% endif %}
 
             <li class="nav-item dropdown">
-              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Notes</a>
+              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Notes</a>
               <div class="dropdown-menu" aria-labelledby="dropdown_qso">
                 <a class="dropdown-item" href="{{ url_for('bp_notes.notes') }}">View</a>
                 <a class="dropdown-item" href="{{ url_for('bp_notes.new') }}">Create</a>
@@ -60,7 +60,7 @@
 
             {% if logbooks %}
                 <li class="nav-item dropdown">
-                  <a href="#" class="nav-item dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Statistics</a>
+                  <a href="#" class="nav-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Statistics</a>
                   <div class="dropdown-menu" aria-labelledby="dropdown_stats">
                       {% for l in logbooks %}
                         <a class="dropdown-item" href="{{ url_for('bp_qsos.logbook_stats', username=current_user.name, logbook_slug=l.slug) }}">For {{ l.name }} <small>({{ l[3] }} qsos)</small></a>
@@ -73,7 +73,7 @@
                 {% if user %}
                     <li class="nav-item {% if request.endpoint == 'bp_logbooks.logbooks' %}active{% endif %}"><a class="nav-link" href="{{ url_for('bp_logbooks.logbooks', user=user.name) }}">Logbook</a></li>
                     <li class="nav-item dropdown">
-                      <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Statistics</a>
+                      <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Statistics</a>
                       <div class="dropdown-menu" aria-labelledby="dropdown_logbooks">
                           {% for l in logbooks %}
                             <a class="dropdown-item" href="{{ url_for('bp_qsos.logbook_stats', username=user.name, logbook_slug=l.slug) }}">For {{ l.name }} <small>({{ l[3] }} qsos)</small></a>
@@ -89,8 +89,8 @@
                 <li class="nav-item {% if request.endpoint.startswith('bp_main.about') %}active{% endif %}"><a class="nav-link" href="{{ url_for('bp_main.about') }}">About</a></li>
                 {% if current_user.is_authenticated %}
                     <li class="nav-item dropdown">
-                      <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Logged as {{ current_user.name }}</a>
-                      <div class="dropdown-menu" aria-labelledby="dropdown_user">
+                      <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Logged as {{ current_user.name }}</a>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown_user">
                           <h6 class="dropdown-header">User</h6>
                           <a class="dropdown-item" href="{{ url_for('bp_users.profile') }}">Profile</a>
                           <a class="dropdown-item" href="{{ url_for('bp_users.logs') }}">Logs</a>
@@ -116,12 +116,11 @@
       </div>
     </nav>
 
-    <div class="row">
+    <main role="main" class="container">
+        <div class="row">
         <div class="col-lg-6 col-lg-offset-3">{{ butils.flashed_messages(container=False) }}</div>
     </div>
 
-
-    <main role="main" class="container">
       <div>
             {% block content %}{% endblock %}
       </div>
@@ -129,8 +128,8 @@
 
     <!-- FIXME: footer styling -->
     <footer class="blog-footer">
-      <p>AHRL Source code --> <a href="https://dev.sigpipe.me/DashieHam/ahrl">Here</a></p>
-        <p><small>Running version {{ g.cfg['AHRL_VERSION'] }}</small></p>
+      <p>AHRL <a href="https://github.com/rhaamo/ahrl">Source code</a></p>
+      <p><small>Running version {{ g.cfg['AHRL_VERSION'] }}</small></p>
       <p>
         <a href="#">Back to top</a>
       </p>
