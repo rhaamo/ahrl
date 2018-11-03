@@ -1,5 +1,5 @@
 import helpers
-from models import db, User
+from models import User
 
 
 def test_login_logout(client, session):

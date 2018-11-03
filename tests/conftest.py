@@ -7,7 +7,7 @@ sys.path.insert(0, mypath + "/../")
 from app import create_app  # noqa: E402
 from models import db as _db  # noqa: E402
 from dbseed import seed_config, seed_bands  # noqa: E402
-from crons import update_dxcc_from_cty_xml
+from crons import update_dxcc_from_cty_xml  # noqa: E402
 
 
 # Note: this file can't be named with another name than "conftest"
