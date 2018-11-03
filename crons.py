@@ -114,7 +114,7 @@ def update_dxcc_from_cty_xml(_file=None, silent=False):
         if not silent:
             print("!!! Error: config not found")
         add_log(category="CONFIG", level="ERROR", message="Config not found")
-        return
+        raise Exception("config not found")
 
     if os.path.isfile(fname):
         os.remove(fname)
@@ -128,7 +128,7 @@ def update_dxcc_from_cty_xml(_file=None, silent=False):
             if not silent:
                 print("!! Clublog API Key not defined")
             add_log(category="CRONS", level="ERROR", message="Clublog API Key not defined")
-            return
+            raise Exception("no clublog_api_key in config")
         url = "https://secure.clublog.org/cty.php?api={0}".format(config.clublog_api_key)
 
         try:
@@ -138,7 +138,7 @@ def update_dxcc_from_cty_xml(_file=None, silent=False):
         except urllib.error.URLError as err:
             if not silent:
                 print("!! Error: {0}".format(err))
-            exit(-1)
+            raise Exception(f"error: {err}")
         if not silent:
             print("-- File downloaded at {0}".format(fname))
     elif os.path.isfile(_file):
@@ -147,8 +147,8 @@ def update_dxcc_from_cty_xml(_file=None, silent=False):
             print("-- File at {0}".format(fname))
     else:
         if not silent:
-            print("-- derp ?")
-        exit()
+            print("-- what are you trying to do ?")
+        raise Exception("unknown error")
 
     # Now parse XML file
     tree = None
@@ -157,14 +157,14 @@ def update_dxcc_from_cty_xml(_file=None, silent=False):
     except FileNotFoundError as err:
         if not silent:
             print("!! Error: {0}".format(err))
-        exit(-1)
+        raise Exception(f"file not found: {err}")
     except ElementTree.ParseError as err:
         if not silent:
             print("!! Error: {0}".format(err))
-        exit(-1)
+        raise Exception(f"XML Parsing error: {err}")
 
     if not tree:
-        exit(-1)
+        raise Exception("XML tree is none")
 
     root = tree.getroot()
 

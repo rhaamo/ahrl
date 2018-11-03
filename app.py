@@ -117,9 +117,10 @@ def create_app(config_filename="config.py", app_name=None, register_blueprints=T
     @babel.localeselector
     def get_locale():
         # if a user is logged in, use the locale from the user settings
-        identity = getattr(g, "identity", None)
-        if identity is not None and identity.id:
-            return identity.user.locale
+        # FIXME: not implemented yet
+        # identity = getattr(g, "identity", None)
+        # if identity is not None and identity.id:
+        #     return identity.user.locale
         # otherwise try to guess the language from the user accept
         # header the browser transmits.  We support fr/en in this
         # example.  The best match wins.
@@ -127,9 +128,11 @@ def create_app(config_filename="config.py", app_name=None, register_blueprints=T
 
     @babel.timezoneselector
     def get_timezone():
-        identity = getattr(g, "identity", None)
-        if identity is not None and identity.id:
-            return identity.user.timezone
+        # identity = getattr(g, "identity", None)
+        # if identity is not None and identity.id:
+        #     return identity.user.timezone
+        # FIXME: not implemented yet
+        pass
 
     @app.before_request
     def before_request():
@@ -302,10 +305,11 @@ def create_app(config_filename="config.py", app_name=None, register_blueprints=T
         pass
 
     @cron.command()
-    def update_dxcc_from_cty():
+    @click.option("--file", default=None, help="Local file to import instead of downloading", type=click.Path(exists=True))
+    def update_dxcc_from_cty(file):
         """Update DXCC tables from cty.xml"""
         print("-- STARTED on {0}".format(datetime.datetime.now()))
-        update_dxcc_from_cty_xml()
+        update_dxcc_from_cty_xml(file)
         print("-- FINISHED on {0}".format(datetime.datetime.now()))
 
     @cron.command()
