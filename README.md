@@ -36,7 +36,7 @@ Or if you have disabled registration, use the ``` flask createuser ``` command t
 
 # Production running
 
-TODO: venv, systemd services
+TODO: venv, systemd services, waitress
 
 # Default config
  - LOTW Download URL: https://p1k.arrl.org/lotwuser/lotwreport.adi
