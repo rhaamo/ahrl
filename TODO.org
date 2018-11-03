@@ -1,9 +1,5 @@
 * GLOBAL
 
-** Upgrades notes
-SQLAlchemy 1.2 break things
-  error on new qso page; ValueError: too many values to unpack (expected 2)
-
 ** Rework CAT / radio stuff (add / edit / remove)
 
 ** UI
