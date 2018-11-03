@@ -1,0 +1,58 @@
+* GLOBAL
+
+** Upgrades notes
+SQLAlchemy 1.2 break things
+  error on new qso page; ValueError: too many values to unpack (expected 2)
+
+** Rework CAT / radio stuff (add / edit / remove)
+
+** UI
+!!! Rewrite Actions menu of QSOs list for setting eQSL to sent / received
+** Delete logs button; ajax
+** Mobile ui
+** Traduction
+
+** Ajouter une option de config pour demander la clé ClubLog
+
+eQSL.cc :
+     * We now accept new band frequency ranges (30m, 60m) and modes (ARDOP, QRA64, MSK144) defined by ADIF 3.0.5 specification
+
+>>>>>>>>>>
+** Hardening des ajax new qso/edit ->
+*** 2/ Test app without internet to check fallback
+*** nicely manage unknown DXCC prefixes when DXCC not updated
+
+>>>>>>>>>>
+*** Change auto select mode : change input anyway if band change
+**** Change input from mode only if : NOT CHANGED MANUALLY
+
+>>>>>>>>>>
+*** Change DXCC tab to "DXCC Table"
+*** Add "DXCC Summary" tab with a list consisting of the country and total counts, maybe modes and counts
+
+*** Search
+**** Date picker for From/To
+**** Callsign autocompletion
+
+** Ideas
+*** Act as a "server" for
+**** HRD
+**** fldigi
+
+** Fixes to do
+*** Form errors doesn't display which field is required, ambiguous
+
+** Tests
+*** Add logbook
+*** Delete logbook
+*** Add QSO
+*** Delete QSO
+*** Export ADIF
+*** Import ADIF
+*** Add/delete/view notes
+*** Add QSO and search
+*** Add QSO and test the two geo json
+*** Test for logged only urls
+*** Test stats, qso, logbook when the logbook doesn't exist
+*** Test logbook public / private and direct logbook / qso access
+*** Test adif imports export and stuff without valid CALL/LOC
