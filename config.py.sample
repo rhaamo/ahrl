@@ -1,40 +1,79 @@
-DEBUG = True
+# Website translations
+BABEL_DEFAULT_LOCALE = "en"
 
-SECRET_KEY = 'bleh23r29-r2-9jwehoiqrpj'
-# SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://dashie@localhost/ahrl'
-# SQLALCHEMY_DATABASE_URI = 'postgresql+pg8000://dashie@localhost/ahrl'
-SQLALCHEMY_DATABASE_URI = 'sqlite:///ahrl.db'
-SQLALCHEMY_ECHO = False
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+# Paginations
+# TBD later
 
-SECURITY_CONFIRMABLE = False
-SECURITY_REGISTERABLE = False  # deactivate registration
+# Lookup method for callsigns infos, available : [hamqth]
+LOOKUP_METHOD = "hamqth"
+
+# For QRZ integration
+QRZ_USERNAME = ""
+QRZ_PASSWORD = ""
+
+# Uploads dirs
+UPLOADED_PICTURES_DEST = "/home/dashie/dev/ahrl/uploads/pictures"
+UPLOADS_DEFAULT_DEST = "/home/dashie/dev/ahrl/uploads"
+TEMP_DOWNLOAD_FOLDER = "/home/dashie/dev/ahrl/tmp"
+
+# If using sentry, set a DSN
+SENTRY_USER_ATTRS = ['name', 'email']
+SENTRY_DSN = ""
+
+# Domain serving this app
+AP_DOMAIN = "mylog.myname.me"
+BASE_URL = f"https://{AP_DOMAIN}"
+
+# You can use a PostgreSQL database
+SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://user:pass@host/ahrl"
+# Or MySQL (at your own risks)
+# SQLALCHEMY_DATABASE_URI = 'mysql://user:pass@host/ahrl'
+# Or Maybe SQLite3 (at your own risks)
+# SQLALCHEMY_DATABASE_URI = 'sqlite:///ahrl.db'
+
+# Should users confirm theire email address ?
+SECURITY_CONFIRMABLE = True
+# Can users register on this instance ?
+SECURITY_REGISTERABLE = True
+# Can users recover theire password ?
 SECURITY_RECOVERABLE = True
-SECURITY_TRACKABLE = False
-SECURITY_CHANGEABLE = True
-SECURITY_PASSWORD_HASH = 'bcrypt'
-SECURITY_PASSWORD_SALT = 'omgponies'
-# SECURITY_URL_PREFIX = '/sec'
+# Salt used for password hashing
+# Do not change after users have registered
+SECURITY_PASSWORD_SALT = 'CHANGEME'
+# Do not change after users have registered
+SECRET_KEY = "CHANGEME"
 
-SECURITY_SEND_REGISTER_EMAIL = False
-SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
-SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = False
+# Mail setup
+MAIL_SERVER = "localhost"
+MAIL_PORT = 25
+MAIL_USE_TLS = False
+MAIL_USE_SSL = False
+MAIL_USERNAME = None
+MAIL_PASSWORD = None
+MAIL_DEFAULT_SENDER = f"postmaster@{AP_DOMAIN}"
+
+# Development only options
+DEBUG = False
+SQLALCHEMY_ECHO = False
+DEBUG_TB_PROFILER_ENABLED = False
+DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+# Do not touch that
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_RECORD_QUERIES = True
+# Users can change password
+# Do not disable, will breaks things
+SECURITY_CHANGEABLE = True
+# Password hash algorithm
+SECURITY_PASSWORD_HASH = 'bcrypt'
+BABEL_DEFAULT_TIMEZONE = "UTC"
+
+
+SECURITY_SEND_REGISTER_EMAIL = True
+SECURITY_SEND_PASSWORD_CHANGE_EMAIL = True
+SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = True
 
 BOOTSTRAP_USE_MINIFIED = True
 BOOTSTRAP_SERVE_LOCAL = True
 BOOTSTRAP_CDN_FORCE_SSL = True
 BOOTSTRAP_QUERYSTRING_REVVING = True
-
-DEBUG_TB_PROFILER_ENABLED = True
-DEBUG_TB_INTERCEPT_REDIRECTS = False
-
-# Paginations
-
-LOOKUP_METHOD = "hamqth"
-
-QRZ_USERNAME = ""
-QRZ_PASSWORD = ""
-
-UPLOADED_PICTURES_DEST = "/home/ahrl/uploads/pictures"
-UPLOADS_DEFAULT_DEST = "/home/ahrl/uploads"
-TEMP_DOWNLOAD_FOLDER = "/home/ahrl/tmp"
