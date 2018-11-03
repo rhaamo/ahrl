@@ -7,7 +7,8 @@ Another Ham Radio Log
 
 
 # Versions requirement
- - Python >= 3.3 (3.0, 3.1, 3.2 not supported)
+ - Python >= 3.6 (all under 3.6 are not supported) (say bye-bye to debian stable, sorry)
+ - try https://github.com/chriskuehl/python3.6-debian-stretch if you use debian stable
 
 # Installation
     Install a BDD (mysql is supported, SQLite maybe, PostgreSQL should be)
@@ -16,19 +17,26 @@ Another Ham Radio Log
     cd ahrl
     git submodule init
     git submodule update
-    pip3 install git+https://github.com/ggramaize/libqth.git
-    pip3 install git+http://dev.sigpipe.me/DashieHam/pyHamQth.git
-    pip3 install --requirement requirements.txt  # if present
+    pip3 install --requirement requirements.txt
     cp config.py.sample config.py
     $EDITOR config.py
-    python3 ahrl.py db upgrade
-    python3 ahrl.py db seed
-    python3 ahrl.py cron update_dxcc_from_cty
-    python3 ahrl.py runserver # or whatever gunicorn whatever stuff
+    export FLASK_ENV=<development or production>
+    $ create your postgresql database like "ahrl"
+    flask db upgrade
+    flask seed
+    flask cron update_dxcc_from_cty
+    flask run
     Don't forget to update default Config by getting to "Your user" (top right) then "Config"
 
-# Gunicorn
-    gunicorn -w 2 -b 127.0.0.1:8000 --error-logfile=errors.log --access-logfile=access.log --chdir=$PWD ahrl:app
+# Creating an user
+
+If you have enabled registration in config, the first user registered will be ADMIN !
+
+Or if you have disabled registration, use the ``` flask createuser ``` command to create an user.
+
+# Production running
+
+TODO: venv, systemd services, waitress
 
 # Default config
  - LOTW Download URL: https://p1k.arrl.org/lotwuser/lotwreport.adi

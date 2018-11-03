@@ -25,12 +25,13 @@ pipeline:
       - python setup.py install
       - black --check .
       - flake8 .
+      - cp tests/config_tests.py config.py
       - python setup.py test
 
   migrations:
     image: python:3-alpine
     commands:
-      - apk -U add gcc g++ make pkgconfig git postgresql-dev libffi libffi-dev python3-dev
+      - apk -U add gcc g++ make pkgconfig git postgresql-dev libffi libffi-dev python3-dev postgresql-client
       - pip install --upgrade pip setuptools
       - pip install --cache-dir=/cache flake8
       - pip install --cache-dir=/cache black

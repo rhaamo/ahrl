@@ -11,3 +11,5 @@ venv
 .coverage
 ahrl.egg-info
 .eggs
+config_tests.py
+config.tests.py
