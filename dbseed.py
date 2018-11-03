@@ -1,4 +1,5 @@
 from models import user_datastore, Config, Role, Band
+from flask_security.utils import encrypt_password
 
 
 def make_db_seed(db):
@@ -29,7 +30,7 @@ def seed_users(db):
 
     user_datastore.create_user(
         email="dashie@sigpipe.me",
-        password="fluttershy",
+        password=encrypt_password("fluttershy"),
         name="toto",
         timezone="UTC",
         roles=[role_adm],
