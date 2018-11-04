@@ -44,6 +44,9 @@ eQSL.cc :
 *** Replace lot of buttons by an icon
 *** How to move the submit button on bottom of the stack ? (using extended wtf flask_security register form)
 *** New QSO Form : add a pause-time checkbox
+*** Edit QSO Form should use the same date / time of New, internally convert to time_on / time_off like New
+*** Edit form also don't work, no error shown
+*** Edit / New : 0.0 power on edit, save was with 0
 
 ** Tests
 *** Add logbook
