@@ -1,4 +1,4 @@
-{% import "bootstrap/utils.html" as butils %}
+{% import "bootstrap/flash.html" as bf %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -156,6 +156,10 @@
     </nav>
 
     <main role="main" class="container">
+        <div class="row justify-content-center">
+            <div class="col-6">{{ bf.flashed_messages(container=False) }}</div>
+        </div>
+
         {% block content %}{% endblock %}
     </main><!-- /.container -->
 
