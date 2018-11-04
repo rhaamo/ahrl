@@ -299,6 +299,8 @@ def new(logbook_slug, method):
 def edit(logbook_slug, qso_slug):
     pcfg = {"title": "Edit QSO"}
 
+    print("EDIT")
+
     _logbook = Logbook.query.filter(Logbook.slug == logbook_slug, Logbook.user_id == current_user.id).first()
     if not _logbook or _logbook.user_id != current_user.id:
         flash("Logbook not found !", "error")
