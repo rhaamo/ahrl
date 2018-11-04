@@ -14,7 +14,7 @@ from wtforms_components.fields import SelectField as WTFComponentsSelectField
 from wtforms import widgets
 from wtforms.fields.core import StringField
 
-from models import db, User, Note, Cat, Mode, Band, Logbook
+from models import db, User, Cat, Mode, Band, Logbook
 from utils import dt_utc_to_user_tz
 
 BaseModelForm = model_form_factory(Form)
