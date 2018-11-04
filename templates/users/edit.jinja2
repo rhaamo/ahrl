@@ -1,49 +1,47 @@
 {% extends "layout.jinja2" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% import 'bootstrap/form.html' as bf4 %}
 
 {% block content %}
-<div class="row">
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-6">
             <h3>Edit profile - {{ current_user.name }}</h3>
         </div>
     </div>
 
     <form action="{{ url_for('bp_users.edit') }}" method="POST" class="form-horizontal">
         {{ form.hidden_tag() }}
-        {{ wtf.form_errors(form, hiddens=True) }}
+        {{ bf4.form_errors(form, hiddens=True) }}
 
         <div class="row">
             <div class="col-lg-6">
-                {{ wtf.form_field(form.callsign, 'horizontal', class="form-control search-ignore-lastpass") }}
-                {{ wtf.form_field(form.locator, 'horizontal', class="form-control search-ignore-lastpass") }}
-                {{ wtf.form_field(form.zone, 'horizontal') }}
-                {{ wtf.form_field(form.timezone, 'horizontal') }}
-                {{ wtf.form_field(form.firstname, 'horizontal', class="form-control search-ignore-lastpass") }}
-                {{ wtf.form_field(form.lastname, 'horizontal', class="form-control search-ignore-lastpass") }}
+                {{ bf4.render_field(form.callsign, 'horizontal', class="form-control search-ignore-lastpass") }}
+                {{ bf4.render_field(form.locator, 'horizontal', class="form-control search-ignore-lastpass") }}
+                {{ bf4.render_field(form.zone, 'horizontal') }}
+                {{ bf4.render_field(form.timezone, 'horizontal') }}
+                {{ bf4.render_field(form.firstname, 'horizontal', class="form-control search-ignore-lastpass") }}
+                {{ bf4.render_field(form.lastname, 'horizontal', class="form-control search-ignore-lastpass") }}
             </div>
             <div class="col-lg-6">
                 <div class="row">
                     <div class="col-lg-5">
-                        {{ wtf.form_field(form.lotw_name, 'vertical') }}
-                        {{ wtf.form_field(form.eqsl_name, 'vertical') }}
-                        {{ wtf.form_field(form.hamqth_name, 'vertical') }}
+                        {{ bf4.render_field(form.lotw_name, 'vertical') }}
+                        {{ bf4.render_field(form.eqsl_name, 'vertical') }}
+                        {{ bf4.render_field(form.hamqth_name, 'vertical') }}
+                        {{ bf4.render_field(form.swl, 'vertical') }}
                     </div>
                     <div class="col-lg-6 col-lg-offset-1">
-                        {{ wtf.form_field(form.lotw_password, 'vertical') }}
-                        {{ wtf.form_field(form.eqsl_password, 'vertical') }}
-                        {{ wtf.form_field(form.hamqth_password, 'vertical') }}
+                        {{ bf4.render_field(form.lotw_password, 'vertical') }}
+                        {{ bf4.render_field(form.eqsl_password, 'vertical') }}
+                        {{ bf4.render_field(form.hamqth_password, 'vertical') }}
                     </div>
                 </div>
-                {{ wtf.form_field(form.swl, 'horizontal', horizontal_columns=('lg', 4, 8)) }}
             </div>
         </div>
         <div class="row">
             <div class="col-lg-6">
-                {{ wtf.form_field(form.submit, button_map={'submit': 'success'}) }}
+                {{ bf4.render_field(form.submit, button_map={'submit': 'success'}) }}
                 <a class="btn btn-warning" href="{{ url_for('bp_users.profile') }}">Cancel edit</a>
             </div>
         </div>
     </form>
-</div>
 {% endblock %}
