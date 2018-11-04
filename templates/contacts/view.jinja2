@@ -5,7 +5,7 @@
     <div class="col-lg-12">
         <h3>
             {{ current_user.name }}'s contacts
-            <a href="{{ url_for('bp_contacts.new') }}" class="btn btn-success btn-xs">new</a>
+            <a href="{{ url_for('bp_contacts.new') }}" class="btn btn-success btn-sm">new</a>
         </h3>
     </div>
 </div>
@@ -13,7 +13,7 @@
 <div class="row">
     <div class="col-lg-6">
 
-        <table class="table table-condensed contacts-list">
+        <table class="table table-sm contacts-list">
             <tr>
                 <th>Callsign</th>
                 <th>Gridsquare</th>
@@ -33,8 +33,9 @@
                     <td>{{ c.bearing_star }}</td>
                     {% if current_user.is_authenticated %}
                         <td>
-                            <a href="{{ url_for('bp_contacts.edit', contact_id=c.id) }}" class="btn btn-primary btn-xs">edit</a>
-                            <a href="{{ url_for('bp_contacts.delete', contact_id=c.id) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                            <a href="{{ url_for('bp_contacts.edit', contact_id=c.id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                            &nbsp;&nbsp;
+                            <a href="{{ url_for('bp_contacts.delete', contact_id=c.id) }}" class="delete_link"><i class="fa fa-trash" aria-hidden="true"></i></a>
                         </td>
                     {% endif %}
                 </tr>

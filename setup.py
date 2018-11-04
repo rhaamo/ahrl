@@ -16,7 +16,7 @@ setup(
         "WTForms-Alchemy",
         "SQLAlchemy-Searchable",
         "SQLAlchemy-Utils",
-        "Flask-Bootstrap",
+        "Bootstrap-Flask",
         "Flask-DebugToolbar",
         "Flask-Login",
         "Flask-Mail",

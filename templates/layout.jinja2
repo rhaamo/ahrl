@@ -1,11 +1,11 @@
-{% import "bootstrap/utils.html" as butils %}
+{% import "bootstrap/flash.html" as bf %}
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
@@ -17,177 +17,156 @@
     <!-- Bootstrap core CSS -->
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="{{ url_for('static', filename='css/ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/fork-awesome.min.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
     {% block styles %}{% endblock %}
   </head>
 
-  <body>
+    <body>
 
-    <!-- Static navbar -->
-    <nav class="navbar navbar-default navbar-static-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="{{ url_for('bp_main.home') }}">AHRL</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            {% if current_user.is_authenticated and request.endpoint %}
-            <li class="{% if request.endpoint == 'bp_logbooks.logbooks' %}active{% endif %}"><a href="{{ url_for('bp_logbooks.logbooks', user=current_user.name) }}">My Logbooks</a></li>
+    <nav class="navbar navbar-expand-md navbar-light">
+      <a class="navbar-brand" href="{{ url_for('bp_main.home') }}">AHRL</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          {% if current_user.is_authenticated and request.endpoint %}
+            <li class="nav-item {% if request.endpoint == 'bp_logbooks.logbooks' %}active{% endif %}"><a class="nav-link" href="{{ url_for('bp_logbooks.logbooks', user=current_user.name) }}">My Logbooks</a></li>
             {% if logbook %}
-                <li class="{% if request.endpoint == 'bp_logbooks.logbooks' %}active{% endif %}"><a href="{{ url_for('bp_qsos.logbook', username=current_user.name, logbook_slug=logbook.slug) }}">Current Logbook</a></li>
+                <li class="nav-item {% if request.endpoint == 'bp_logbooks.logbooks' %}active{% endif %}"><a class="nav-link" href="{{ url_for('bp_qsos.logbook', username=current_user.name, logbook_slug=logbook.slug) }}">Current Logbook</a></li>
             {% endif %}
-            <li class="{% if request.endpoint.startswith('bp_contacts.') %}active{% endif %}"><a href="{{ url_for('bp_contacts.contacts') }}">Contacts</a></li>
+            <li class="nav-item {% if request.endpoint.startswith('bp_contacts.') %}active{% endif %}"><a class="nav-link" href="{{ url_for('bp_contacts.contacts') }}">Contacts</a></li>
 
             {% if logbook and (current_user.id == logbook.user_id) %}
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">QSOs <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{{ url_for('bp_qsos.new', method='live', logbook_slug=logbook.slug) }}">Live QSO</a></li>
-                <li><a href="{{ url_for('bp_qsos.new', method='manual', logbook_slug=logbook.slug) }}">Post QSO</a></li>
-              </ul>
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">QSOs</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown_qso">
+                <a class="dropdown-item" href="{{ url_for('bp_qsos.new', method='live', logbook_slug=logbook.slug) }}">Live QSO</a>
+                <a class="dropdown-item" href="{{ url_for('bp_qsos.new', method='manual', logbook_slug=logbook.slug) }}">Post QSO</a>
+              </div>
             </li>
             {% endif %}
 
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Notes <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{{ url_for('bp_notes.notes') }}">View</a></li>
-                <li><a href="{{ url_for('bp_notes.new') }}">Create</a></li>
-              </ul>
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Notes</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown_qso">
+                <a class="dropdown-item" href="{{ url_for('bp_notes.notes') }}">View</a>
+                <a class="dropdown-item" href="{{ url_for('bp_notes.new') }}">Create</a>
+              </div>
             </li>
 
             {% if logbooks %}
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Statistics <span class="caret"></span></a>
-                  <ul class="dropdown-menu">
+                <li class="nav-item dropdown">
+                  <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Statistics</a>
+                  <div class="dropdown-menu" aria-labelledby="dropdown_stats">
                       {% for l in logbooks %}
-                        <li><a href="{{ url_for('bp_qsos.logbook_stats', username=current_user.name, logbook_slug=l.slug) }}">For {{ l.name }} <small>({{ l[3] }} qsos)</small></a></li>
+                        <a class="dropdown-item" href="{{ url_for('bp_qsos.logbook_stats', username=current_user.name, logbook_slug=l.slug) }}">For {{ l.name }} <small>({{ l[3] }} qsos)</small></a>
                       {% endfor %}
+                  </div>
+                </li>
+            {% endif %}
+
+          {% else %}
+                {% if user %}
+                    <li class="nav-item {% if request.endpoint == 'bp_logbooks.logbooks' %}active{% endif %}"><a class="nav-link" href="{{ url_for('bp_logbooks.logbooks', user=user.name) }}">Logbook</a></li>
+                    <li class="nav-item dropdown">
+                      <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Statistics</a>
+                      <div class="dropdown-menu" aria-labelledby="dropdown_logbooks">
+                          {% for l in logbooks %}
+                            <a class="dropdown-item" href="{{ url_for('bp_qsos.logbook_stats', username=user.name, logbook_slug=l.slug) }}">For {{ l.name }} <small>({{ l[3] }} qsos)</small></a>
+                          {% endfor %}
+                      </div>
+                    </li>
+                {% endif %}
+          {% endif %}
+
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tools</a>
+              <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{{ url_for('bp_tools.bands_plan') }}">IARU Band Plans</a>
+                  <a class="dropdown-item" href="{{ url_for('bp_tools.map') }}">World Map w/day-night</a>
+                  {% if current_user.is_authenticated %}
+                    <a class="dropdown-item" href="{{ url_for('bp_tools.adif_import') }}">ADIF Import</a>
+                  {% endif %}
+              </div>
+            </li>
+
+            {% if logbook %}
+                <li class="nav-item dropdown">
+                  <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</a>
+                  <ul id="search-dd" class="dropdown-menu">
+                      <li>
+                        <div class="row adv-search">
+                          <div class="col-md-12">
+                              <a href="{{ url_for('bp_qsos.logbook_search_adv', logbook_slug=logbook.slug, username=logbook.user.name) }}">Advanced search page</a>
+                          </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form accept-charset="UTF-8" role="form" class="form-inline" method="get" action="{{ url_for('bp_qsos.logbook_search', logbook_slug=logbook.slug, username=logbook.user.name) }}">
+                                    <div class="form-group">
+                                        <input class="form-control" type="text" name="q" placeholder="Search term">
+                                    </div>
+                                    <button type="submit" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                      </li>
                   </ul>
                 </li>
             {% endif %}
 
-            {% else %}
-                {% if user %}
-                    <li class="{% if request.endpoint == 'bp_logbooks.logbooks' %}active{% endif %}"><a href="{{ url_for('bp_logbooks.logbooks', user=user.name) }}">Logbook</a></li>
-                    <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Statistics <span class="caret"></span></a>
-                      <ul class="dropdown-menu">
-                          {% for l in logbooks %}
-                            <li><a href="{{ url_for('bp_qsos.logbook_stats', username=user.name, logbook_slug=l.slug) }}">For {{ l.name }} <small>({{ l[3] }} qsos)</small></a></li>
-                          {% endfor %}
-                      </ul>
-                    </li>
-                {% endif %}
-            {% endif %}
+        </ul>
 
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tools <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                  <li><a href="{{ url_for('bp_tools.bands_plan') }}">IARU Band Plans</a></li>
-                  <li><a href="{{ url_for('bp_tools.map') }}">World Map w/day-night</a></li>
-                  {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('bp_tools.adif_import') }}">ADIF Import</a></li>
-                  {% endif %}
-              </ul>
-            </li>
-
-            {% if logbook %}
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Search <span class="caret"></span></a>
-              <ul id="search-dd" class="dropdown-menu">
-                  <li>
-                    <div class="row adv-search">
-                      <div class="col-md-12">
-                          <a href="{{ url_for('bp_qsos.logbook_search_adv', logbook_slug=logbook.slug, username=logbook.user.name) }}">Advanced search page</a>
-                      </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <form accept-charset="UTF-8" role="form" class="form-inline" method="get" action="{{ url_for('bp_qsos.logbook_search', logbook_slug=logbook.slug, username=logbook.user.name) }}">
-                                <div class="form-group">
-                                    <input class="form-control" type="text" name="q" placeholder="Search term">
-                                </div>
-                                <button type="submit" class="btn btn-info">Search</button>
-                            </form>
-                        </div>
-                    </div>
-                  </li>
-              </ul>
-            </li>
-            {% endif %}
-
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
+        <ul class="navbar-nav ml-auto">
             {% if request.endpoint %}
-                <li class="{% if request.endpoint.startswith('bp_main.about') %}active{% endif %}"><a href="{{ url_for('bp_main.about') }}">About</a></li>
+                <li class="nav-item {% if request.endpoint.startswith('bp_main.about') %}active{% endif %}"><a class="nav-link" href="{{ url_for('bp_main.about') }}">About</a></li>
                 {% if current_user.is_authenticated %}
-                    <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Logged as {{ current_user.name }} <span class="caret"></span></a>
-                      <ul class="dropdown-menu">
-                          <li class="dropdown-header">User</li>
-                          <li><a href="{{ url_for('bp_users.profile') }}">Profile</a></li>
-                          <li><a href="{{ url_for('bp_users.logs') }}">Logs</a></li>
+                    <li class="nav-item dropdown">
+                      <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Logged as {{ current_user.name }}</a>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown_user">
+                          <h6 class="dropdown-header">User</h6>
+                          <a class="dropdown-item" href="{{ url_for('bp_users.profile') }}">Profile</a>
+                          <a class="dropdown-item" href="{{ url_for('bp_users.logs') }}">Logs</a>
                           {% if is_admin() %}
-                              <li role="separator" class="divider"></li>
-                              <li class="dropdown-header">Admin</li>
-                              <li><a href="{{ url_for('bp_admin.config') }}">App config</a></li>
-                              <li><a href="{{ url_for('bp_admin.logs') }}">App logs</a></li>
+                              <div class="dropdown-divider"></div>
+                              <h6 class="dropdown-header">Admin</h6>
+                              <a class="dropdown-item" href="{{ url_for('bp_admin.config') }}">App config</a>
+                              <a class="dropdown-item" href="{{ url_for('bp_admin.logs') }}">App logs</a>
                           {% endif %}
-                          <li role="separator" class="divider"></li>
-                          <li><a href="{{ url_for_security('change_password') }}">Change password</a></li>
-                          <li><a href="{{ url_for_security('logout') }}">Logout</a></li>
-                        </ul>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="{{ url_for_security('change_password') }}">Change password</a>
+                          <a class="dropdown-item" href="{{ url_for_security('logout') }}">Logout</a>
+                        </div>
                     </li>
                 {% else %}
                     {% if security.registerable %}
-                        <li class="{% if request.endpoint.startswith('security.register') %}active{% endif %}"><a href="{{ url_for_security('register') }}">Register</a></li>
+                        <li class="nav-item {% if request.endpoint.startswith('security.register') %}active{% endif %}"><a class="nav-link" href="{{ url_for_security('register') }}">Register</a></li>
                     {% endif %}
-                    <li class="{% if request.endpoint.startswith('security.login') %}active{% endif %}"><a href="{{ url_for_security('login') }}">Login</a></li>
+                    <li class="nav-item {% if request.endpoint.startswith('security.login') %}active{% endif %}"><a class="nav-link" href="{{ url_for_security('login') }}">Login</a></li>
                 {% endif %}
             {% endif %}
           </ul>
-        </div><!--/.nav-collapse -->
       </div>
     </nav>
 
-    <div class="container">
-
-        <div class="row">
-            <div class="col-lg-6 col-lg-offset-3">{{ butils.flashed_messages(container=False) }}</div>
+    <main role="main" class="container">
+        <div class="row justify-content-center">
+            <div class="col-6">{{ bf.flashed_messages(container=False) }}</div>
         </div>
 
-      <div class="row">
+        {% block content %}{% endblock %}
+    </main><!-- /.container -->
 
-        <div class="col-sm-12 blog-main">
-            {% block content %}{% endblock %}
-        </div><!-- /.blog-main -->
-
-      </div><!-- /.row -->
-
-    </div><!-- /.container -->
-
+    <!-- FIXME: footer styling -->
     <footer class="blog-footer">
-      <p>Blog template built for <a href="http://getbootstrap.com">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a> and uses <a href="http://glyphicons.com/">Glyphicons</a></p>
-      <p>AHRL Source code --> <a href="https://dev.sigpipe.me/DashieHam/ahrl">Here</a></p>
-        <p><small>Running version {{ g.cfg['AHRL_VERSION'] }}</small></p>
+      <p>AHRL <a href="https://github.com/rhaamo/ahrl">Source code</a></p>
+      <p><small>Running version {{ g.cfg['AHRL_VERSION'] }}</small></p>
       <p>
         <a href="#">Back to top</a>
       </p>
@@ -198,9 +177,8 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="{{ url_for('static', filename='js/ie10-viewport-bug-workaround.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.bootstrap-growl.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/global.js') }}"></script>
     {% block scripts %}{% endblock %}

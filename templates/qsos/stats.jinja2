@@ -2,37 +2,37 @@
 
 {% block content %}
 
-    <div>
     <div class="row">
-        <div class="col-lg-5">
+        <div class="col-5">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="active"><a href="#home" aria-controls="stats" role="tab" data-toggle="tab">Stats</a></li>
-                <li role="presentation"><a href="#sat" aria-controls="profile" role="tab" data-toggle="tab">Satellites</a></li>
-                <li role="presentation"><a href="#dxcc" aria-controls="messages" role="tab" data-toggle="tab">DXCC</a></li>
+                <li class="nav-item"><a class="nav-link active" id="tab-home" data-toggle="tab" href="#home" role="tab" aria-controls="stats">Stats</a></li>
+                <li class="nav-item"><a class="nav-link" id="tab-satellites" data-toggle="tab" href="#sat" role="tab" aria-controls="satellites">Satellites</a></li>
+                <li class="nav-item"><a class="nav-link" id="tab-dxcc" data-toggle="tab" href="#dxcc" role="tab" aria-controls="dxcc">DXCC</a></li>
             </ul>
         </div>
     </div>
 
     <div class="tab-content">
+    <!-- home -->
         <div role="tabpanel" class="tab-pane active" id="home">
             <div class="row">
-                <div class="col-lg-5 col-lg-offset-1">
+                <div class="col-5 col-lg-offset-1">
                     <h4>QSOs in <span class="year-prev"></span></h4>
                     <div id="lb-stats-months-prev"></div>
                 </div>
-                <div class="col-lg-5">
+                <div class="col-5">
                     <h4>QSOs in <span class="year-cur"></span></h4>
                     <div id="lb-stats-months-cur"></div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-lg-5 col-lg-offset-1">
+                <div class="col-5 col-lg-offset-1">
                     <h4>Total modes logged</h4>
                     <div id="lb-stats-modes"></div>
                 </div>
-                <div class="col-lg-5">
+                <div class="col-5">
                     <h4>Total bands logged</h4>
                     <div id="lb-stats-bands"></div>
                 </div>
@@ -40,8 +40,8 @@
 
             {% if stats['total_qsos_year'] > 0 %}
             <div class="row">
-                <div class="col-lg-5 col-lg-offset-1">
-                    <table class="table table-condensed">
+                <div class="col-5 col-lg-offset-1">
+                    <table class="table table-sm">
                         {% for i in stats['modes_used'] | batch(2) %}
                             <tr>
                                 {% for col in i %}
@@ -52,8 +52,8 @@
                         {% endfor %}
                     </table>
                 </div>
-                <div class="col-lg-5">
-                    <table class="table table-condensed">
+                <div class="col-5">
+                    <table class="table table-sm">
                         {% for i in stats['bands_used'] | batch(2)%}
                             <tr>
                                 {% for col in i %}
@@ -68,20 +68,22 @@
             {% endif %}
         </div>
 
+    <!-- sat -->
         <div role="tabpanel" class="tab-pane" id="sat">
             <div class="row">
-                <div class="col-lg-5">
+                <div class="col-5">
                     No available stats now.
                 </div>
             </div>
         </div>
 
+    <!-- dxcc -->
         <div role="tabpanel" class="tab-pane" id="dxcc">
             <div class="row">
-                <div class="col-lg-10">
+                <div class="col-10">
                     <h4>Worked DXCC</h4>
 
-                    <table class="table table-condensed table-striped table-bordered">
+                    <table class="table table-sm table-striped table-bordered">
                         <tr>
                             <th>Country</th>
                             {% for i in stats['bands_list'] %}
@@ -108,7 +110,6 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
 {% endblock %}
 

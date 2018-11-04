@@ -1,22 +1,22 @@
 {% extends "layout.jinja2" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-xs-3">
+<div class="row justify-content-between">
+    <div class="col-4">
         <h3>{{ current_user.name }}'s logs (latest 100)</h3>
     </div>
-    <div class="col-lg-offset-6 col-xs-3" style="margin-top: 1.6em">
+    <div class="col-4 text-right">
         Show only:
-        <a href="{{ url_for('bp_users.logs') }}" class="btn btn-xs btn-default">all</a>
-        <a href="{{ url_for('bp_users.logs', level='info') }}" class="btn btn-xs btn-info">info</a>
-        <a href="{{ url_for('bp_users.logs', level='warning') }}" class="btn btn-xs btn-warning">warning</a>
-        <a href="{{ url_for('bp_users.logs', level='error') }}" class="btn btn-xs btn-danger">error</a>
+        <a href="{{ url_for('bp_users.logs') }}" class="btn btn-sm btn-secondary">all</a>
+        <a href="{{ url_for('bp_users.logs', level='info') }}" class="btn btn-sm btn-info">info</a>
+        <a href="{{ url_for('bp_users.logs', level='warning') }}" class="btn btn-sm btn-warning">warning</a>
+        <a href="{{ url_for('bp_users.logs', level='error') }}" class="btn btn-sm btn-danger">error</a>
     </div>
 </div>
 
 <div class="row">
     <div class="col-lg-12">
-        <table class="table table-condensed table-stripped table-bordered">
+        <table class="table table-sm table-stripped table-bordered">
             <tr>
                 <th>Date</th>
                 <th>Category</th>

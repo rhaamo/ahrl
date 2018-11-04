@@ -1,36 +1,16 @@
 {% extends "layout.jinja2" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% import 'bootstrap/form.html' as bf4 %}
 
 {% block content %}
-<div class="row">
     <div class="row">
-        <div class="col-lg-6">
-            <h3>Edit logbook: {{ logbook.name }}</h3>
+        <div class="col-12">
+            <h3>Edit logbook: {{ logbook.name }} <a class="btn btn-sm btn-warning" href="{{ url_for('bp_logbooks.logbooks', user=current_user.name) }}">Cancel</a></h3>
         </div>
     </div>
 
-    <form action="{{ url_for('bp_logbooks.edit', logbook_slug=logbook.slug) }}" method="POST" class="form-horizontal" name="gtfo-lastpass-search">
-        {{ form.hidden_tag() }}
-        {{ wtf.form_errors(form, hiddens=True) }}
-
-        <div class="row">
-            <div class="col-lg-6">
-                {{ wtf.form_field(form.name, 'horizontal') }}
-                {{ wtf.form_field(form.callsign, 'horizontal') }}
-                {{ wtf.form_field(form.locator, 'horizontal') }}
-                {{ wtf.form_field(form.eqsl_qth_nickname, 'horizontal', placeholder='eQSL QTH Nickname from wanted eQSL profile') }}
-                {{ wtf.form_field(form.swl, 'horizontal') }}
-                {{ wtf.form_field(form.public, 'horizontal') }}
-                {{ wtf.form_field(form.default, 'horizontal') }}
-                {{ wtf.form_field(form.old, 'horizontal') }}
-            </div>
+    <div class="row justify-content-center">
+        <div class="col-12">
+            {{ bf4.render_form(form, action=url_for('bp_logbooks.edit', logbook_slug=logbook.slug), horizontal_columns=('lg', 2, 5), form_type='horizontal', button_map={'submit': 'success'}) }}
         </div>
-        <div class="row">
-            <div class="col-lg-6">
-                {{ wtf.form_field(form.submit, button_map={'submit': 'success'}) }}
-                <a class="btn btn-warning" href="{{ url_for('bp_logbooks.logbooks', user=current_user.name) }}">Cancel edit</a>
-            </div>
-        </div>
-    </form>
-</div>
+    </div>
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "layout.jinja2" %}
 {% from "bootstrap/pagination.html" import render_pagination %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% import 'bootstrap/form.html' as bf4 %}
 
 {% block content %}
 
@@ -13,35 +14,27 @@
           <div class="modal-body">
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-    <div class="row">
-    <div class="col-lg-12">
-        <div class="row">
-            {% if band or mode %}
-                <div class="col-lg-6">
-                    <h4>QSOs filtered: band: {{ band }} & mode: {{ mode }}</h4>
-                    <h5>From logbook: {{ logbook.name }}</h5>
-                </div>
-            {% else %}
-                <div class="col-lg-6">
-                    <h4>All QSOs</h4>
-                    <h5>From logbook: {{ logbook.name }}</h5>
-                </div>
-            {% endif %}
-            <div class="col-lg-6">
-                <form action="{{ url_for('bp_qsos.logbook', username=user.name, logbook_slug=logbook.slug) }}" method="get">
-                    <div class="col-lg-5">{{ wtf.form_field(filter_form.band, 'inline') }}</div>
-                    <div class="col-lg-5">{{ wtf.form_field(filter_form.mode, 'inline') }}</div>
-                    <div class="col-lg-1">{{ wtf.form_field(filter_form.submit, button_map={'submit': 'success'}) }}</div>
-                </form>
+    <div class="row justify-content-between">
+        {% if band or mode %}
+            <div class="col-6">
+                <h4>QSOs filtered: band: {{ band }} & mode: {{ mode }}</h4>
+                <h5>From logbook: {{ logbook.name }}</h5>
             </div>
+        {% else %}
+            <div class="col-6">
+                <h4>All QSOs</h4>
+                <h5>From logbook: {{ logbook.name }}</h5>
+            </div>
+        {% endif %}
+        <div class="col-4 text-right">
+            {{ bf4.render_form(filter_form, action=url_for('bp_qsos.logbook', username=user.name, logbook_slug=logbook.slug), form_type='inline', button_map={'submit': 'success'}) }}
         </div>
-    </div>
     </div>
 
     <div class="row">
@@ -51,7 +44,7 @@
     </div>
     <div class="row">
     <div class="col-lg-4">
-        <a href="{{ url_for("bp_qsos.map", logbook_slug=logbook.slug, username=logbook.user.name) }}" class="btn btn-xs btn-default">bigger map</a>
+        <a href="{{ url_for("bp_qsos.map", logbook_slug=logbook.slug, username=logbook.user.name) }}" title="Bigger map" class="btn btn-sm btn-secondary"><i class="fa fa-search-plus" aria-hidden="true"></i></a>
         <small id="curDate"></small>
     </div>
     <div class="col-lg-2 col-lg-offset-6">
@@ -62,7 +55,7 @@
     <div class="row">
     <br />
     <div class="col-lg-9">
-        <table class="table table-condensed table-stripped">
+        <table class="table table-sm table-stripped">
             <tr>
                 <th>Date</th>
                 <th>Call</th>
@@ -97,8 +90,8 @@
                 <td class="log-cnty">{{ log.country }}</td>
                 {% if current_user.is_authenticated and (current_user.id == log.user_id) %}
                     <td>
-                        <a href="{{ url_for('bp_qsos.edit', qso_slug=log.slug, logbook_slug=log.logbook.slug) }}" class="btn btn-primary btn-xs">edit</a>
-                        <a href="{{ url_for('bp_qsos.delete', qso_slug=log.slug) }}" class="btn btn-danger btn-xs delete_link">delete</a>
+                        <a href="{{ url_for('bp_qsos.edit', qso_slug=log.slug, logbook_slug=log.logbook.slug) }}" class="btn btn-primary btn-sm">edit</a>
+                        <a href="{{ url_for('bp_qsos.delete', qso_slug=log.slug) }}" class="btn btn-danger btn-sm delete_link">delete</a>
                     </td>
                 {% endif %}
                 </tr>
@@ -108,7 +101,7 @@
         {{ render_pagination(qsos) }}
     </div>
     <div class="col-lg-3">
-        <table class="table table-condensed table-stripped">
+        <table class="table table-sm table-stripped">
             <tr><td colspan="2"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> User</td></tr>
             <tr><td width="60%">Callsign</td><td>{{ user.callsign }}</td></tr>
             {% if user.swl %}
@@ -120,7 +113,7 @@
             </tr>
         </table>
 
-        <table class="table table-condensed table-stripped">
+        <table class="table table-sm table-stripped">
             <tr><td colspan="2"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> This logbook</td></tr>
             {% if logbook.callsign != logbook.user.callsign %}
             <tr><td width="60%">Callsign used</td><td>{{ logbook.callsign }}</td></tr>
@@ -139,20 +132,20 @@
             {% endif %}
         </table>
 
-        <table class="table table-condensed table-stripped">
+        <table class="table table-sm table-stripped">
             <tr><td colspan="2"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> QSOs</td></tr>
             <tr><td width="60%">Total</td><td>{{ stats['qsos']['total'] }}</td></tr>
             <tr><td width="60%">Month</td><td>{{ stats['qsos']['month'] }}</td></tr>
             <tr><td width="60%">Year</td><td>{{ stats['qsos']['year'] }}</td></tr>
         </table>
 
-        <table class="table table-condensed table-stripped">
+        <table class="table table-sm table-stripped">
             <tr><td colspan="2"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Countries</td></tr>
             <tr><td width="60%">Worked</td><td>{{ stats['countries']['worked'] }}</td></tr>
             <tr><td width="60%">Needed</td><td>{{ stats['countries']['needed'] }}</td></tr>
         </table>
 
-        <table class="table table-condensed table-stripped">
+        <table class="table table-sm table-stripped">
             <tr><td colspan="2"><span class="glyphicon glyphicon-picture" aria-hidden="true"></span> QSL Cards</td></tr>
             <tr><td width="60%">Sent</td><td>{{ stats['qsl']['sent'] }}</td></tr>
             <tr><td width="60%">Received</td><td>{{ stats['qsl']['received'] }}</td></tr>
