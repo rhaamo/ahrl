@@ -5,7 +5,16 @@ from flask_security import RegisterForm, current_user
 from flask_uploads import UploadSet, IMAGES
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, HiddenField, BooleanField
+from wtforms import (
+    PasswordField,
+    SubmitField,
+    TextAreaField,
+    SelectField,
+    IntegerField,
+    HiddenField,
+    BooleanField,
+    FloatField,
+)
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, ValidationError, Optional, NumberRange
@@ -221,8 +230,8 @@ class BaseQsoForm(Form):
     # Station
     radio = QuerySelectField(query_factory=get_radios, allow_blank=True, label="Radio", get_label="radio")
     freq = IntegerField("Frequency (tx)", [DataRequired()])
-    tx_pwr = IntegerField("Power (tx, W)", [NumberRange(min=0, max=None)], default=0)
-    rx_pwr = IntegerField("Power (rx, W)", [NumberRange(min=0, max=None)], default=0)
+    tx_pwr = FloatField("Power (tx, W)", [NumberRange(min=0, max=None)], default=0)
+    rx_pwr = FloatField("Power (rx, W)", [NumberRange(min=0, max=None)], default=0)
 
     # Satellite
     sat_name = StringField("Sat name")
