@@ -1,0 +1,210 @@
+{% extends "layout.jinja2" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<div class="row">
+    <div class="row">
+        <div class="col-lg-5">
+            <h3>New QSO <small class="freq_mhz"></small><small>TZ: {{ current_user.timezone }}</small></h3>
+            <h5>Adding in logbook: {{ logbook.name }}</h5>
+
+            <form action="{{ url_for('bp_qsos.new', method=method, logbook_slug=logbook.slug) }}" method="POST" class="form-horizontal new-qso" name="gtfo-lastpass-search">
+                {{ form.hidden_tag() }}
+                {{ wtf.form_errors(form) }}
+
+                <div class="row">
+                    <div class="col-lg-6">/div>
+                    <div class="col-lg-6"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">{</div>
+                    <div class="col-lg-6"></div>
+                </div>
+                <div class="row">
+
+
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6"></div>
+                    <div class="col-lg-6"></div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6"></div>
+                    <div class="col-lg-6"><div id="bearing_info"></div></div>
+                </div>
+
+
+                {{ wtf.form_field(form.web, 'inline', placeholder='Web URL') }}
+
+                <div>
+
+                  <!-- Nav tabs -->
+                  <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+                    <li role="presentation"><a href="#station" aria-controls="station" role="tab" data-toggle="tab">Station</a></li>
+                    <li role="presentation"><a href="#satellite" aria-controls="satellite" role="tab" data-toggle="tab">Satellite</a></li>
+                    <li role="presentation"><a href="#qsl" aria-controls="qsl" role="tab" data-toggle="tab">QSL</a></li>
+                    <li role="presentation"><a href="#eqsl" aria-controls="eqsl" role="tab" data-toggle="tab">eQSL</a></li>
+                  </ul>
+
+                  <!-- Tab panes -->
+                  <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="home">
+
+
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="station">
+
+
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="satellite">
+
+
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="qsl">
+
+
+
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="eqsl">
+                        <div class="row">
+                            <div class="col-lg-6"></div>
+                        </div>
+                    </div>
+                  </div>
+
+                </div>
+
+
+
+            </form>
+        </div>
+        <div class="col-lg-6 col-lg-offset-1">
+            <div class="new_qso_logs_table">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {% if method == 'live' %}
+    <script src="{{ url_for('static', filename='js/jquery.jclock.js') }}"></script>
+    <script>
+        $(function($){
+            var options = { };
+            $('#time').jclock(options);
+        });
+    </script>
+    {% endif %}
+    <script>
+        function reload_frequency() {
+            $.ajax({
+                url: '{{ url_for('bp_qsos.lib_jambon_band_to_freq') }}',
+                data: 'mode=' + $('select#mode').val() + '&band=' + $('select#band').val(),
+                dataType: 'json',
+                success: function (result) {
+                    $('input#freq').val(result.frequency).trigger('keyup');
+                }
+            })
+        }
+
+        function get_bearing() {
+            $.ajax({
+                url: '{{ url_for('bp_qsos.lib_geo_bearing') }}',
+                data: 'locator_qso=' + $('input#gridsquare').val() + '&locator_user={{ current_user.locator }}',
+                dataType: 'json',
+                success: function (result) {
+                    var b = Math.round(result.bearing) + "&deg; " + result.bearing_star + " " + result.distance.toFixed(2) + result.unit;
+                    console.log(b);
+                    $('div#bearing_info').html(b);
+                },
+                error: function (result) {
+                    $('div#bearing_info').html("Invalid locator or error");
+                }
+            })
+        }
+
+        $('select#band').change(function() { reload_frequency(); });
+        $('input#gridsquare').keyup(function() { get_bearing(); });
+
+        $('select#mode').change(function() {
+            reload_frequency();
+
+            if ($(this).val() == 'JT65' || $(this).val() == 'JT65B' || $(this).val() == 'JT6C' || $(this).val() == 'JT6M' || $(this).val() == 'FSK441' || $(this).val() == 'JTMS' || $(this).val() == 'ISCAT') {
+                $('input#rst_s').val('-5');
+                $('input#rst_r').val('-5');
+            } else if ($(this).val() == 'CW') {
+                $('input#rst_s').val('599');
+                $('input#rst_r').val('599');
+            } else {
+                $('input#rst_s').val('59');
+                $('input#rst_r').val('59');
+            }
+        });
+
+        $('#call').focusout(function() {
+            var callsign = $('input#call').val();
+            if (callsign) {
+                document.getElementById("submit").disabled = true;
+                // DXCC
+                $.ajax({
+                    url: '{{ url_for('bp_qsos.lib_clublog_dxcc') }}',
+                    data: 'callsign=' + callsign,
+                    dataType: 'json',
+                    success: function (result) {
+                        $('input#country').val(result.Name);
+                        $('input#dxcc').val(result.DXCC);
+                        $('input#cqz').val(result.CQZ);
+                        return true;
+                    }
+                });
+
+                // HamQTH
+                $.ajax({
+                    url: '{{ url_for('bp_qsos.lib_hamqth_call') }}',
+                    data: 'callsign=' + callsign,
+                    dataType: 'json',
+                    success: function (result) {
+                        $('input#name').val(result.nick);
+                        $('input#gridsquare').val(result.grid);
+                        $('input#qth').val(result.qth);
+                        $('input#web').val(result.web);
+                        $('input#iota').val(result.iota);
+                        return true;
+                    }
+                });
+                $('input#submit').removeAttr("disabled");
+            }
+        });
+        $('input#call').keyup(function() {
+            var callsign = $('input#call').val();
+            if (callsign) {
+                $.ajax({
+                    url: '{{ url_for('bp_qsos.last_16_qsos', logbook_slug=logbook.slug) }}',
+                    data: 'callsign=' + callsign,
+                    dataType: 'html',
+                    success: function (result) {
+                        $('div.new_qso_logs_table').html(result);
+                        return true;
+                    }
+                });
+            }
+        })
+
+
+        $('input#freq').keyup(function() {
+            var freq = $('input#freq').val();
+            $('small.freq_mhz').html("(" + freq / 1000000.0 + "MHz) ");
+        });
+
+        // in last, call functions to be updated on load
+        reload_frequency(); // first call on page load
+
+        // Load right page table
+        var last16_url = '{{ url_for('bp_qsos.last_16_qsos', logbook_slug=logbook.slug) }}';
+        $('div.new_qso_logs_table').load(last16_url);
+    </script>
+{% endblock %}

@@ -272,6 +272,8 @@ def new(logbook_slug, method):
         a.cqz = form.cqz.data
         a.swl = 1 if _logbook.swl else 0
         a.web = form.web.data
+        a.rx_pwr = form.rx_pwr.data
+        a.tx_pwr = form.tx_pwr.data
 
         a.distance = 0  # ??
         a.freq_rx = 0  # ??
@@ -353,6 +355,8 @@ def edit(logbook_slug, qso_slug):
         a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
         a.web = form.web.data
+        a.rx_pwr = form.rx_pwr.data
+        a.tx_pwr = form.tx_pwr.data
 
         a.distance = 0  # ??
         a.freq_rx = 0  # ??

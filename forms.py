@@ -8,7 +8,7 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, HiddenField, BooleanField
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.validators import DataRequired, ValidationError, Optional
+from wtforms.validators import DataRequired, ValidationError, Optional, NumberRange
 from wtforms_alchemy import model_form_factory
 from wtforms_components.fields import SelectField as WTFComponentsSelectField
 from wtforms import widgets
@@ -188,10 +188,10 @@ class BaseQsoForm(Form):
     band = QuerySelectField(
         query_factory=get_bands, default=dflt_band, label="Band", validators=[DataRequired()], get_label="name"
     )
-    rst_sent = IntegerField("RST (S)", [DataRequired()], default=59)
-    rst_rcvd = IntegerField("RST (R)", [DataRequired()], default=59)
+    rst_sent = IntegerField("RST (tx)", [DataRequired()], default=59)
+    rst_rcvd = IntegerField("RST (rx)", [DataRequired()], default=59)
     name = StringField("Name")
-    qth = StringField("Location")
+    qth = StringField("QTH")
 
     gridsquare = StringField("Locator")
 
@@ -220,7 +220,9 @@ class BaseQsoForm(Form):
 
     # Station
     radio = QuerySelectField(query_factory=get_radios, allow_blank=True, label="Radio", get_label="radio")
-    freq = IntegerField("Frequency", [DataRequired()])
+    freq = IntegerField("Frequency (tx)", [DataRequired()])
+    tx_pwr = IntegerField("Power (tx, W)", [DataRequired(), NumberRange(min=0, max=None)], default=0)
+    rx_pwr = IntegerField("Power (rx, W)", [DataRequired(), NumberRange(min=0, max=None)], default=0)
 
     # Satellite
     sat_name = StringField("Sat name")

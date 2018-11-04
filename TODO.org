@@ -43,7 +43,7 @@ eQSL.cc :
 *** Required form fields should have a red border or something
 *** Replace lot of buttons by an icon
 *** How to move the submit button on bottom of the stack ? (using extended wtf flask_security register form)
-
+*** New QSO Form : add a pause-time checkbox
 
 ** Tests
 *** Add logbook

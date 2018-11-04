@@ -1,93 +1,133 @@
 {% extends "layout.jinja2" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% import 'bootstrap/form.html' as bf4 %}
 
 {% block content %}
-<div class="row">
     <div class="row">
-        <div class="col-lg-5">
+        <div class="col-8 justify-content-between">
             <h3>New QSO <small class="freq_mhz"></small><small>TZ: {{ current_user.timezone }}</small></h3>
-            <h5>Adding in logbook: {{ logbook.name }}</h5>
-
-            <form action="{{ url_for('bp_qsos.new', method=method, logbook_slug=logbook.slug) }}" method="POST" class="form-horizontal new-qso" name="gtfo-lastpass-search">
-                {{ form.hidden_tag() }}
-                {{ wtf.form_errors(form) }}
-
-                <div class="row">
-                    <div class="col-lg-6">{{ wtf.form_field(form.date, 'inline', placeholder='DD-MM-YYYY') }}</div>
-                    <div class="col-lg-6">{{ wtf.form_field(form.time, 'inline', placeholder='HH:MM:SS', autocomplete=off) }}</div>
-                </div>
-                {{ wtf.form_field(form.call, 'inline', placeholder='Callsign') }}
-                <div class="row">
-                    <div class="col-lg-6">{{ wtf.form_field(form.mode, 'inline') }}</div>
-                    <div class="col-lg-6">{{ wtf.form_field(form.band, 'inline') }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6">{{ wtf.form_field(form.rst_sent, 'vertical', placeholder='59') }}</div>
-                    <div class="col-lg-6">{{ wtf.form_field(form.rst_rcvd, 'vertical', placeholder='59') }}</div>
-                </div>
-                {{ wtf.form_field(form.name, 'inline', placeholder='Name') }}
-                <div class="row">
-                    <div class="col-lg-6">{{ wtf.form_field(form.qth, 'inline', placeholder='Location') }}</div>
-                    <div class="col-lg-6">{{ wtf.form_field(form.country, 'inline', placeholder='Country') }}</div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6">{{ wtf.form_field(form.gridsquare, 'inline', placeholder='Locator') }}</div>
-                    <div class="col-lg-6"><div id="bearing_info"></div></div>
-                </div>
-                {{ wtf.form_field(form.comment, 'inline', placeholder='Comment') }}
-                {{ wtf.form_field(form.qsl_comment, 'inline', placeholder='This comment will be wrote on (e)QSL') }}
-                {{ wtf.form_field(form.web, 'inline', placeholder='Web URL') }}
-
-                <div>
-
-                  <!-- Nav tabs -->
-                  <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
-                    <li role="presentation"><a href="#station" aria-controls="station" role="tab" data-toggle="tab">Station</a></li>
-                    <li role="presentation"><a href="#satellite" aria-controls="satellite" role="tab" data-toggle="tab">Satellite</a></li>
-                    <li role="presentation"><a href="#qsl" aria-controls="qsl" role="tab" data-toggle="tab">QSL</a></li>
-                    <li role="presentation"><a href="#eqsl" aria-controls="eqsl" role="tab" data-toggle="tab">eQSL</a></li>
-                  </ul>
-
-                  <!-- Tab panes -->
-                  <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="home">
-                        {{ wtf.form_field(form.prop_mode, 'vertical') }}
-                        {{ wtf.form_field(form.iota, 'vertical', placeholder='eg. EU-005') }}
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="station">
-                        {{ wtf.form_field(form.radio, 'vertical') }}
-                        {{ wtf.form_field(form.freq, 'vertical') }}
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="satellite">
-                        {{ wtf.form_field(form.sat_name, 'vertical') }}
-                        {{ wtf.form_field(form.sat_mode, 'vertical') }}
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="qsl">
-                        {{ wtf.form_field(form.qsl_sent, 'vertical') }}
-                        {{ wtf.form_field(form.qsl_sent_via, 'vertical') }}
-                        {{ wtf.form_field(form.qsl_via, 'vertical') }}
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="eqsl">
-                        <div class="row">
-                            <div class="col-lg-6">{{ wtf.form_field(form.eqsl_qsl_sent, 'vertical') }}</div>
-                        </div>
-                    </div>
-                  </div>
-
-                </div>
-
-                {{ wtf.form_field(form.submit, button_map={'submit': 'success'}) }}
-
-            </form>
         </div>
-        <div class="col-lg-6 col-lg-offset-1">
-            <div class="new_qso_logs_table">
-            </div>
+        <div class="col-4">
+            <h5>Adding in logbook: {{ logbook.name }}</h5>
         </div>
     </div>
-</div>
+
+    <div class="row justify-content-center">
+        <div class="col-7">
+            <form action="{{ url_for('bp_qsos.new', method=method, logbook_slug=logbook.slug) }}" method="POST" class="form-horizontal new-qso" name="gtfo-lastpass-search">
+                {{ form.hidden_tag() }}
+                {{ bf4.form_errors(form) }}
+
+                <div class="card">
+                  <div class="card-body">
+                      <div class="form-row">
+                          <div class="col">{{ bf4.render_field(form.call, 'inline', placeholder='Callsign') }}</div>
+                          <div class="col-3">{{ bf4.render_field(form.band, 'inline') }}</div>
+                          <div class="col-3">{{ bf4.render_field(form.mode, 'inline') }}</div>
+                      </div>
+                      <div class="form-row">
+                          <div class="col">{{ bf4.render_field(form.date, 'inline', placeholder='DD-MM-YYYY') }}</div>
+                          <div class="col">{{ bf4.render_field(form.time, 'inline', placeholder='HH:MM:SS', autocomplete=off) }}</div>
+                          <div class="col text-right">{{ bf4.render_field(form.submit, button_map={'submit': 'success'}) }}</div>
+                          <div class="col"><a class="btn btn-warning" href="#clear">clear</a></div>
+                      </div>
+                  </div>
+                </div>
+
+                <br />
+
+                <div class="card">
+                  <div class="card-body">
+                      <div class="form-row">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" id="tab-qso" data-toggle="tab" href="#qso" role="tab" aria-controls="qso">QSO</a></li>
+                            <li class="nav-item"><a class="nav-link" id="tab-qsl" data-toggle="tab" href="#qsl" role="tab" aria-controls="qsl">QSL</a></li>
+                            <li class="nav-item"><a class="nav-link" id="tab-eqsl" data-toggle="tab" href="#eqsl" role="tab" aria-controls="eqsl">eQSL</a></li>
+                            <li class="nav-item"><a class="nav-link" id="tab-comment" data-toggle="tab" href="#comment" role="tab" aria-controls="comment">Comment</a></li>
+                            <li class="nav-item"><a class="nav-link" id="tab-other" data-toggle="tab" href="#other" role="tab" aria-controls="other">Others</a></li>
+                            <li class="nav-item"><a class="nav-link" id="tab-mydata" data-toggle="tab" href="#mydata" role="tab" aria-controls="mydata">My Data</a></li>
+                            <li class="nav-item"><a class="nav-link" id="tab-sat" data-toggle="tab" href="#sat" role="tab" aria-controls="sat">Satellite</a></li>
+                        </ul>
+                      </div>
+
+                      <div class="tab-content">
+                          <div role="tabpanel" class="tab-pane active" id="qso">
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.rst_sent, 'vertical', placeholder='59') }}</div>
+                                  <div class="col">{{ bf4.render_field(form.rst_rcvd, 'vertical', placeholder='59') }}</div>
+                                  <div class="col">{{ bf4.render_field(form.freq, 'vertical') }}</div>
+                              </div>
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.qth, 'vertical', placeholder='QTH') }}</div>
+                                  <div class="col">{{ bf4.render_field(form.gridsquare, 'vertical', placeholder='Locator') }}</div>
+                                  <div class="col">{{ bf4.render_field(form.country, 'vertical', placeholder='Country') }}</div>
+                              </div>
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.name, 'vertical', placeholder='Name') }}</div>
+                                  <div class="col">{{ bf4.render_field(form.tx_pwr, 'vertical') }}</div>
+                                  <div class="col">{{ bf4.render_field(form.rx_pwr, 'vertical') }}</div>
+                              </div>
+                          </div>
+
+                          <div role="tabpanel" class="tab-pane" id="qsl">
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.qsl_sent, 'vertical') }}</div>
+                                  <div class="col">{{ bf4.render_field(form.qsl_sent_via, 'vertical') }}</div>
+                              </div>
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.qsl_via, 'vertical') }}</div>
+                              </div>
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.qsl_comment, 'inline', placeholder='This comment will be wrote on (e)QSL') }}</div>
+                              </div>
+                          </div>
+
+                          <div role="tabpanel" class="tab-pane" id="eqsl">
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.eqsl_qsl_sent, 'vertical') }}</div>
+                              </div>
+                          </div>
+
+                          <div role="tabpanel" class="tab-pane" id="comment">
+                              <div class="form-row">
+                                  <div class="col"><br/>{{ bf4.render_field(form.comment, 'inline', placeholder='Comment') }}</div>
+                              </div>
+                          </div>
+
+                          <div role="tabpanel" class="tab-pane" id="other">
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.iota, 'vertical', placeholder='eg. EU-005') }}</div>
+                              </div>
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.prop_mode, 'vertical') }}</div>
+                              </div>
+                          </div>
+
+                          <div role="tabpanel" class="tab-pane" id="mydata">
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.radio, 'vertical') }}</div>
+                              </div>
+                          </div>
+
+                          <div role="tabpanel" class="tab-pane" id="sat">
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.sat_name, 'vertical') }}</div>
+                              </div>
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.sat_mode, 'vertical') }}</div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-5">
+        </div>
+
+    </div>
 {% endblock %}
+
 
 {% block scripts %}
     {% if method == 'live' %}
