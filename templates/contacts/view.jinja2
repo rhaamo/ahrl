@@ -33,8 +33,9 @@
                     <td>{{ c.bearing_star }}</td>
                     {% if current_user.is_authenticated %}
                         <td>
-                            <a href="{{ url_for('bp_contacts.edit', contact_id=c.id) }}" class="btn btn-primary btn-sm">edit</a>
-                            <a href="{{ url_for('bp_contacts.delete', contact_id=c.id) }}" class="btn btn-danger btn-sm delete_link">delete</a>
+                            <a href="{{ url_for('bp_contacts.edit', contact_id=c.id) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                            &nbsp;&nbsp;
+                            <a href="{{ url_for('bp_contacts.delete', contact_id=c.id) }}" class="delete_link"><i class="fa fa-trash" aria-hidden="true"></i></a>
                         </td>
                     {% endif %}
                 </tr>
