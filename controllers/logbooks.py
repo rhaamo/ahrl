@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
 from sqlalchemy import func
 
-from forms import LogbookForm
+from forms import LogbookForm, EditLogbookForm
 from models import db, Logbook, User, Log
 from utils import check_default_profile
 
@@ -49,7 +49,7 @@ def edit(logbook_slug):
         flash("Logbook not found", "error")
         return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
 
-    form = LogbookForm(request.form, obj=a)
+    form = EditLogbookForm(request.form, obj=a)
 
     if form.validate_on_submit():
         a.name = form.name.data

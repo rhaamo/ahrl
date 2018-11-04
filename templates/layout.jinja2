@@ -62,7 +62,7 @@
 
             {% if logbooks %}
                 <li class="nav-item dropdown">
-                  <a href="#" class="nav-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Statistics</a>
+                  <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Statistics</a>
                   <div class="dropdown-menu" aria-labelledby="dropdown_stats">
                       {% for l in logbooks %}
                         <a class="dropdown-item" href="{{ url_for('bp_qsos.logbook_stats', username=current_user.name, logbook_slug=l.slug) }}">For {{ l.name }} <small>({{ l[3] }} qsos)</small></a>
@@ -84,6 +84,43 @@
                     </li>
                 {% endif %}
           {% endif %}
+
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tools</a>
+              <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{{ url_for('bp_tools.bands_plan') }}">IARU Band Plans</a>
+                  <a class="dropdown-item" href="{{ url_for('bp_tools.map') }}">World Map w/day-night</a>
+                  {% if current_user.is_authenticated %}
+                    <a class="dropdown-item" href="{{ url_for('bp_tools.adif_import') }}">ADIF Import</a>
+                  {% endif %}
+              </div>
+            </li>
+
+            {% if logbook %}
+                <li class="nav-item dropdown">
+                  <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</a>
+                  <ul id="search-dd" class="dropdown-menu">
+                      <li>
+                        <div class="row adv-search">
+                          <div class="col-md-12">
+                              <a href="{{ url_for('bp_qsos.logbook_search_adv', logbook_slug=logbook.slug, username=logbook.user.name) }}">Advanced search page</a>
+                          </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form accept-charset="UTF-8" role="form" class="form-inline" method="get" action="{{ url_for('bp_qsos.logbook_search', logbook_slug=logbook.slug, username=logbook.user.name) }}">
+                                    <div class="form-group">
+                                        <input class="form-control" type="text" name="q" placeholder="Search term">
+                                    </div>
+                                    <button type="submit" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                      </li>
+                  </ul>
+                </li>
+            {% endif %}
+
         </ul>
 
         <ul class="navbar-nav ml-auto">

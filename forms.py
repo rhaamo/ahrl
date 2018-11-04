@@ -107,18 +107,14 @@ class UserProfileForm(ModelForm):
     submit = SubmitField("Update profile")
 
 
-class NoteForm(ModelForm):
-    class Meta:
-        model = Note
-
+class NoteForm(Form):
+    title = StringField("Title", [DataRequired()])
     cat = SelectField(
         choices=[("General", "General"), ("Antennas", "Antennas"), ("Satellites", "Satellites")],
         default=["General"],
         label="Category",
     )
-    title = StringField("Title", [DataRequired()])
     note = TextAreaField("Note", [DataRequired()])
-
     submit = SubmitField("Save note")
 
 
@@ -282,15 +278,15 @@ class EditQsoForm(BaseQsoForm):
 
 
 class AdifParse(Form):
-    adif_file = FileField("File", [FileRequired(), FileAllowed(["adi", "adif"], "Adif only !")])
     logbook = QuerySelectField(query_factory=get_logbooks, allow_blank=False, label="Logbook", get_label="name")
+    adif_file = FileField("File", [FileRequired(), FileAllowed(["adi", "adif"], "Adif only !")])
 
     submit = SubmitField("Import file")
 
 
 class FilterLogbookBandMode(Form):
-    mode = SelectField(label="Mode", validators=[DataRequired()])
     band = SelectField(label="Band", validators=[DataRequired()])
+    mode = SelectField(label="Mode", validators=[DataRequired()])
     submit = SubmitField("Filter")
 
 
@@ -307,10 +303,14 @@ class ContactsForm(Form):
     submit = SubmitField("Save contact")
 
 
-class LogbookForm(Form):
+class BaseLogbookForm(Form):
     name = StringField("Name", [DataRequired()])
     callsign = StringField("Callsign", [DataRequired()])
     locator = StringField("Locator")
+    eqsl_qth_nickname = StringField("eQSL QTH Nickname")
+    swl = BooleanField("Logbook of a SWL HAM ?")
+    public = BooleanField("Make this logbook public ?")
+    default = BooleanField("Do you want this logbook to be the default one ?")
 
     def validate_gridsquare(form, field):
         if len(field.data) <= 2:
@@ -318,13 +318,13 @@ class LogbookForm(Form):
         if not is_valid_qth(field.data, 6):
             raise ValidationError("QTH is invalid, validation failed")
 
-    swl = BooleanField("Logbook of a SWL HAM ?")
-    default = BooleanField("Do you want this logbook to be the default one ?")
-    public = BooleanField("Make this logbook public ?")
+
+class LogbookForm(BaseLogbookForm):
+    submit = SubmitField("Save logbook")
+
+
+class EditLogbookForm(BaseLogbookForm):
     old = BooleanField("Old and unused logbook ?")
-
-    eqsl_qth_nickname = StringField("eQSL QTH Nickname")
-
     submit = SubmitField("Save logbook")
 
 

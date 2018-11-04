@@ -1,6 +1,7 @@
 {% extends "layout.jinja2" %}
 {% from "bootstrap/pagination.html" import render_pagination %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% import 'bootstrap/form.html' as bf4 %}
 
 {% block content %}
 
@@ -19,29 +20,21 @@
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-    <div class="row">
-    <div class="col-lg-12">
-        <div class="row">
-            {% if band or mode %}
-                <div class="col-lg-6">
-                    <h4>QSOs filtered: band: {{ band }} & mode: {{ mode }}</h4>
-                    <h5>From logbook: {{ logbook.name }}</h5>
-                </div>
-            {% else %}
-                <div class="col-lg-6">
-                    <h4>All QSOs</h4>
-                    <h5>From logbook: {{ logbook.name }}</h5>
-                </div>
-            {% endif %}
-            <div class="col-lg-6">
-                <form action="{{ url_for('bp_qsos.logbook', username=user.name, logbook_slug=logbook.slug) }}" method="get">
-                    <div class="col-lg-5">{{ wtf.form_field(filter_form.band, 'inline') }}</div>
-                    <div class="col-lg-5">{{ wtf.form_field(filter_form.mode, 'inline') }}</div>
-                    <div class="col-lg-1">{{ wtf.form_field(filter_form.submit, button_map={'submit': 'success'}) }}</div>
-                </form>
+    <div class="row justify-content-between">
+        {% if band or mode %}
+            <div class="col-6">
+                <h4>QSOs filtered: band: {{ band }} & mode: {{ mode }}</h4>
+                <h5>From logbook: {{ logbook.name }}</h5>
             </div>
+        {% else %}
+            <div class="col-6">
+                <h4>All QSOs</h4>
+                <h5>From logbook: {{ logbook.name }}</h5>
+            </div>
+        {% endif %}
+        <div class="col-4 text-right">
+            {{ bf4.render_form(filter_form, action=url_for('bp_qsos.logbook', username=user.name, logbook_slug=logbook.slug), form_type='inline', button_map={'submit': 'success'}) }}
         </div>
-    </div>
     </div>
 
     <div class="row">
@@ -51,7 +44,7 @@
     </div>
     <div class="row">
     <div class="col-lg-4">
-        <a href="{{ url_for("bp_qsos.map", logbook_slug=logbook.slug, username=logbook.user.name) }}" class="btn btn-sm btn-secondary">bigger map</a>
+        <a href="{{ url_for("bp_qsos.map", logbook_slug=logbook.slug, username=logbook.user.name) }}" title="Bigger map" class="btn btn-sm btn-secondary"><i class="fa fa-search-plus" aria-hidden="true"></i></a>
         <small id="curDate"></small>
     </div>
     <div class="col-lg-2 col-lg-offset-6">
