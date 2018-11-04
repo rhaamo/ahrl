@@ -221,8 +221,8 @@ class BaseQsoForm(Form):
     # Station
     radio = QuerySelectField(query_factory=get_radios, allow_blank=True, label="Radio", get_label="radio")
     freq = IntegerField("Frequency (tx)", [DataRequired()])
-    tx_pwr = IntegerField("Power (tx, W)", [DataRequired(), NumberRange(min=0, max=None)], default=0)
-    rx_pwr = IntegerField("Power (rx, W)", [DataRequired(), NumberRange(min=0, max=None)], default=0)
+    tx_pwr = IntegerField("Power (tx, W)", [NumberRange(min=0, max=None)], default=0)
+    rx_pwr = IntegerField("Power (rx, W)", [NumberRange(min=0, max=None)], default=0)
 
     # Satellite
     sat_name = StringField("Sat name")

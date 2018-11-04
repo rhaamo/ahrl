@@ -89,7 +89,10 @@
 
                           <div role="tabpanel" class="tab-pane" id="comment">
                               <div class="form-row">
-                                  <div class="col"><br/>{{ bf4.render_field(form.comment, 'inline', placeholder='Comment') }}</div>
+                                  <div class="col"><br/>{{ bf4.render_field(form.comment, 'vertical', placeholder='Comment') }}</div>
+                              </div>
+                              <div class="form-row">
+                                  <div class="col">{{ bf4.render_field(form.web, 'vertical', placeholder='Web URL') }}</div>
                               </div>
                           </div>
 
@@ -122,7 +125,22 @@
             </form>
         </div>
 
-        <div class="col-5">
+        <div class="col">
+
+            <div class="card">
+              <div class="card-body">
+                  Bearing: <span id="bearing_info">n/a</span>.
+              </div>
+            </div>
+
+            <br/>
+
+            <div class="card">
+              <div class="card-body">
+                  <div class="new_qso_logs_table"></div>
+              </div>
+            </div>
+
         </div>
 
     </div>
@@ -159,10 +177,10 @@
                 success: function (result) {
                     var b = Math.round(result.bearing) + "&deg; " + result.bearing_star + " " + result.distance.toFixed(2) + result.unit;
                     console.log(b);
-                    $('div#bearing_info').html(b);
+                    $('span#bearing_info').html(b);
                 },
                 error: function (result) {
-                    $('div#bearing_info').html("Invalid locator or error");
+                    $('span#bearing_info').html("Invalid locator or error");
                 }
             })
         }
