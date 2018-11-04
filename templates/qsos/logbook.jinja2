@@ -72,7 +72,7 @@
                 <tr>
                 <td>{{ log.time_on | localize(user=log.user) | show_date_no_offset }}</td>
                 <td>
-                    <a href="{{ url_for('bp_qsos.view', username=log.user.name, logbook_slug=log.logbook.slug, qso_slug=log.slug) }}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a href="{{ url_for('bp_qsos.view', username=log.user.name, logbook_slug=log.logbook.slug, qso_slug=log.slug) }}"><span class="fa fa-eye"></span></a>
                     <a data-toggle="modal" data-target="#ModalQsoSingle" data-qso-id="{{ log.id }}">{{ log.call }}</a>
                 </td>
                 <td>
@@ -89,8 +89,9 @@
                 <td class="log-cnty">{{ log.country }}</td>
                 {% if current_user.is_authenticated and (current_user.id == log.user_id) %}
                     <td>
-                        <a href="{{ url_for('bp_qsos.edit', qso_slug=log.slug, logbook_slug=log.logbook.slug) }}" class="btn btn-primary btn-sm">edit</a>
-                        <a href="{{ url_for('bp_qsos.delete', qso_slug=log.slug) }}" class="btn btn-danger btn-sm delete_link">delete</a>
+                        <a href="{{ url_for('bp_qsos.edit', qso_slug=log.slug, logbook_slug=log.logbook.slug) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                            &nbsp;&nbsp;
+                        <a href="{{ url_for('bp_qsos.delete', qso_slug=log.slug) }}" class="delete_link"><i class="fa fa-trash" aria-hidden="true"></i></a>
                     </td>
                 {% endif %}
                 </tr>
@@ -101,10 +102,10 @@
     </div>
     <div class="col-lg-3">
         <table class="table table-sm table-stripped">
-            <tr><td colspan="2"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> User</td></tr>
+            <tr><td colspan="2"><span class="fa fa-user" aria-hidden="true"></span> User</td></tr>
             <tr><td width="60%">Callsign</td><td>{{ user.callsign }}</td></tr>
             {% if user.swl %}
-                <tr><td width="60%">SWL</td><td><span class="glyphicon glyphicon-{{ 'ok' if user.swl else 'remove' }}"></span></td></tr>
+                <tr><td width="60%">SWL</td><td><span class="fa fa-{{ 'ok' if user.swl else 'remove' }}"></span></td></tr>
             {% endif %}
             <tr>
                 <td width="60%">Zone</td>
@@ -113,7 +114,7 @@
         </table>
 
         <table class="table table-sm table-stripped">
-            <tr><td colspan="2"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> This logbook</td></tr>
+            <tr><td colspan="2"><span class="fa fa-book" aria-hidden="true"></span> This logbook</td></tr>
             {% if logbook.callsign != logbook.user.callsign %}
             <tr><td width="60%">Callsign used</td><td>{{ logbook.callsign }}</td></tr>
             {% endif %}
@@ -121,31 +122,31 @@
             <tr><td width="60%">Locator used</td><td>{{ logbook.locator }}</td></tr>
             {% endif %}
             {% if logbook.swl %}
-                <tr><td width="60%">SWL</td><td><span class="glyphicon glyphicon-{{ 'ok' if logbook.swl else 'remove' }}"></span></td></tr>
+                <tr><td width="60%">SWL</td><td><span class="fa fa-{{ 'ok' if logbook.swl else 'remove' }}"></span></td></tr>
             {% endif %}
             {% if not logbook.public %}
-                <tr><td width="60%">Is private?</td><td><span class="glyphicon glyphicon-{{ 'remove' if logbook.public else 'lock' }}"></span></td></tr>
+                <tr><td width="60%">Is private?</td><td><span class="fa fa-{{ 'remove' if logbook.public else 'lock' }}"></span></td></tr>
             {% endif %}
             {% if logbook.default %}
-                <tr><td width="60%">Default</td><td><span class="glyphicon glyphicon-{{ 'ok' if logbook.default else 'remove' }}"></span></td></tr>
+                <tr><td width="60%">Default</td><td><span class="fa fa-{{ 'ok' if logbook.default else 'remove' }}"></span></td></tr>
             {% endif %}
         </table>
 
         <table class="table table-sm table-stripped">
-            <tr><td colspan="2"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> QSOs</td></tr>
+            <tr><td colspan="2"><span class="fa fa-signal" aria-hidden="true"></span> QSOs</td></tr>
             <tr><td width="60%">Total</td><td>{{ stats['qsos']['total'] }}</td></tr>
             <tr><td width="60%">Month</td><td>{{ stats['qsos']['month'] }}</td></tr>
             <tr><td width="60%">Year</td><td>{{ stats['qsos']['year'] }}</td></tr>
         </table>
 
         <table class="table table-sm table-stripped">
-            <tr><td colspan="2"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Countries</td></tr>
+            <tr><td colspan="2"><span class="fa fa-globe" aria-hidden="true"></span> Countries</td></tr>
             <tr><td width="60%">Worked</td><td>{{ stats['countries']['worked'] }}</td></tr>
             <tr><td width="60%">Needed</td><td>{{ stats['countries']['needed'] }}</td></tr>
         </table>
 
         <table class="table table-sm table-stripped">
-            <tr><td colspan="2"><span class="glyphicon glyphicon-picture" aria-hidden="true"></span> QSL Cards</td></tr>
+            <tr><td colspan="2"><span class="fa fa-picture-o" aria-hidden="true"></span> QSL Cards</td></tr>
             <tr><td width="60%">Sent</td><td>{{ stats['qsl']['sent'] }}</td></tr>
             <tr><td width="60%">Received</td><td>{{ stats['qsl']['received'] }}</td></tr>
             <tr><td width="60%">Requested</td><td>{{ stats['qsl']['requested'] }}</td></tr>

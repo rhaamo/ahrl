@@ -1,6 +1,6 @@
 {% extends "layout.jinja2" %}
 {% from "bootstrap/pagination.html" import render_pagination %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% import 'bootstrap/form.html' as bf4 %}
 
 {% block content %}
 
@@ -36,30 +36,30 @@
 
             <form action="{{ url_for('bp_qsos.logbook_search_adv', username=logbook.user.name, logbook_slug=logbook.slug) }}" method="POST" class="form-horizontal" name="gtfo-lastpass-search">
                 {{ form.hidden_tag() }}
-                {{ wtf.form_errors(form, hiddens=True) }}
+                {{ bf4.form_errors(form, hiddens=True) }}
 
                 <div class="row">
                     <div class="col-lg-3">
-                        {{ wtf.form_field(form.from_date, 'vertical', class="form-control form-control-sm") }}
-                        {{ wtf.form_field(form.fts, 'vertical', class="form-control form-control-sm", placeholder="Full text search") }}
-                        {{ wtf.form_field(form.mode, 'vertical', class="form-control form-control-sm") }}
+                        {{ bf4.render_field(form.from_date, 'vertical', class="form-control form-control-sm") }}
+                        {{ bf4.render_field(form.fts, 'vertical', class="form-control form-control-sm", placeholder="Full text search") }}
+                        {{ bf4.render_field(form.mode, 'vertical', class="form-control form-control-sm") }}
                     </div>
 
                     <div class="col-lg-3 col-lg-offset-1">
-                        {{ wtf.form_field(form.to_date, 'vertical', class="form-control form-control-sm") }}
-                        {{ wtf.form_field(form.call, 'vertical', class="form-control form-control-sm") }}
-                        {{ wtf.form_field(form.band, 'vertical', class="form-control form-control-sm") }}
+                        {{ bf4.render_field(form.to_date, 'vertical', class="form-control form-control-sm") }}
+                        {{ bf4.render_field(form.call, 'vertical', class="form-control form-control-sm") }}
+                        {{ bf4.render_field(form.band, 'vertical', class="form-control form-control-sm") }}
                     </div>
 
                     <div class="col-lg-3 col-lg-offset-1">
-                        {{ wtf.form_field(form.frequency, 'vertical', class="form-control form-control-sm", placeholder="In hertz") }}
-                        {{ wtf.form_field(form.country, 'vertical', class="form-control form-control-sm") }}
-                        {{ wtf.form_field(form.pictures, 'vertical', class="form-control form-control-sm") }}
+                        {{ bf4.render_field(form.frequency, 'vertical', class="form-control form-control-sm", placeholder="In hertz") }}
+                        {{ bf4.render_field(form.country, 'vertical', class="form-control form-control-sm") }}
+                        {{ bf4.render_field(form.pictures, 'vertical', class="form-control form-control-sm") }}
                     </div>
                 </div>
                 <div class="row form-adv-submit">
                     <div class="col-lg-6">
-                        {{ wtf.form_field(form.submit, button_map={'submit': 'success'}) }}
+                        {{ bf4.render_field(form.submit, button_map={'submit': 'success'}) }}
                     </div>
                 </div>
             </form>
@@ -97,7 +97,7 @@
                 <tr>
                 <td>{{ log.time_on | localize(user=log.user) | show_date_no_offset }}</td>
                 <td>
-                    <a href="{{ url_for('bp_qsos.view', username=log.user.name, logbook_slug=log.logbook.slug, qso_slug=log.slug) }}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    <a href="{{ url_for('bp_qsos.view', username=log.user.name, logbook_slug=log.logbook.slug, qso_slug=log.slug) }}"><span class="fa fa-eye"></span></a>
                     <a data-toggle="modal" data-target="#ModalQsoSingle" data-qso-id="{{ log.id }}">{{ log.call }}</a>
                 </td>
                 <td>

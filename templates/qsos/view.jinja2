@@ -1,5 +1,5 @@
 {% extends "layout.jinja2" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% import 'bootstrap/form.html' as bf4 %}
 
 {% block content %}
 <div class="row">
@@ -91,12 +91,12 @@
             <br/>
             <form action="{{ url_for('bp_qsos.view_post', logbook_slug=qso.logbook.slug, username=qso.user.name, qso_slug=qso.slug) }}" method="POST" enctype="multipart/form-data" class="form-horizontal new-qso" name="gtfo-lastpass-search">
                 {{ new_pic.hidden_tag() }}
-                {{ wtf.form_errors(new_pic, hiddens=True) }}
+                {{ bf4.form_errors(new_pic, hiddens=True) }}
 
-                {{ wtf.form_field(new_pic.name, 'horizontal', placeholder="New picture name") }}
-                {{ wtf.form_field(new_pic.picture, 'horizontal', accept='.jpg, .jpeg, .gif, .png') }}
-                {{ wtf.form_field(new_pic.submit, button_map={'submit': 'success'}) }}
-            </form>
+                {{ bf4.render_field(new_pic.name, 'horizontal', placeholder="New picture name") }}
+                {{ bf4.render_field(new_pic.picture, 'horizontal', accept='.jpg, .jpeg, .gif, .png') }}
+                {{ bf4.render_field(new_pic.submit, button_map={'submit': 'success'}) }}
+        </form>
         {% endif %}
     </div>
 

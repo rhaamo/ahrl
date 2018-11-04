@@ -35,7 +35,7 @@
             </tr>
             <tr>
                 <td>Is a SWL ?</td>
-                <td><span class="glyphicon glyphicon-{{ 'ok' if current_user.swl else 'remove' }}"></span></td>
+                <td><span class="fa fa-{{ 'ok' if current_user.swl else 'remove' }}"></span></td>
             </tr>
             <tr>
                 <td>Timezone</td>
@@ -61,21 +61,21 @@
                 <td>LoTW</td>
                 <td>
                     {% if current_user.lotw_name %}{{ current_user.lotw_name }}{% endif %}
-                    {% if current_user.lotw_password %}<span title='Password defined' class="glyphicon glyphicon-lock" aria-hidden="true"></span>{% endif %}
+                    {% if current_user.lotw_password %}<span title='Password defined' class="fa fa-lock" aria-hidden="true"></span>{% endif %}
                 </td>
             </tr>
             <tr>
                 <td>eQSL</td>
                 <td>
                     {% if current_user.eqsl_name %}{{ current_user.eqsl_name }}{% endif %}
-                    {% if current_user.eqsl_password %}<span title='Password defined' class="glyphicon glyphicon-lock" aria-hidden="true"></span>{% endif %}
+                    {% if current_user.eqsl_password %}<span title='Password defined' class="fa fa-lock" aria-hidden="true"></span>{% endif %}
                 </td>
             </tr>
             <tr>
                 <td>HamQTH</td>
                 <td>
                     {% if current_user.hamqth_name %}{{ current_user.hamqth_name }}{% endif %}
-                    {% if current_user.hamqth_password %}<span title='Password defined' class="glyphicon glyphicon-lock" aria-hidden="true"></span>{% endif %}
+                    {% if current_user.hamqth_password %}<span title='Password defined' class="fa fa-lock" aria-hidden="true"></span>{% endif %}
                 </td>
             </tr>
         </table>
