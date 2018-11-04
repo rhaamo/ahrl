@@ -335,14 +335,14 @@ class PictureForm(Form):
 
 
 class ConfigForm(Form):
+    clublog_api_key = StringField("ClubLog API Key")
+    lotw_login_url = StringField("LORW Login URL", [DataRequired()])
     lotw_download_url = StringField("LOTW Download URL", [DataRequired()])
     lotw_upload_url = StringField("LOTW Upload URL", [DataRequired()])
     lotw_rcvd_mark = StringField("LOTW Rcvd Mark", [DataRequired()])
-    lotw_login_url = StringField("LORW Login URL", [DataRequired()])
     eqsl_download_url = StringField("eQSL Download URL", [DataRequired()])
     eqsl_upload_url = StringField("eQSL Upload URL", [DataRequired()])
     eqsl_rcvd_mark = StringField("eQSL Rcvd Mark", [DataRequired()])
-    clublog_api_key = StringField("ClubLog API Key")
 
     submit = SubmitField("Update config")
 

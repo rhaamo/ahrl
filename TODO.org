@@ -38,6 +38,13 @@ eQSL.cc :
 ** Fixes to do
 *** Form errors doesn't display which field is required, ambiguous
 
+** Design
+*** Stats.jinja2, DXCC table too large
+*** We need to bring back the flash messages, the new Bootstrap-Flask replacement doesn't have it :(
+*** Required form fields should have a red border or something
+*** Replace lot of buttons by an icon
+
+
 ** Tests
 *** Add logbook
 *** Delete logbook

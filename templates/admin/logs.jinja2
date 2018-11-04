@@ -1,11 +1,11 @@
 {% extends "layout.jinja2" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-xs-4">
+<div class="row justify-content-between">
+    <div class="col-4">
         <h3>Application logs (latest 100)</h3>
     </div>
-    <div class="col-lg-offset-5 col-xs-3" style="margin-top: 1.6em">
+    <div class="col-4 text-right">
         Show only:
         <a href="{{ url_for('bp_admin.logs') }}" class="btn btn-sm btn-secondary">all</a>
         <a href="{{ url_for('bp_admin.logs', level='info') }}" class="btn btn-sm btn-info">info</a>
