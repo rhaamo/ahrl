@@ -118,7 +118,7 @@ def new():
         db.session.add(a)
         db.session.commit()
 
-        flash("Success updating logbook: {0}".format(a.name), "success")
+        flash("Success creating logbook: {0}".format(a.name), "success")
         return redirect(url_for("bp_logbooks.logbooks", user=current_user.name))
 
     return render_template("logbooks/new.jinja2", pcfg=pcfg, form=form)
