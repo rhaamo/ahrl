@@ -27,6 +27,7 @@
                       <div class="form-row">
                           <div class="col">{{ bf4.render_field(form.date, 'inline', placeholder='DD-MM-YYYY') }}</div>
                           <div class="col">{{ bf4.render_field(form.time, 'inline', placeholder='HH:MM:SS', autocomplete=off) }}</div>
+                          {% if method == 'live' %}<div class="col">stop time <input id="time_frozen" type="checkbox"></div>{% endif %}
                           <div class="col text-right">{{ bf4.render_field(form.submit, button_map={'submit': 'success'}) }}</div>
                           <div class="col"><a class="btn btn-warning" href="#clear">clear</a></div>
                       </div>
@@ -149,12 +150,13 @@
 
 {% block scripts %}
     {% if method == 'live' %}
-    <script src="{{ url_for('static', filename='js/jquery.jclock.js') }}"></script>
     <script>
-        $(function($){
-            var options = { };
-            $('#time').jclock(options);
-        });
+        function update() {
+            if (!document.getElementById('time_frozen').checked) {
+                $('#time').val(moment().format('HH:mm:ss'));
+            }
+        }
+        setInterval(update, 1000);
     </script>
     {% endif %}
     <script>
