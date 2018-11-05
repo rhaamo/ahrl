@@ -27,7 +27,14 @@
                       <div class="form-row">
                           <div class="col">{{ bf4.render_field(form.date, 'inline', placeholder='DD-MM-YYYY') }}</div>
                           <div class="col">{{ bf4.render_field(form.time, 'inline', placeholder='HH:MM:SS', autocomplete=off) }}</div>
-                          {% if method == 'live' %}<div class="col">stop time <input id="time_frozen" type="checkbox"></div>{% endif %}
+                          {% if method == 'live' %}
+                              <div class="col">
+                                  <div class="form-check form-check-inline">
+                                      <input class="form-check-input" type="checkbox" id="time_frozen">
+                                      <label class="form-check-label" for="time_frozen">pause timer</label>
+                                  </div>
+                              </div>
+                              {% endif %}
                           <div class="col text-right">{{ bf4.render_field(form.submit, button_map={'submit': 'success'}) }}</div>
                           <div class="col"><a class="btn btn-warning" href="#clear">clear</a></div>
                       </div>
