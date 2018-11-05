@@ -43,6 +43,7 @@ eQSL.cc :
 *** Replace lot of buttons by an icon
 *** How to move the submit button on bottom of the stack ? (using extended wtf flask_security register form)
 *** Edit QSO Form should use the same date / time of New, internally convert to time_on / time_off like New
+*** Edit and New should both have the same fields displayed and savable
 
 ** Tests
 *** Add logbook

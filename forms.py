@@ -242,7 +242,7 @@ class BaseQsoForm(Form):
         "QSL Sent", choices=[["N", "No"], ["Y", "Yes"], ["R", "Requested"], ["Q", "Queued"], ["I", "Invalid (Ignore)"]]
     )
     qsl_sent_via = SelectField(
-        "Sent via", choices=[["", "Method"], ["D", "Direct"], ["B", "Bureau"], ["E", "Electronic"], ["M", "Manager"]]
+        "Sent via", choices=[["B", "Bureau"], ["D", "Direct"], ["E", "Electronic"], ["M", "Manager"]]
     )
     eqsl_qsl_sent = SelectField(
         "eQSL Sent", choices=[["N", "No"], ["Y", "Yes"], ["R", "Requested"], ["Q", "Queued"], ["I", "Invalid (Ignore)"]]
@@ -268,8 +268,7 @@ class EditQsoForm(BaseQsoForm):
     )
 
     qsl_rcvd_via = SelectField(
-        "Received via",
-        choices=[["", "Method"], ["D", "Direct"], ["B", "Bureau"], ["E", "Electronic"], ["M", "Manager"]],
+        "Received via", choices=[["B", "Bureau"], ["D", "Direct"], ["E", "Electronic"], ["M", "Manager"]]
     )
 
     eqsl_qsl_rcvd = SelectField(
