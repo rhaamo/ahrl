@@ -39,7 +39,6 @@ eQSL.cc :
 *** Form errors doesn't display which field is required, ambiguous
 
 ** Design
-*** Stats.jinja2, DXCC table too large
 *** Required form fields should have a red border or something
 *** Replace lot of buttons by an icon
 *** How to move the submit button on bottom of the stack ? (using extended wtf flask_security register form)
