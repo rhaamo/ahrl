@@ -10,9 +10,6 @@
 
 ** Ajouter une option de config pour demander la clé ClubLog
 
-eQSL.cc :
-     * We now accept new band frequency ranges (30m, 60m) and modes (ARDOP, QRA64, MSK144) defined by ADIF 3.0.5 specification
-
 >>>>>>>>>>
 ** Hardening des ajax new qso/edit ->
 *** 2/ Test app without internet to check fallback
