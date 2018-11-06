@@ -11,16 +11,7 @@
 ** Ajouter une option de config pour demander la clé ClubLog
 
 >>>>>>>>>>
-** Hardening des ajax new qso/edit ->
-*** 2/ Test app without internet to check fallback
-*** nicely manage unknown DXCC prefixes when DXCC not updated
-
->>>>>>>>>>
-*** Change auto select mode : change input anyway if band change
-**** Change input from mode only if : NOT CHANGED MANUALLY
-
->>>>>>>>>>
-*** Change DXCC tab to "DXCC Table"
+** Stats
 *** Add "DXCC Summary" tab with a list consisting of the country and total counts, maybe modes and counts
 
 *** Search
