@@ -1,16 +1,14 @@
 * GLOBAL
 
-** Rework CAT / radio stuff (add / edit / remove)
 
 ** UI
-!!! Rewrite Actions menu of QSOs list for setting eQSL to sent / received
+** Rewrite Actions menu of QSOs list for setting eQSL to sent / received
 ** Delete logs button; ajax
 ** Mobile ui
 ** Traduction
-
 ** Ajouter une option de config pour demander la clé ClubLog
+** Qso list, switch to a datatable-like ?
 
->>>>>>>>>>
 ** Stats
 *** Add "DXCC Summary" tab with a list consisting of the country and total counts, maybe modes and counts
 
@@ -18,10 +16,10 @@
 **** Date picker for From/To
 **** Callsign autocompletion
 
-** Ideas
 *** Act as a "server" for
 **** HRD
 **** fldigi
+**** Rework CAT / radio stuff (add / edit / remove)
 
 ** Fixes to do
 *** Form errors doesn't display which field is required, ambiguous
