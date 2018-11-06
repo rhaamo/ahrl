@@ -56,7 +56,7 @@ pipeline:
     secrets:
       - SLACK_WEBHOOK
     when:
-      event: [ push, tag, pull_request ]
+      event: [ push, tag ]
       status: [ changed, failure, success ]
 
 services:
