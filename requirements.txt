@@ -59,7 +59,7 @@ snowballstemmer==1.2.1
 speaklater==1.3
 SQLAlchemy==1.2.14
 SQLAlchemy-Searchable==1.0.3
-SQLAlchemy-Utils==0.33.6
+SQLAlchemy-Utils==0.33.8
 texttable==1.5.0
 Unidecode==1.0.22
 urllib3==1.24.1
