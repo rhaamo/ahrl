@@ -61,7 +61,7 @@ SQLAlchemy==1.2.14
 SQLAlchemy-Searchable==1.0.3
 SQLAlchemy-Utils==0.33.6
 texttable==1.5.0
-Unidecode==1.0.22
+Unidecode==1.0.23
 urllib3==1.24.1
 validators==0.12.3
 visitor==0.1.3
