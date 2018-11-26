@@ -48,7 +48,7 @@ pycparser==2.19
 pydocstyle==3.0.0
 pyflakes==2.0.0
 pylama==7.6.6
-pylint==2.1.1
+pylint==2.2.0
 python-dateutil==2.7.5
 python-editor==1.0.3
 python-slugify==1.2.6
