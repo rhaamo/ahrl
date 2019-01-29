@@ -46,7 +46,7 @@ psycopg2-binary==2.7.6.1
 pycodestyle==2.4.0
 pycparser==2.19
 pydocstyle==3.0.0
-pyflakes==2.0.0
+pyflakes==2.1.0
 pylama==7.6.6
 pylint==2.2.2
 python-dateutil==2.7.5
