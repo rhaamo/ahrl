@@ -76,4 +76,4 @@ Bootstrap-Flask==1.0.10
 git+https://github.com/mattupstate/flask-security#egg=Flask-Security
 git+http://dev.sigpipe.me/DashieHam/pyHamQth.git#egg=pyhamqth
 git+https://github.com/ggramaize/libqth.git#egg=libqth
-git+https://github.com/jswhit/pyproj.git#egg=pyproj
+pyproj==2.1.2
