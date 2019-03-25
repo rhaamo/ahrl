@@ -72,7 +72,7 @@ WTForms-Alchemy==0.16.8
 WTForms-Components==0.10.3
 parameterized==0.6.1
 flask-accept==0.0.6
-Bootstrap-Flask==1.0.9
+Bootstrap-Flask==1.0.10
 git+https://github.com/mattupstate/flask-security#egg=Flask-Security
 git+http://dev.sigpipe.me/DashieHam/pyHamQth.git#egg=pyhamqth
 git+https://github.com/ggramaize/libqth.git#egg=libqth
