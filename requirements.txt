@@ -40,7 +40,7 @@ MarkupSafe==1.1.1
 mccabe==0.6.1
 parsedatetime==2.4
 passlib==1.7.1
-pg8000==1.12.4
+pg8000==1.13.1
 psycopg2==2.7.7
 psycopg2-binary==2.7.7
 pycodestyle==2.5.0
