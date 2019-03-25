@@ -18,10 +18,10 @@ pipeline:
     commands:
       - apk -U add gcc g++ make pkgconfig git postgresql-dev libffi libffi-dev python3-dev
       - pip install --upgrade pip setuptools
-      - pip install --cache-dir=/cache flake8
-      - pip install --cache-dir=/cache black
-      - pip install --cache-dir=/cache cython
-      - pip install --cache-dir=/cache -r requirements.txt
+      - pip install --cache-dir=.cache flake8
+      - pip install --cache-dir=.cache black
+      - pip install --cache-dir=.cache cython
+      - pip install --cache-dir=.cache -r requirements.txt
       - python setup.py install
       - black --check .
       - flake8 .
@@ -33,10 +33,10 @@ pipeline:
     commands:
       - apk -U add gcc g++ make pkgconfig git postgresql-dev libffi libffi-dev python3-dev postgresql-client
       - pip install --upgrade pip setuptools
-      - pip install --cache-dir=/cache flake8
-      - pip install --cache-dir=/cache black
-      - pip install --cache-dir=/cache cython
-      - pip install --cache-dir=/cache -r requirements.txt
+      - pip install --cache-dir=.cache flake8
+      - pip install --cache-dir=.cache black
+      - pip install --cache-dir=.cache cython
+      - pip install --cache-dir=.cache -r requirements.txt
       - python setup.py install
       - psql -U postgres -h database -w -c 'CREATE DATABASE ahrl'
       - cp config.py.sample config.py
