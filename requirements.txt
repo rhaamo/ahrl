@@ -69,7 +69,7 @@ Werkzeug==0.15.2
 wrapt==1.11.1
 WTForms==2.2.1
 WTForms-Alchemy==0.16.9
-WTForms-Components==0.10.3
+WTForms-Components==0.10.4
 parameterized==0.7.0
 flask-accept==0.0.6
 Bootstrap-Flask==1.0.10
