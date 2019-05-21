@@ -1,4 +1,4 @@
-alembic==1.0.9
+alembic==1.0.10
 astroid==2.2.5
 Babel==2.6.0
 bcrypt==3.1.6
