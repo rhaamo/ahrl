@@ -41,7 +41,7 @@ mccabe==0.6.1
 parsedatetime==2.4
 passlib==1.7.1
 pg8000==1.13.1
-psycopg2==2.8.2
+psycopg2==2.8.3
 psycopg2-binary==2.8.2
 pycodestyle==2.5.0
 pycparser==2.19
