@@ -35,7 +35,7 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 LatLon==1.0.2
 lazy-object-proxy==1.4.1
-Mako==1.0.10
+Mako==1.0.13
 MarkupSafe==1.1.1
 mccabe==0.6.1
 parsedatetime==2.4
