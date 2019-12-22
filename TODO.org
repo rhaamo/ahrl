@@ -1,49 +1,35 @@
 * GLOBAL
 
-** Rework CAT / radio stuff (add / edit / remove)
 
 ** UI
-!!! Rewrite Actions menu of QSOs list for setting eQSL to sent / received
+** Rewrite Actions menu of QSOs list for setting eQSL to sent / received
 ** Delete logs button; ajax
 ** Mobile ui
 ** Traduction
-
 ** Ajouter une option de config pour demander la clé ClubLog
+** Qso list, switch to a datatable-like ?
 
-eQSL.cc :
-     * We now accept new band frequency ranges (30m, 60m) and modes (ARDOP, QRA64, MSK144) defined by ADIF 3.0.5 specification
-
->>>>>>>>>>
-** Hardening des ajax new qso/edit ->
-*** 2/ Test app without internet to check fallback
-*** nicely manage unknown DXCC prefixes when DXCC not updated
-
->>>>>>>>>>
-*** Change auto select mode : change input anyway if band change
-**** Change input from mode only if : NOT CHANGED MANUALLY
-
->>>>>>>>>>
-*** Change DXCC tab to "DXCC Table"
+** Stats
 *** Add "DXCC Summary" tab with a list consisting of the country and total counts, maybe modes and counts
 
 *** Search
 **** Date picker for From/To
 **** Callsign autocompletion
 
-** Ideas
 *** Act as a "server" for
 **** HRD
 **** fldigi
+**** Rework CAT / radio stuff (add / edit / remove)
 
 ** Fixes to do
 *** Form errors doesn't display which field is required, ambiguous
 
 ** Design
-*** Stats.jinja2, DXCC table too large
 *** Required form fields should have a red border or something
 *** Replace lot of buttons by an icon
 *** How to move the submit button on bottom of the stack ? (using extended wtf flask_security register form)
-
+*** Edit QSO Form should use the same date / time of New, internally convert to time_on / time_off like New
+*** Edit and New should both have the same fields displayed and savable
 
 ** Tests
 *** Add logbook

@@ -121,3 +121,13 @@ div#lb-stats-bands {
 .form-adv-submit .col-lg-6 {
     padding-left: 0;
 }
+
+/* We need to reduce the font of the whole table or it will be way too large for the page */
+table.dxcc-table {
+    font-size: smaller;
+}
+
+/* This table is way much better this way too */
+div.new_qso_logs_table {
+    font-size: small;
+}

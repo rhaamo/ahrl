@@ -272,6 +272,8 @@ def new(logbook_slug, method):
         a.cqz = form.cqz.data
         a.swl = 1 if _logbook.swl else 0
         a.web = form.web.data
+        a.rx_pwr = form.rx_pwr.data
+        a.tx_pwr = form.tx_pwr.data
 
         a.distance = 0  # ??
         a.freq_rx = 0  # ??
@@ -296,6 +298,8 @@ def new(logbook_slug, method):
 @check_default_profile
 def edit(logbook_slug, qso_slug):
     pcfg = {"title": "Edit QSO"}
+
+    print("EDIT")
 
     _logbook = Logbook.query.filter(Logbook.slug == logbook_slug, Logbook.user_id == current_user.id).first()
     if not _logbook or _logbook.user_id != current_user.id:
@@ -353,6 +357,8 @@ def edit(logbook_slug, qso_slug):
         a.dxcc = form.dxcc.data
         a.cqz = form.cqz.data
         a.web = form.web.data
+        a.rx_pwr = form.rx_pwr.data
+        a.tx_pwr = form.tx_pwr.data
 
         a.distance = 0  # ??
         a.freq_rx = 0  # ??

@@ -5,10 +5,19 @@ from flask_security import RegisterForm, current_user
 from flask_uploads import UploadSet, IMAGES
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import PasswordField, SubmitField, TextAreaField, SelectField, IntegerField, HiddenField, BooleanField
+from wtforms import (
+    PasswordField,
+    SubmitField,
+    TextAreaField,
+    SelectField,
+    IntegerField,
+    HiddenField,
+    BooleanField,
+    FloatField,
+)
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.validators import DataRequired, ValidationError, Optional
+from wtforms.validators import DataRequired, ValidationError, Optional, NumberRange
 from wtforms_alchemy import model_form_factory
 from wtforms_components.fields import SelectField as WTFComponentsSelectField
 from wtforms import widgets
@@ -188,10 +197,10 @@ class BaseQsoForm(Form):
     band = QuerySelectField(
         query_factory=get_bands, default=dflt_band, label="Band", validators=[DataRequired()], get_label="name"
     )
-    rst_sent = IntegerField("RST (S)", [DataRequired()], default=59)
-    rst_rcvd = IntegerField("RST (R)", [DataRequired()], default=59)
+    rst_sent = IntegerField("RST (tx)", [DataRequired()], default=59)
+    rst_rcvd = IntegerField("RST (rx)", [DataRequired()], default=59)
     name = StringField("Name")
-    qth = StringField("Location")
+    qth = StringField("QTH")
 
     gridsquare = StringField("Locator")
 
@@ -220,7 +229,9 @@ class BaseQsoForm(Form):
 
     # Station
     radio = QuerySelectField(query_factory=get_radios, allow_blank=True, label="Radio", get_label="radio")
-    freq = IntegerField("Frequency", [DataRequired()])
+    freq = IntegerField("Frequency (tx)", [DataRequired()])
+    tx_pwr = FloatField("Power (tx, W)", [NumberRange(min=0, max=None)], default=0)
+    rx_pwr = FloatField("Power (rx, W)", [NumberRange(min=0, max=None)], default=0)
 
     # Satellite
     sat_name = StringField("Sat name")
@@ -231,7 +242,7 @@ class BaseQsoForm(Form):
         "QSL Sent", choices=[["N", "No"], ["Y", "Yes"], ["R", "Requested"], ["Q", "Queued"], ["I", "Invalid (Ignore)"]]
     )
     qsl_sent_via = SelectField(
-        "Sent via", choices=[["", "Method"], ["D", "Direct"], ["B", "Bureau"], ["E", "Electronic"], ["M", "Manager"]]
+        "Sent via", choices=[["B", "Bureau"], ["D", "Direct"], ["E", "Electronic"], ["M", "Manager"]]
     )
     eqsl_qsl_sent = SelectField(
         "eQSL Sent", choices=[["N", "No"], ["Y", "Yes"], ["R", "Requested"], ["Q", "Queued"], ["I", "Invalid (Ignore)"]]
@@ -257,8 +268,7 @@ class EditQsoForm(BaseQsoForm):
     )
 
     qsl_rcvd_via = SelectField(
-        "Received via",
-        choices=[["", "Method"], ["D", "Direct"], ["B", "Bureau"], ["E", "Electronic"], ["M", "Manager"]],
+        "Received via", choices=[["B", "Bureau"], ["D", "Direct"], ["E", "Electronic"], ["M", "Manager"]]
     )
 
     eqsl_qsl_rcvd = SelectField(
